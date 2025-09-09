@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Danh sách sản phẩm</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      h1 {
+        color: #333;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      a {
+        text-decoration: none;
+        color: blue;
+      }
+      .btn {
+        padding: 6px 12px;
+        background: #4caf50;
+        color: white;
+        border-radius: 4px;
+      }
+      .btn:hover {
+        background: #45a049;
+      }
+    </style>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <script src="/js/bootstrap.bundle.min.js"></script>
+  </head>
+  <body>
+    <h1>📦 Danh sách sản phẩm</h1>
+
+    <a class="btn" href="/products/create">➕ Thêm sản phẩm</a>
+
+    <% if (products.length === 0) { %>
+    <p>Chưa có sản phẩm nào.</p>
+    <% } else { %>
+    <table>
+      <thead>
+        <tr>
+          <th>Tên sản phẩm</th>
+          <th>Giá</th>
+          <th>Ngày tạo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% products.forEach(product => { %>
+        <tr>
+          <td><%= product.name %></td>
+          <td><%= product.price %></td>
+          <td><%= product.createdAt.toLocaleDateString() %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <% } %>
+  </body>
+</html>
