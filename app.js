@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
             <div class="container mt-5">
                 <h1 class="text-center">🏫 Middle School Equipment Management</h1>
                 <div class="row mt-4">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">Quản lý thiết bị</h5>
@@ -46,16 +46,94 @@ app.get('/', (req, res) => {
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Đăng ký mượn thiết bị</h5>
+                                <p class="card-text">Đăng ký mượn và trả thiết bị</p>
+                                <a href="/borrow/register" class="btn btn-success">Mượn thiết bị</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">Đăng nhập</h5>
                                 <p class="card-text">Truy cập hệ thống</p>
-                                <a href="/auth/login" class="btn btn-success">Đăng nhập</a>
+                                <a href="/auth/login" class="btn btn-warning">Đăng nhập</a>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+// Borrow routes
+app.get('/borrow/register', (req, res) => {
+    res.render('borrow/views/register', { title: 'Đăng ký mượn thiết bị' });
+});
+
+app.get('/borrow/slip/:id', (req, res) => {
+    res.render('borrow/views/slip', { title: 'Phiếu mượn thiết bị', slipId: req.params.id });
+});
+
+app.get('/borrow/history', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="vi">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Lịch sử mượn/trả</title>
+            <link href="/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                <div class="container">
+                    <a class="navbar-brand" href="/">🏫 Equipment Management</a>
+                </div>
+            </nav>
+            <div class="container mt-4">
+                <h1>📚 Lịch sử mượn/trả</h1>
+                <div class="alert alert-info">
+                    <h5>Chức năng đang được phát triển...</h5>
+                    <p>Lịch sử mượn/trả sẽ hiển thị ở đây</p>
+                </div>
+                <a href="/borrow/register" class="btn btn-primary">Đăng ký mượn thiết bị</a>
+                <a href="/" class="btn btn-secondary">← Quay lại trang chủ</a>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+app.get('/borrow/status', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="vi">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Tình trạng phiếu mượn</title>
+            <link href="/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                <div class="container">
+                    <a class="navbar-brand" href="/">🏫 Equipment Management</a>
+                </div>
+            </nav>
+            <div class="container mt-4">
+                <h1>📊 Tình trạng phiếu mượn</h1>
+                <div class="alert alert-info">
+                    <h5>Chức năng đang được phát triển...</h5>
+                    <p>Tình trạng phiếu mượn sẽ hiển thị ở đây</p>
+                </div>
+                <a href="/borrow/register" class="btn btn-primary">Đăng ký mượn thiết bị</a>
+                <a href="/" class="btn btn-secondary">← Quay lại trang chủ</a>
             </div>
         </body>
         </html>

@@ -226,7 +226,7 @@ npm list
 
 ##  Ghi chú
 
-- Dự án sử dụng **Monolith architecture** (không phải Microservice)
+- Dự án sử dụng **Monolith architecture**
 - Sử dụng **Express.js + EJS + Bootstrap**
 - Database: **MongoDB** 
 
