@@ -1,20 +1,35 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const connectDB = require('./config/db');
-const productRoutes = require('./routes/product/productRoutes');
-
+const express = require("express");
+const path = require("path");
 const app = express();
-app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({ extended: true }));
 
-const path = require('path');
-app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
-app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
+// Thiết lập EJS view engine
+app.set("view engine", "ejs");
 
-// Kết nối MongoDB
-connectDB();
+// Đặt thư mục gốc cho các view (tất cả các module sẽ nằm trong src/features)
+app.set("views", path.join(__dirname, "src/features"));
 
-// Routes
-app.use('/products', productRoutes);
+// Cho phép sử dụng file tĩnh (CSS, hình ảnh, JS frontend)
+app.use("/public", express.static(path.join(__dirname, "public")));
 
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+// ==========================
+// ⚙️ ROUTES
+// ==========================
+
+// Categories feature
+const categoriesRoutes = require("./src/features/categories/routes/categories.routes");
+app.use("/categories", categoriesRoutes);
+
+// ==========================
+// 🏠 Trang chủ
+// ==========================
+app.get("/", (req, res) => {
+  res.send("Trang chủ đang chạy!");
+});
+
+// ==========================
+// 🚀 Khởi động server
+// ==========================
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server đang chạy tại: http://localhost:${PORT}`);
+});
