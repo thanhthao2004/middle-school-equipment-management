@@ -142,5 +142,26 @@ app.get('/auth/login', (req, res) => {
     `);
 });
 
+// Temporary route to preview the purchasing-plans UI with sample data
+app.get('/purchasing-plans', (req, res) => {
+    const plans = [
+        { id: 1, code: 'KH001', schoolYear: '2019-2020', status: 'approved' },
+        { id: 2, code: 'KH002', schoolYear: '2020-2021', status: 'approved' },
+        { id: 3, code: 'KH003', schoolYear: '2021-2022', status: 'approved' },
+        { id: 4, code: 'KH004', schoolYear: '2022-2023', status: 'approved' },
+        { id: 5, code: 'KH005', schoolYear: '2023-2024', status: 'approved' },
+        { id: 6, code: 'KH006', schoolYear: '2024-2025', status: 'approved' },
+        { id: 7, code: 'KH007', schoolYear: '2025-2026', status: 'pending' }
+    ];
+    const years = ['2019-2020', '2020-2021', '2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
+    res.render('purchasing-plans/views/list', { title: 'Quản lý kế hoạch mua sắm', plans, years });
+});
+
+// Preview route for creating a new purchasing plan
+app.get('/purchasing-plans/create', (req, res) => {
+    // render the create view; pass an empty plan object for defaults
+    res.render('purchasing-plans/views/create', { title: 'Lập kế hoạch mua sắm', plan: {} });
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

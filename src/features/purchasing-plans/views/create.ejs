@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <style>
+        .form-label { font-weight:600 }
+        .table thead th { text-align:center }
+        .table tbody td input { width:100% }
+        .small-btn { padding:6px 10px; font-size:13px }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" role="navigation" aria-label="Main menu">
+            <div class="menu-title">☰ &nbsp; BẢNG CHỌN</div>
+            <nav class="menu">
+                <a href="/reports/device-stats" class="nav-link">
+                    <span class="icon">📊</span>
+                    <span class="text">Xem báo cáo thống kê thiết bị hỏng</span>
+                </a>
+                <a href="/training-plans" class="nav-link">
+                    <span class="icon">📅</span>
+                    <span class="text">Xem kế hoạch đào tạo</span>
+                </a>
+                <a href="/purchasing-plans" class="nav-link active">
+                    <span class="icon">🛒</span>
+                    <span class="text">Quản lý kế hoạch mua sắm</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
+                <div style="font-size:14px; margin-top:6px;">Lập kế hoạch mua sắm thiết bị</div>
+            </div>
+
+            <form action="/purchasing-plans" method="post">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Mã kế hoạch</label>
+                        <!-- show generated code read-only; submit via hidden input -->
+                        <input id="plan-code-display" class="form-control" readonly value="<%= (plan && plan.code) ? plan.code : '' %>" />
+                        <input type="hidden" id="plan-code" name="code" value="<%= (plan && plan.code) ? plan.code : '' %>" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Ngày lập</label>
+                        <!-- show generated date read-only; submit via hidden input -->
+                        <input id="plan-date-display" class="form-control" readonly value="<%= (plan && plan.date) ? plan.date : '' %>" />
+                        <input type="hidden" id="plan-date" name="date" value="<%= (plan && plan.date) ? plan.date : '' %>" />
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end justify-content-end">
+                        <button type="button" id="add-row" class="btn btn-outline-secondary small-btn me-2">+ Thêm nhiều thiết bị</button>
+                    </div>
+                </div>
+
+                <div class="card card-table mb-3">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Tên Danh Mục TB</th>
+                                        <th>Mã TB</th>
+                                        <th>Tên TB</th>
+                                        <th>Số lượng dự kiến</th>
+                                        <th>ĐVT</th>
+                                        <th>Dự toán kinh phí</th>
+                                        <th>Thời gian dự kiến mua</th>
+                                        <th>Lý do</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="items-tbody">
+                                    <tr>
+                                        <td><input name="items[0][category]" class="form-control" /></td>
+                                        <td><input name="items[0][code]" class="form-control" /></td>
+                                        <td><input name="items[0][name]" class="form-control" /></td>
+                                        <td><input name="items[0][quantity]" type="number" min="0" class="form-control" /></td>
+                                        <td><input name="items[0][uom]" class="form-control" /></td>
+                                        <td><input name="items[0][budget]" type="number" step="0.01" class="form-control" /></td>
+                                        <td><input name="items[0][expectedAt]" type="text" class="form-control" placeholder="Ví dụ: 2026-01" /></td>
+                                        <td><input name="items[0][reason]" class="form-control" /></td>
+                                        <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3">
+                    <a href="/purchasing-plans" class="btn btn-secondary">Đóng</a>
+                    <button type="submit" class="btn btn-danger">Lưu và gửi Phê duyệt</button>
+                </div>
+            </form>
+
+            <template id="row-template">
+                <tr>
+                    <td><input name="__NAME__" class="form-control" /></td>
+                </tr>
+            </template>
+
+        </main>
+    </div>
+
+    <script>
+        (function(){
+            // Auto-generate plan code and date on page load when not provided by server
+            const codeInput = document.getElementById('plan-code');
+            const codeDisplay = document.getElementById('plan-code-display');
+            const dateInput = document.getElementById('plan-date');
+            const dateDisplay = document.getElementById('plan-date-display');
+
+            if(codeInput && dateInput){
+                if(!codeInput.value){
+                    // Generate code in format: KHXXX where XXX is a 3-digit number (001-999)
+                    const rand = Math.floor(Math.random() * 999) + 1; // 1..999
+                    const num = String(rand).padStart(3, '0');
+                    const genCode = `KH${num}`;
+                    codeInput.value = genCode;
+                    if(codeDisplay) codeDisplay.value = genCode;
+                }
+
+                if(!dateInput.value){
+                    const today = new Date();
+                    const iso = today.toISOString().slice(0,10); // YYYY-MM-DD
+                    dateInput.value = iso;
+                    if(dateDisplay) dateDisplay.value = iso;
+                }
+            }
+
+            const addBtn = document.getElementById('add-row');
+            const tbody = document.getElementById('items-tbody');
+            let idx = 1; // already have 0
+
+            addBtn.addEventListener('click', function(){
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input name="items[${idx}][category]" class="form-control" /></td>
+                    <td><input name="items[${idx}][code]" class="form-control" /></td>
+                    <td><input name="items[${idx}][name]" class="form-control" /></td>
+                    <td><input name="items[${idx}][quantity]" type="number" min="0" class="form-control" /></td>
+                    <td><input name="items[${idx}][uom]" class="form-control" /></td>
+                    <td><input name="items[${idx}][budget]" type="number" step="0.01" class="form-control" /></td>
+                    <td><input name="items[${idx}][expectedAt]" type="text" class="form-control" placeholder="Ví dụ: 2026-01" /></td>
+                    <td><input name="items[${idx}][reason]" class="form-control" /></td>
+                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
+                `;
+                tbody.appendChild(tr);
+                idx++;
+            });
+
+            document.addEventListener('click', function(e){
+                if(e.target && e.target.classList.contains('remove-row')){
+                    const tr = e.target.closest('tr');
+                    if(tr) tr.remove();
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>
