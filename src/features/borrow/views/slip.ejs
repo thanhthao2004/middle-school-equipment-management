@@ -233,6 +233,8 @@
             const from = params.get('from');
             if (from === 'pending') {
                 window.location.href = '/borrow/pending-approvals';
+            } else if (from === 'history') {
+                window.location.href = '/borrow/history';
             } else {
                 window.location.href = '/borrow/register';
             }

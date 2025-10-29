@@ -170,6 +170,18 @@ class BorrowController {
         }
     }
 
+    // API: GET /borrow/api/history
+    async getHistoryApi(req, res) {
+        try {
+            const userId = req.user?.id || 1;
+            const { status, createdFrom, createdTo, search } = req.query;
+            const items = await borrowService.getBorrowHistory(userId, { status, createdFrom, createdTo, search });
+            res.json({ success: true, data: items });
+        } catch (error) {
+            console.error('Error fetching history:', error);
+            res.status(500).json({ success: false, message: 'Lỗi khi lấy lịch sử mượn/trả' });
+        }
+    }
     // GET /borrow/api/devices - API lấy danh sách thiết bị
     async getDevices(req, res) {
         try {
