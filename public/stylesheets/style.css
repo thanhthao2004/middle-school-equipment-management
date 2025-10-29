@@ -1,8 +1,56 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+/* Design tokens from docs/COLOR_GUIDELINES.md */
+:root {
+  --primary-blue: #1e3a8a;
+  --primary-blue-hover: #3b82f6;
+  --primary-blue-light: #007bff;
+
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e9ecef;
+  --border-gray: #dee2e6;
+  --text-gray: #6c757d;
+  --dark-gray: #495057;
+
+  --success-green: #28a745;
+  --error-red: #dc3545;
 }
 
-a {
-  color: #00B7FF;
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  color: var(--dark-gray);
+  background-color: var(--white);
 }
+
+a { color: var(--primary-blue-light); text-decoration: none; }
+a:hover { color: var(--primary-blue-hover); }
+
+/* Sidebar */
+.sidebar { background-color: var(--primary-blue); }
+.sidebar .nav-link { color: var(--white); }
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active { background-color: var(--primary-blue-hover); }
+
+/* Tables */
+.equipment-table th { background-color: var(--light-gray); color: var(--dark-gray); }
+.borrow-slip { background-color: var(--light-gray); border: 2px solid var(--border-gray); }
+.borrower-info { background-color: var(--medium-gray); }
+
+/* Buttons */
+.btn-register { background-color: var(--primary-blue-light); border-color: var(--primary-blue-light); color: var(--white); }
+.btn-register:hover { background-color: #0056b3; }
+.btn-cancel { background-color: var(--error-red); border-color: var(--error-red); color: var(--white); }
+.btn-close { color: var(--error-red); }
+
+/* Status */
+.status-available, .success-text { color: var(--success-green); }
+.status-borrowed, .error-text { color: var(--error-red); }
+.condition-good { color: var(--success-green); }
+.condition-damaged { color: var(--error-red); }
+.search-icon { color: var(--text-gray); }
+
+/* Teacher Home cards */
+.feature-card { border: 1px solid var(--border-gray); transition: transform .15s ease, box-shadow .15s ease; }
+.feature-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.08); }
+.feature-icon { width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background-color: var(--light-gray); color: var(--primary-blue-light); }
+.feature-link { color: var(--primary-blue-light); font-weight: 600; }
+.feature-link:hover { color: var(--primary-blue-hover); }

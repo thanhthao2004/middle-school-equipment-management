@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title || 'Middle School Equipment Management' %></title>
+    <title><%= typeof title !== 'undefined' ? title : 'Middle School Equipment Management' %></title>
     
     <!-- Bootstrap 5.3.0 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,17 +19,26 @@
         <%- additionalCSS %>
     <% } %>
 </head>
-<body class="<%= bodyClass || '' %>">
-    <!-- Header -->
-    <%- include('../partials/header') %>
-    
-    <!-- Main Content -->
-    <main class="<%= mainClass || 'container-fluid' %>">
-        <%- body %>
-    </main>
-    
-    <!-- Footer -->
-    <%- include('../partials/footer') %>
+<body class="<%= typeof bodyClass !== 'undefined' ? bodyClass : '' %>" style="background-color: var(--light-gray);">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <%- include('../partials/' + (typeof sidebarType !== 'undefined' ? sidebarType : 'borrow-sidebar')) %>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- Page Header -->
+                <% if (typeof pageHeader !== 'undefined' && pageHeader) { %>
+                    <%- pageHeader %>
+                <% } %>
+                
+                <!-- Main Content -->
+                <div class="container-fluid">
+                    <%- body %>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
