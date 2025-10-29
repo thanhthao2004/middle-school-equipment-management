@@ -13,6 +13,7 @@ router.use(authMiddleware);
 router.get('/register', borrowController.getRegisterPage);
 router.get('/history', borrowController.getHistoryPage);
 router.get('/status', borrowController.getStatusPage);
+router.get('/pending-approvals', borrowController.getPendingApprovalsPage);
 router.get('/teacher-home', borrowController.getTeacherHomePage);
 router.get('/slip/:id', borrowController.getBorrowSlip);
 
@@ -24,5 +25,7 @@ router.post('/register',
 
 // API Routes
 router.get('/api/devices', borrowController.getDevices);
+router.get('/api/pending-approvals', borrowController.getPendingApprovals);
+router.post('/api/cancel/:id', borrowController.cancelBorrow);
 
 module.exports = router;

@@ -21,6 +21,52 @@ class BorrowController {
         }
     }
 
+    // GET /borrow/pending-approvals - Danh sách phiếu chờ duyệt
+    async getPendingApprovalsPage(req, res) {
+        try {
+            const userId = req.user?.id || 1;
+            const slips = await borrowService.getPendingApprovals(userId, {});
+            res.render('borrow/pending-approvals', {
+                title: 'Phiếu mượn chờ duyệt',
+                currentPage: 'status',
+                sidebarType: 'borrow-sidebar',
+                bodyClass: '',
+                slips
+            });
+        } catch (error) {
+            console.error('Error rendering pending approvals page:', error);
+            res.status(500).render('error', {
+                message: 'Lỗi khi tải trang chờ duyệt',
+                error: process.env.NODE_ENV === 'development' ? error : {}
+            });
+        }
+    }
+
+    // API: GET /borrow/api/pending-approvals
+    async getPendingApprovals(req, res) {
+        try {
+            const userId = req.user?.id || 1;
+            const { id, createdFrom, createdTo, search } = req.query;
+            const slips = await borrowService.getPendingApprovals(userId, { id, createdFrom, createdTo, search });
+            res.json({ success: true, data: slips });
+        } catch (error) {
+            console.error('Error fetching pending approvals:', error);
+            res.status(500).json({ success: false, message: 'Lỗi khi lấy danh sách chờ duyệt' });
+        }
+    }
+
+    // API: POST /borrow/api/cancel/:id
+    async cancelBorrow(req, res) {
+        try {
+            const slipId = req.params.id;
+            await borrowService.cancelBorrow(slipId);
+            res.json({ success: true, message: 'Hủy mượn thành công' });
+        } catch (error) {
+            console.error('Error canceling borrow:', error);
+            res.status(500).json({ success: false, message: 'Lỗi khi hủy phiếu mượn' });
+        }
+    }
+
     // GET /borrow/history - Lịch sử mượn/trả
     async getHistoryPage(req, res) {
         try {

@@ -16,6 +16,8 @@
     <link href="/public/stylesheets/borrow.css" rel="stylesheet">
 </head>
 <body>
+    <!-- Header -->
+    <%- include('../../../views/partials/header') %>
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar -->
@@ -23,29 +25,7 @@
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
-                <!-- Page Header -->
-                <div class="page-header">
-                    <div class="container-fluid">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h1 class="h2 mb-2">
-                                    <i class="fas fa-clipboard-list me-3"></i>
-                                    Đăng ký mượn thiết bị
-                                </h1>
-                                <p class="mb-0 opacity-75">Chọn thiết bị cần mượn và điền thông tin đăng ký</p>
-                            </div>
-                        <div class="d-flex align-items-center">
-                                <div class="text-end me-3">
-                                    <div class="fw-bold">Giáo viên bộ môn</div>
-                                    <small class="opacity-75">Nguyễn Văn A</small>
-                                </div>
-                                <i class="fas fa-user-circle fs-1 opacity-75"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="container-fluid">
+                <div class="container py-4">
 
                     <!-- Filters and Search -->
 <div class="card mb-4">
@@ -177,7 +157,7 @@
                     </div>
 
                     <!-- Equipment Table -->
-                    <div class="card">
+                    <div class="card mt-2">
                         <div class="card-body p-0">
                             <div class="table-responsive">
             <table class="table table-hover equipment-table mb-0" id="equipmentTable">
@@ -363,6 +343,15 @@
             </div>
         </div>
     </div>
+
+    <!-- Close main content wrappers to align footer like pending-approvals -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../../../views/partials/footer') %>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

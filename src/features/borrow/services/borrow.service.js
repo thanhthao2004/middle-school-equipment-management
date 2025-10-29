@@ -254,6 +254,29 @@ class BorrowService {
             throw error;
         }
     }
+
+    // Lấy danh sách phiếu chờ duyệt của user
+    async getPendingApprovals(userId, filters = {}) {
+        // Mock list of pending slips
+        const mock = [
+            { id: 'PM1', createdAt: '2025-09-10', status: 'pending' },
+            { id: 'PM2', createdAt: '2025-09-10', status: 'pending' },
+            { id: 'PM3', createdAt: '2025-09-10', status: 'pending' }
+        ];
+
+        let list = mock;
+        if (filters.id) list = list.filter(x => x.id.toLowerCase().includes(filters.id.toLowerCase()));
+        if (filters.search) list = list.filter(x => x.id.toLowerCase().includes(filters.search.toLowerCase()));
+        if (filters.createdFrom) list = list.filter(x => x.createdAt >= filters.createdFrom);
+        if (filters.createdTo) list = list.filter(x => x.createdAt <= filters.createdTo);
+        return list;
+    }
+
+    // Hủy phiếu mượn (mock)
+    async cancelBorrow(slipId) {
+        // In real app: validate permissions, update DB, restore quantities
+        return { id: slipId, status: 'canceled' };
+    }
 }
 
 module.exports = new BorrowService();

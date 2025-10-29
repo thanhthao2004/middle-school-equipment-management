@@ -22,66 +22,42 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // Kết nối MongoDB (tạm thời comment để test)
 // connectDB();
 
-// Routes - tạm thời tạo route cơ bản
+// Routes
+// Trang chủ: chuyển thẳng về trang giáo viên
 app.get('/', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="vi">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Trang chủ</title>
-            <link href="/css/bootstrap.min.css" rel="stylesheet">
-        </head>
-        <body>
-            <div class="container mt-5">
-                <h1 class="text-center">🏫 Middle School Equipment Management</h1>
-            <div class="row mt-4">
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Đăng ký mượn thiết bị</h5>
-                                <p class="card-text">Đăng ký mượn và trả thiết bị</p>
-                                <a href="/borrow/register" class="btn btn-success">Mượn thiết bị</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Đăng nhập</h5>
-                                <p class="card-text">Truy cập hệ thống</p>
-                                <a href="/auth/login" class="btn btn-warning">Đăng nhập</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
-    `);
+    res.redirect('/teacher/home');
 });
 
 // Teacher home (giáo viên)
 app.get('/teacher/home', (req, res) => {
-    res.render('borrow/views/teacher-home', { title: 'Trang chủ giáo viên' });
+    res.render('borrow/views/teacher-home', { title: 'Trang chủ giáo viên', currentPage: 'teacher-home' });
+});
+
+// Alias to support links that point to /borrow/teacher-home
+app.get('/borrow/teacher-home', (req, res) => {
+    res.redirect('/teacher/home');
 });
 
 // Borrow routes
 app.get('/borrow/register', (req, res) => {
-    res.render('borrow/views/register', { title: 'Đăng ký mượn thiết bị' });
+    res.render('borrow/views/register', { title: 'Đăng ký mượn thiết bị', currentPage: 'register' });
 });
 
 app.get('/borrow/slip/:id', (req, res) => {
-    res.render('borrow/views/slip', { title: 'Phiếu mượn thiết bị', slipId: req.params.id });
+    res.render('borrow/views/slip', { title: 'Phiếu mượn thiết bị', slipId: req.params.id, from: req.query.from || '' });
 });
 
 app.get('/borrow/history', (req, res) => {
-    res.render('borrow/views/history', { title: 'Lịch sử mượn/trả' });
+    res.render('borrow/views/history', { title: 'Lịch sử mượn/trả', currentPage: 'history' });
 });
 
 app.get('/borrow/pending-approvals', (req, res) => {
-    res.render('borrow/views/pending-approvals', { title: 'Chờ duyệt' });
+    res.render('borrow/views/pending-approvals', { title: 'Chờ duyệt', currentPage: 'status' });
+});
+
+// Backward-compatible alias for status → pending approvals
+app.get('/borrow/status', (req, res) => {
+    res.redirect('/borrow/pending-approvals');
 });
 
 app.get('/borrow/detail/:id', (req, res) => {

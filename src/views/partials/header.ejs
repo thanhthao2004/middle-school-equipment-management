@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <a class="navbar-brand fw-bold" href="/">
             <i class="fas fa-graduation-cap me-2"></i>
-            Middle School Equipment Management
+            HỆ THỐNG QUẢN LÝ THIẾT BỊ TRƯỜNG THCS
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -13,13 +13,8 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link <%= (currentPage === 'home') ? 'active' : '' %>" href="/">
+                    <a class="nav-link <%= (currentPage === 'home') ? 'active' : '' %>" href="/borrow/teacher-home">
                         <i class="fas fa-home me-1"></i>Trang chủ
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <%= (currentPage === 'devices') ? 'active' : '' %>" href="/devices">
-                        <i class="fas fa-laptop me-1"></i>Thiết bị
                     </a>
                 </li>
                 <li class="nav-item dropdown">
@@ -38,11 +33,6 @@
                             <i class="fas fa-star me-2"></i>Tình trạng phiếu
                         </a></li>
                     </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <%= (currentPage === 'reports') ? 'active' : '' %>" href="/reports">
-                        <i class="fas fa-chart-bar me-1"></i>Báo cáo
-                    </a>
                 </li>
             </ul>
             
