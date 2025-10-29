@@ -4,134 +4,175 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng ký mượn thiết bị</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .sidebar {
-            background-color: #1e3a8a;
-            min-height: 100vh;
-            padding: 0;
-        }
-        .sidebar .nav-link {
-            color: white;
-            padding: 15px 20px;
-            border-radius: 0;
-            transition: background-color 0.3s;
-        }
-        .sidebar .nav-link:hover {
-            background-color: #3b82f6;
-        }
-        .sidebar .nav-link.active {
-            background-color: #3b82f6;
-        }
-        .equipment-table {
-            font-size: 0.9rem;
-        }
-        .equipment-table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        .status-available {
-            color: #28a745;
-            font-weight: 600;
-        }
-        .status-borrowed {
-            color: #dc3545;
-            font-weight: 600;
-        }
-        .condition-good {
-            color: #28a745;
-        }
-        .condition-damaged {
-            color: #dc3545;
-        }
-        .search-container {
-            position: relative;
-        }
-        .search-container .search-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c757d;
-        }
-        .btn-register {
-            background-color: #007bff;
-            border-color: #007bff;
-            padding: 10px 30px;
-            font-weight: 600;
-        }
-        .btn-cancel {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            padding: 10px 30px;
-            font-weight: 600;
-        }
-    </style>
+    
+    <!-- Bootstrap 5.3.0 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6.4.0 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="/public/stylesheets/borrow.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
             <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 sidebar">
-                <div class="d-flex align-items-center p-3">
-                    <i class="fas fa-bars me-2 text-white"></i>
-                    <span class="text-white fw-bold">Bảng chọn</span>
-                </div>
-                <nav class="nav flex-column">
-                    <a class="nav-link active" href="/borrow/register">
-                        <i class="fas fa-clipboard-list me-2"></i>
-                        Đăng ký mượn thiết bị
-                    </a>
-                    <a class="nav-link" href="/borrow/history">
-                        <i class="fas fa-history me-2"></i>
-                        Xem lịch sử mượn/trả
-                    </a>
-                    <a class="nav-link" href="/borrow/status">
-                        <i class="fas fa-star me-2"></i>
-                        Xem tình trạng phiếu mượn
-                    </a>
-                </nav>
-            </div>
+            <%- include('../../../views/partials/borrow-sidebar') %>
 
             <!-- Main Content -->
-            <div class="col-md-9 col-lg-10">
-                <div class="p-4">
-                    <!-- Header -->
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1 class="h2 mb-0">Đăng ký mượn thiết bị</h1>
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="container-fluid">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h1 class="h2 mb-2">
+                                    <i class="fas fa-clipboard-list me-3"></i>
+                                    Đăng ký mượn thiết bị
+                                </h1>
+                                <p class="mb-0 opacity-75">Chọn thiết bị cần mượn và điền thông tin đăng ký</p>
+                            </div>
                         <div class="d-flex align-items-center">
-                            <i class="fas fa-user-circle me-2 text-primary"></i>
-                            <span class="text-muted">Giáo viên bộ môn</span>
+                                <div class="text-end me-3">
+                                    <div class="fw-bold">Giáo viên bộ môn</div>
+                                    <small class="opacity-75">Nguyễn Văn A</small>
+                                </div>
+                                <i class="fas fa-user-circle fs-1 opacity-75"></i>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="container-fluid">
 
                     <!-- Filters and Search -->
-                    <div class="row mb-4">
-                        <div class="col-md-3">
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted small">DANH MỤC THIẾT BỊ</label>
                             <select class="form-select" id="categoryFilter">
-                                <option value="">Danh mục thiết bị</option>
+                    <option value="">Tất cả danh mục</option>
                                 <option value="chemistry">Hóa học</option>
                                 <option value="it">Tin học</option>
                                 <option value="literature">Ngữ văn</option>
                                 <option value="physics">Vật lý</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted small">LỚP HỌC</label>
                             <select class="form-select" id="classFilter">
-                                <option value="">Lớp</option>
+                    <option value="">Tất cả lớp</option>
                                 <option value="6">Lớp 6</option>
                                 <option value="7">Lớp 7</option>
                                 <option value="8">Lớp 8</option>
                                 <option value="9">Lớp 9</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted small">NGÀY MƯỢN TỪ</label>
+                <input type="date" class="form-control" id="borrowDateFrom" 
+                       value="" min="">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted small">NGÀY MƯỢN ĐẾN</label>
+                <input type="date" class="form-control" id="borrowDateTo" 
+                       value="" min="">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold text-muted small">TÌM KIẾM THIẾT BỊ</label>
                             <div class="search-container">
-                                <input type="text" class="form-control" placeholder="Tìm kiếm..." id="searchInput">
+                    <input type="text" class="form-control" placeholder="Nhập tên thiết bị, mã thiết bị..." id="searchInput">
                                 <i class="fas fa-search search-icon"></i>
                             </div>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button class="btn btn-outline-secondary w-100" onclick="resetFilters()" title="Reset bộ lọc">
+                    <i class="fas fa-undo"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Advanced Filters Row -->
+        <div class="row g-3 mt-2" id="advancedFilters" style="display: none;">
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted small">TRẠNG THÁI</label>
+                <select class="form-select" id="statusFilter">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="available">Có sẵn</option>
+                    <option value="borrowed">Đã mượn</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted small">TÌNH TRẠNG</label>
+                <select class="form-select" id="conditionFilter">
+                    <option value="">Tất cả tình trạng</option>
+                    <option value="good">Tốt</option>
+                    <option value="damaged">Hỏng</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted small">VỊ TRÍ LƯU TRỮ</label>
+                <select class="form-select" id="locationFilter">
+                    <option value="">Tất cả vị trí</option>
+                    <option value="Phòng thiết bị 2">Phòng thiết bị 2</option>
+                    <option value="Kho Hóa học">Kho Hóa học</option>
+                    <option value="Phòng IT">Phòng IT</option>
+                    <option value="Phòng 101">Phòng 101</option>
+                    <option value="Phòng thiết bị 3">Phòng thiết bị 3</option>
+                    <option value="Thư viện">Thư viện</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted small">NGUỒN GỐC</label>
+                <select class="form-select" id="originFilter">
+                    <option value="">Tất cả nguồn gốc</option>
+                    <option value="CC">CC</option>
+                    <option value="NCC">NCC</option>
+                    <option value="GV Thanh Th">GV Thanh Th</option>
+                    <option value="Bộ giáo dục">Bộ giáo dục</option>
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <div class="d-flex gap-2 w-100">
+                    <button class="btn btn-outline-info btn-sm" onclick="applyFilters()">
+                        <i class="fas fa-filter me-1"></i>Áp dụng
+                    </button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="clearAdvancedFilters()">
+                        <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toggle Advanced Filters -->
+        <div class="text-center mt-3">
+            <button class="btn btn-link text-muted" onclick="toggleAdvancedFilters()" id="toggleAdvancedBtn">
+                <i class="fas fa-chevron-down me-1"></i>
+                Bộ lọc nâng cao
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Selection Counter -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center">
+        <h5 class="mb-0 me-3">Danh sách thiết bị</h5>
+        <span class="selection-counter" id="selectionCounter" style="display: none;">
+            <i class="fas fa-check-circle me-1"></i>
+            <span id="selectedCount">0</span> thiết bị đã chọn
+        </span>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm" onclick="selectAllAvailable()">
+            <i class="fas fa-check-double me-1"></i>Chọn tất cả có sẵn
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" onclick="cancelSelection()">
+            <i class="fas fa-times me-1"></i>Bỏ chọn tất cả
+        </button>
                         </div>
                     </div>
 
@@ -139,144 +180,51 @@
                     <div class="card">
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover equipment-table mb-0">
+            <table class="table table-hover equipment-table mb-0" id="equipmentTable">
                                     <thead>
                                         <tr>
-                                            <th>MaT</th>
-                                            <th>Tên Thiết Bị</th>
-                                            <th>Danh mục</th>
-                                            <th>Đơn vị</th>
-                                            <th>Lớp</th>
-                                            <th>Số Lượng T</th>
-                                            <th>Trạng Thái</th>
-                                            <th>Tình trạng</th>
-                                            <th>Vị Trí Lưu Trữ</th>
-                                            <th>Nguồn Gốc</th>
-                                            <th>Xem chi tiết</th>
-                                            <th>Chọn mượn</th>
+                        <th width="5%">Mã TB</th>
+                        <th width="20%">Tên Thiết Bị</th>
+                        <th width="8%">Danh mục</th>
+                        <th width="6%">Đơn vị</th>
+                        <th width="8%">Lớp</th>
+                        <th width="6%">SL Tồn</th>
+                        <th width="8%">Trạng Thái</th>
+                        <th width="8%">Tình trạng</th>
+                        <th width="12%">Vị Trí Lưu Trữ</th>
+                        <th width="8%">Nguồn Gốc</th>
+                        <th width="6%">Chi tiết</th>
+                        <th width="5%">Chọn</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>101</td>
-                                            <td>Bộ dụng cụ thí nghiệm H2SO4</td>
-                                            <td>Hóa học</td>
+                <tbody id="equipmentTableBody">
+                    <tr data-category="chemistry" data-class="8,9" data-status="available" data-condition="good">
+                        <td><span class="fw-bold text-primary">101</span></td>
+                        <td>
+                            <div class="fw-bold">Bộ dụng cụ thí nghiệm H2SO4</div>
+                            <small class="text-muted">Thiết bị hóa học chuyên dụng</small>
+                        </td>
+                        <td><span class="badge bg-info">Hóa học</span></td>
                                             <td>cái</td>
                                             <td>8, 9</td>
-                                            <td>3</td>
+                        <td><span class="fw-bold text-success">3</span></td>
                                             <td><span class="status-available">Có sẵn</span></td>
-                                            <td><span class="condition-good">tốt</span></td>
+                        <td><span class="condition-good">Tốt</span></td>
                                             <td>Phòng thiết bị 2</td>
                                             <td>CC</td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary" onclick="viewDetails(101)">
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewDetails(101)" title="Xem chi tiết">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                             </td>
                                             <td>
-                                                <input type="checkbox" class="form-check-input" checked>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input equipment-checkbox" 
+                                       data-device-id="101" data-max-quantity="3" checked>
+                            </div>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>103</td>
-                                            <td>Bộ thí nghiệm Hoá học cơ bản</td>
-                                            <td>Hóa học</td>
-                                            <td>bộ</td>
-                                            <td>8, 9</td>
-                                            <td>5</td>
-                                            <td><span class="status-available">Có sẵn</span></td>
-                                            <td><span class="condition-good">tốt</span></td>
-                                            <td>Kho Hóa học</td>
-                                            <td>GV Thanh Th</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary" onclick="viewDetails(103)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" class="form-check-input" checked>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>104</td>
-                                            <td>Laptop Dell Inspiron 3501</td>
-                                            <td>Tin học</td>
-                                            <td>cái</td>
-                                            <td>6, 7, 8</td>
-                                            <td>10</td>
-                                            <td><span class="status-available">Có sẵn</span></td>
-                                            <td><span class="condition-good">tốt</span></td>
-                                            <td>Phòng IT</td>
-                                            <td>NCC</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary" onclick="viewDetails(104)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" class="form-check-input" checked>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>105</td>
-                                            <td>Bảng tương tác thông minh</td>
-                                            <td>Tin học</td>
-                                            <td>cái</td>
-                                            <td>6, 7, 8</td>
-                                            <td>1</td>
-                                            <td><span class="status-available">Có sẵn</span></td>
-                                            <td><span class="condition-damaged">Hỏng</span></td>
-                                            <td>Phòng 101</td>
-                                            <td>NCC</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary" onclick="viewDetails(105)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" class="form-check-input">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>102</td>
-                                            <td>Bộ sách tuổi thơ lớp 8</td>
-                                            <td>Ngữ văn</td>
-                                            <td>bộ</td>
-                                            <td>8</td>
-                                            <td>10</td>
-                                            <td><span class="status-borrowed">đã mượn</span></td>
-                                            <td><span class="condition-good">tốt</span></td>
-                                            <td>Phòng thiết bị 3</td>
-                                            <td>Bộ giáo dục</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary" onclick="viewDetails(102)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" class="form-check-input">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>106</td>
-                                            <td>Phim tư liệu về tác phẩm Nam quốc s</td>
-                                            <td>Ngữ văn</td>
-                                            <td>bộ</td>
-                                            <td>1</td>
-                                            <td>9</td>
-                                            <td><span class="status-borrowed">Đã mượn</span></td>
-                                            <td><span class="condition-good">tốt</span></td>
-                                            <td>Thư viện</td>
-                                            <td>NCC</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary" onclick="viewDetails(106)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" class="form-check-input">
-                                            </td>
-                                        </tr>
+                    <!-- More rows... -->
                                     </tbody>
                                 </table>
                             </div>
@@ -286,15 +234,11 @@
                     <!-- Action Buttons -->
                     <div class="d-flex justify-content-end mt-4 gap-3">
                         <button class="btn btn-cancel text-white" onclick="cancelSelection()">
-                            Hủy chọn
+        <i class="fas fa-times me-2"></i>Hủy chọn
                         </button>
                         <button class="btn btn-register text-white" onclick="openBorrowForm()">
-                            Đăng ký
+        <i class="fas fa-clipboard-list me-2"></i>Đăng ký
                         </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Device Details Modal -->
@@ -420,198 +364,10 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function viewDetails(deviceId) {
-            // In a real application, you would fetch device details from the server
-            const deviceData = {
-                101: {
-                    name: "Bộ dụng cụ thí nghiệm H2SO4",
-                    id: "101",
-                    category: "Hóa học",
-                    unit: "cái",
-                    class: "8, 9",
-                    quantity: "3",
-                    status: "Có sẵn",
-                    condition: "Tốt",
-                    location: "Phòng thiết bị 201",
-                    origin: "NCC",
-                    supplier: "Công ty TNHH Hóa Chất Việt"
-                }
-            };
-            
-            const device = deviceData[deviceId] || deviceData[101];
-            
-            document.getElementById('deviceName').textContent = device.name;
-            document.getElementById('deviceId').textContent = device.id;
-            document.getElementById('deviceCategory').textContent = device.category;
-            document.getElementById('deviceUnit').textContent = device.unit;
-            document.getElementById('deviceClass').textContent = device.class;
-            document.getElementById('deviceQuantity').textContent = device.quantity;
-            document.getElementById('deviceStatus').textContent = device.status;
-            document.getElementById('deviceCondition').textContent = device.condition;
-            document.getElementById('deviceLocation').textContent = device.location;
-            document.getElementById('deviceOrigin').textContent = device.origin;
-            document.getElementById('deviceSupplier').textContent = device.supplier;
-            
-            const modal = new bootstrap.Modal(document.getElementById('deviceDetailsModal'));
-            modal.show();
-        }
-        
-        function selectDevice() {
-            // Close details modal and open borrow form
-            const detailsModal = bootstrap.Modal.getInstance(document.getElementById('deviceDetailsModal'));
-            detailsModal.hide();
-            
-            // Add device to borrow form
-            openBorrowForm();
-        }
-        
-        function openBorrowForm() {
-            // Get selected devices from checkboxes
-            const selectedDevices = [];
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-            
-            checkboxes.forEach((checkbox, index) => {
-                const row = checkbox.closest('tr');
-                const cells = row.querySelectorAll('td');
-                
-                selectedDevices.push({
-                    st: index + 1,
-                    name: cells[1].textContent,
-                    category: cells[2].textContent,
-                    unit: cells[3].textContent,
-                    quantity: cells[5].textContent,
-                    location: cells[8].textContent,
-                    origin: cells[9].textContent
-                });
-            });
-            
-            // Populate borrow form table
-            const tbody = document.getElementById('borrowFormTable');
-            tbody.innerHTML = '';
-            
-            selectedDevices.forEach(device => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${device.st}</td>
-                    <td>${device.name}</td>
-                    <td>${device.category}</td>
-                    <td>${device.unit}</td>
-                    <td>${device.quantity}</td>
-                    <td>${device.location}</td>
-                    <td>${device.origin}</td>
-                    <td>
-                        <input type="date" class="form-control form-control-sm" value="${new Date().toISOString().split('T')[0]}">
-                    </td>
-                    <td>
-                        <input type="date" class="form-control form-control-sm" value="${new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0]}">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm" value="1" min="1" max="${device.quantity}">
-                    </td>
-                    <td>
-                        <select class="form-select form-select-sm">
-                            <option value="sang">Sáng</option>
-                            <option value="chieu">Chiều</option>
-                        </select>
-                    </td>
-                    <td>
-                        <textarea class="form-control form-control-sm" rows="2" placeholder="ghi chú nội dung dạy..."></textarea>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            const modal = new bootstrap.Modal(document.getElementById('borrowFormModal'));
-            modal.show();
-        }
-        
-        function submitBorrowForm() {
-            // Validate form data
-            const borrowDate = document.querySelector('input[type="date"]').value;
-            const returnDate = document.querySelectorAll('input[type="date"]')[1].value;
-            
-            if (new Date(returnDate) < new Date(borrowDate)) {
-                showErrorModal('Ngày trả không hợp lệ. Vui lòng chọn ngày trả sau hoặc bằng ngày mượn.');
-                return;
-            }
-            
-            // Check if borrow date is at least 1 day in advance
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            
-            if (new Date(borrowDate) < tomorrow) {
-                showErrorModal('Cần đăng ký sớm hơn (≥1 ngày) trước buổi dạy');
-                return;
-            }
-            
-            // Submit form (in real app, this would be an AJAX call)
-            const modal = bootstrap.Modal.getInstance(document.getElementById('borrowFormModal'));
-            modal.hide();
-            
-            // Show success notification
-            showSuccessModal();
-        }
-        
-        function cancelSelection() {
-            // Uncheck all checkboxes
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(checkbox => checkbox.checked = false);
-        }
-        
-        function showSuccessModal() {
-            const modalHtml = `
-                <div class="modal fade" id="successModal" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-body text-center py-5">
-                                <h4 class="text-success mb-3">THÔNG BÁO</h4>
-                                <h5 class="text-success mb-4">ĐĂNG KÝ MƯỢN THÀNH CÔNG !</h5>
-                                <div class="d-flex gap-3 justify-content-center">
-                                    <button class="btn btn-primary" onclick="viewBorrowSlip()">Xem phiếu mượn</button>
-                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Bỏ qua</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            const modal = new bootstrap.Modal(document.getElementById('successModal'));
-            modal.show();
-        }
-        
-        function showErrorModal(message) {
-            const modalHtml = `
-                <div class="modal fade" id="errorModal" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-body text-center py-4">
-                                <h4 class="text-danger mb-3">THÔNG BÁO</h4>
-                                <p class="mb-4">${message}</p>
-                                <button class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            const modal = new bootstrap.Modal(document.getElementById('errorModal'));
-            modal.show();
-        }
-        
-        function viewBorrowSlip() {
-            // Close success modal
-            const successModal = bootstrap.Modal.getInstance(document.getElementById('successModal'));
-            successModal.hide();
-            
-            // Show borrow slip
-            window.location.href = '/borrow/slip/PM01';
-        }
-    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Borrow Feature JavaScript -->
+    <script src="/public/javascripts/borrow.js"></script>
 </body>
 </html>

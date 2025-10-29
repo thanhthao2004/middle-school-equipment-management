@@ -36,16 +36,7 @@ app.get('/', (req, res) => {
         <body>
             <div class="container mt-5">
                 <h1 class="text-center">🏫 Middle School Equipment Management</h1>
-                <div class="row mt-4">
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Quản lý thiết bị</h5>
-                                <p class="card-text">Quản lý danh sách thiết bị trong trường</p>
-                                <a href="/devices" class="btn btn-primary">Xem thiết bị</a>
-                            </div>
-                        </div>
-                    </div>
+            <div class="row mt-4">
                     <div class="col-md-4">
                         <div class="card">
                             <div class="card-body">
@@ -71,6 +62,11 @@ app.get('/', (req, res) => {
     `);
 });
 
+// Teacher home (giáo viên)
+app.get('/teacher/home', (req, res) => {
+    res.render('borrow/views/teacher-home', { title: 'Trang chủ giáo viên' });
+});
+
 // Borrow routes
 app.get('/borrow/register', (req, res) => {
     res.render('borrow/views/register', { title: 'Đăng ký mượn thiết bị' });
@@ -81,63 +77,19 @@ app.get('/borrow/slip/:id', (req, res) => {
 });
 
 app.get('/borrow/history', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="vi">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Lịch sử mượn/trả</title>
-            <link href="/css/bootstrap.min.css" rel="stylesheet">
-        </head>
-        <body>
-            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-                <div class="container">
-                    <a class="navbar-brand" href="/">🏫 Equipment Management</a>
-                </div>
-            </nav>
-            <div class="container mt-4">
-                <h1>📚 Lịch sử mượn/trả</h1>
-                <div class="alert alert-info">
-                    <h5>Chức năng đang được phát triển...</h5>
-                    <p>Lịch sử mượn/trả sẽ hiển thị ở đây</p>
-                </div>
-                <a href="/borrow/register" class="btn btn-primary">Đăng ký mượn thiết bị</a>
-                <a href="/" class="btn btn-secondary">← Quay lại trang chủ</a>
-            </div>
-        </body>
-        </html>
-    `);
+    res.render('borrow/views/history', { title: 'Lịch sử mượn/trả' });
 });
 
-app.get('/borrow/status', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="vi">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Tình trạng phiếu mượn</title>
-            <link href="/css/bootstrap.min.css" rel="stylesheet">
-        </head>
-        <body>
-            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-                <div class="container">
-                    <a class="navbar-brand" href="/">🏫 Equipment Management</a>
-                </div>
-            </nav>
-            <div class="container mt-4">
-                <h1>📊 Tình trạng phiếu mượn</h1>
-                <div class="alert alert-info">
-                    <h5>Chức năng đang được phát triển...</h5>
-                    <p>Tình trạng phiếu mượn sẽ hiển thị ở đây</p>
-                </div>
-                <a href="/borrow/register" class="btn btn-primary">Đăng ký mượn thiết bị</a>
-                <a href="/" class="btn btn-secondary">← Quay lại trang chủ</a>
-            </div>
-        </body>
-        </html>
-    `);
+app.get('/borrow/pending-approvals', (req, res) => {
+    res.render('borrow/views/pending-approvals', { title: 'Chờ duyệt' });
+});
+
+app.get('/borrow/detail/:id', (req, res) => {
+    res.render('borrow/views/detail', { title: 'Chi tiết phiếu', id: req.params.id });
+});
+
+app.get('/borrow/cancel', (req, res) => {
+    res.render('borrow/views/cancel', { title: 'Hủy phiếu' });
 });
 
 // Routes cho các feature (sẽ implement sau)

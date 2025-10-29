@@ -1,28 +1,112 @@
-<footer class="bg-light text-center text-lg-start mt-5">
+<footer class="bg-light text-center text-lg-start mt-5" style="background-color: var(--light-gray) !important;">
     <div class="container p-4">
         <div class="row">
-            <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
-                <h5 class="text-uppercase">Middle School Equipment Management</h5>
-                <p>
-                    Hệ thống quản lý thiết bị trường THCS
+            <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+                <h5 class="text-uppercase fw-bold" style="color: var(--primary-blue);">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    Middle School Equipment Management
+                </h5>
+                <p class="text-muted">
+                    Hệ thống quản lý thiết bị trường THCS hiện đại, 
+                    giúp quản lý và theo dõi thiết bị học tập một cách hiệu quả.
                 </p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-primary"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-primary"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-primary"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="text-primary"><i class="fab fa-instagram"></i></a>
+                </div>
             </div>
             
-            <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
-                <h5 class="text-uppercase">Liên hệ</h5>
-                <p>
-                    <i class="fas fa-envelope me-2"></i>
-                    info@school.edu.vn
-                </p>
-                <p>
-                    <i class="fas fa-phone me-2"></i>
-                    +84 123 456 789
-                </p>
+            <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                <h6 class="text-uppercase fw-bold mb-3" style="color: var(--primary-blue);">Chức năng</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="/devices" class="text-muted text-decoration-none">
+                            <i class="fas fa-laptop me-1"></i>Quản lý thiết bị
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/borrow" class="text-muted text-decoration-none">
+                            <i class="fas fa-clipboard-list me-1"></i>Mượn/Trả
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/reports" class="text-muted text-decoration-none">
+                            <i class="fas fa-chart-bar me-1"></i>Báo cáo
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/users" class="text-muted text-decoration-none">
+                            <i class="fas fa-users me-1"></i>Quản lý người dùng
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                <h6 class="text-uppercase fw-bold mb-3" style="color: var(--primary-blue);">Liên hệ</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-envelope me-2 text-primary"></i>
+                        <span class="text-muted">info@school.edu.vn</span>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-phone me-2 text-primary"></i>
+                        <span class="text-muted">+84 123 456 789</span>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                        <span class="text-muted">123 Đường ABC, Quận XYZ, TP.HCM</span>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-clock me-2 text-primary"></i>
+                        <span class="text-muted">Thứ 2 - Thứ 6: 7:00 - 17:00</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                <h6 class="text-uppercase fw-bold mb-3" style="color: var(--primary-blue);">Hỗ trợ</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="/help" class="text-muted text-decoration-none">
+                            <i class="fas fa-question-circle me-1"></i>Trung tâm trợ giúp
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/docs" class="text-muted text-decoration-none">
+                            <i class="fas fa-book me-1"></i>Tài liệu hướng dẫn
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/contact" class="text-muted text-decoration-none">
+                            <i class="fas fa-headset me-1"></i>Liên hệ hỗ trợ
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/feedback" class="text-muted text-decoration-none">
+                            <i class="fas fa-comment me-1"></i>Góp ý phản hồi
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
     
-    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
-        © 2024 Middle School Equipment Management. All rights reserved.
+    <div class="text-center p-3" style="background-color: var(--primary-blue); color: white;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-md-start">
+                    © 2024 Middle School Equipment Management. All rights reserved.
+                </div>
+                <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                    <small>
+                        <i class="fas fa-code me-1"></i>
+                        Made with <i class="fas fa-heart text-danger"></i> by Development Team
+                    </small>
+                </div>
+            </div>
+        </div>
     </div>
 </footer>
