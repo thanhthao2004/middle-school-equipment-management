@@ -26,8 +26,12 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
 app.use('/purchasing-plans', purchasingRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+// Categories feature (từ develop)
+const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
+app.use('/categories', categoriesRoutes);
+
+const usersRoutes = require('./src/features/users/routes/users.routes');
+app.use('/users', usersRoutes);
 // ==========================
 // ⚙️ ROUTES
 // ==========================
@@ -64,11 +68,9 @@ app.get('/borrow/cancel', (req, res) => {
 });
 
 // Categories feature (từ develop)
-const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
-app.use('/categories', categoriesRoutes);
 
 // ==========================
 // Khởi động server
 // ==========================
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server đang chạy tại: http://localhost:${PORT}`));
