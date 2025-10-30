@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử mượn/trả</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="/public/stylesheets/borrow.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <%- include('../../../views/partials/header') %>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <%- include('../../../views/partials/borrow-sidebar') %>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="container py-4">
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-2">
+                        <label class="form-label small text-muted fw-bold">Mã phiếu</label>
+                        <input type="text" class="form-control" id="filterId" placeholder="VD: PM2">
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label small text-muted fw-bold">Trạng thái</label>
+                        <select class="form-select" id="filterStatus">
+                            <option value="">Tất cả</option>
+                            <option value="pending">Chờ duyệt</option>
+                            <option value="approved">Đã duyệt</option>
+                            <option value="rejected">Không duyệt</option>
+                            <option value="completed">Đã trả</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label small text-muted fw-bold">Ngày tạo từ</label>
+                        <input type="date" class="form-control" id="filterFrom">
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label small text-muted fw-bold">Ngày tạo đến</label>
+                        <input type="date" class="form-control" id="filterTo">
+                    </div>
+                    <div class="col-12 col-md-3 d-flex justify-content-end gap-2 flex-wrap">
+                        <button class="btn btn-outline-info text-nowrap px-3" id="btnApply"><i class="fas fa-filter me-1"></i>Áp dụng</button>
+                        <button class="btn btn-outline-secondary text-nowrap px-3" id="btnReset"><i class="fas fa-undo me-1"></i>Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card mt-2">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover equipment-table mb-0" id="historyTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">Mã phiếu</th>
+                                <th style="width: 180px;">Ngày tạo</th>
+                                <th style="width: 180px;">Trạng thái</th>
+                                <th style="width: 160px;">Lựa chọn</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTbody">
+                            <!-- Mock row -->
+                            <tr>
+                                <td class="fw-semibold">PM2</td>
+                                <td>10/09/2025</td>
+                                <td><span class="badge bg-success">Đã duyệt</span></td>
+                                <td>
+                                    <a class="btn btn-link p-0" href="/borrow/slip/PM2?from=history">Xem chi tiết phiếu</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../../../views/partials/footer') %>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/javascripts/history.js"></script>
+    </body>
+    </html>
+
