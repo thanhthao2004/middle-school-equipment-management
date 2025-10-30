@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4"><%= title %></h1>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Danh sách thiết bị</h5>
+                    </div>
+                    <div class="card-body">
+                        <% if (devices && devices.length > 0) { %>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên thiết bị</th>
+                                            <th>Danh mục</th>
+                                            <th>Trạng thái</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% devices.forEach(device => { %>
+                                            <tr>
+                                                <td><%= device.id %></td>
+                                                <td><%= device.name %></td>
+                                                <td><%= device.category %></td>
+                                                <td><%= device.status %></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary">Sửa</button>
+                                                    <button class="btn btn-sm btn-danger">Xóa</button>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <% } else { %>
+                            <div class="alert alert-info">
+                                <h5>Chưa có thiết bị nào</h5>
+                                <p>Bắt đầu bằng cách thêm thiết bị mới.</p>
+                                <button class="btn btn-primary">Thêm thiết bị</button>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
