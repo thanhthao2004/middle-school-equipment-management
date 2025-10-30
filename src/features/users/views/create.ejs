@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tạo Tài Khoản Người Dùng</title>
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; }
+    .form-container { width: 600px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px #ddd; }
+    input, select { width: 100%; padding: 8px; margin: 8px 0; }
+    button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Tạo Tài Khoản Người Dùng</h2>
+    <% if (error) { %><p class="error"><%= error %></p><% } %>
+    <form action="/users/create" method="POST">
+      <label>Họ và tên:</label><input type="text" name="fullname" />
+      <label>Số điện thoại:</label><input type="text" name="phone" />
+      <label>Địa chỉ:</label><input type="text" name="address" />
+      <label>Tên người dùng:</label><input type="text" name="username" />
+      <label>Mật khẩu:</label><input type="password" name="password" />
+      <label>Chức vụ:</label>
+      <select name="role">
+        <option value="Hiệu Trưởng">Hiệu Trưởng</option>
+        <option value="Giáo Viên">Giáo Viên</option>
+        <option value="Nhân Viên">Nhân Viên</option>
+      </select>
+      <label>Năm kinh nghiệm:</label><input type="text" name="experience" />
+      <label>Trình độ chuyên môn:</label><input type="text" name="specialization" />
+      <label>Giới tính:</label>
+      <select name="gender">
+        <option value="Nam">Nam</option>
+        <option value="Nữ">Nữ</option>
+      </select>
+      <label>Bị mù màu:</label>
+      <select name="vision">
+        <option value="Không">Không</option>
+        <option value="Có">Có</option>
+      </select>
+      <label>Ngày sinh:</label><input type="date" name="dob" />
+      <button type="submit">Tạo tài khoản</button>
+    </form>
+  </div>
+</body>
+</html>
