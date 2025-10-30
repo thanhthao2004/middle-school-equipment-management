@@ -129,7 +129,12 @@
                         
                         <div class="slip-header">
                             <div class="slip-title">Phiếu mượn</div>
-                            <div class="slip-id">MÃ PHIẾU: PM01</div>
+                            <div class="slip-id">MÃ PHIẾU: PM02</div>
+                            <% if (typeof from !== 'undefined' && from === 'pending') { %>
+                                <div class="mt-2">
+                                    <span class="badge bg-warning text-dark">Trạng thái: chờ duyệt</span>
+                                </div>
+                            <% } %>
                         </div>
 
                         <h6 class="mb-3">Thiết bị mượn:</h6>
@@ -139,6 +144,7 @@
                                     <tr>
                                         <th>S</th>
                                         <th>Tên Thiết Bị</th>
+                                        <th>Danh mục</th>
                                         <th>Đơn vị</th>
                                         <th>Vị trí</th>
                                         <th>Nguồn</th>
@@ -154,7 +160,7 @@
                                     <tr>
                                         <td>1</td>
                                         <td>Bộ dụng cụ thí nghiệm</td>
-                                        <td>Hóa</td>
+                                        <td>Hóa học</td>
                                         <td>cái</td>
                                         <td>Phòng thí nghiệm</td>
                                         <td>NCC</td>
@@ -168,7 +174,7 @@
                                     <tr>
                                         <td>2</td>
                                         <td>Bộ thí nghiệm H</td>
-                                        <td>Hóa</td>
+                                        <td>Hóa học</td>
                                         <td>bộ</td>
                                         <td>Kho Hóa</td>
                                         <td>GV</td>
@@ -223,8 +229,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function closeSlip() {
-            // In a real application, you might want to redirect back to the main page
-            window.location.href = '/borrow/register';
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            if (from === 'pending') {
+                window.location.href = '/borrow/pending-approvals';
+            } else if (from === 'history') {
+                window.location.href = '/borrow/history';
+            } else {
+                window.location.href = '/borrow/register';
+            }
         }
     </script>
 </body>

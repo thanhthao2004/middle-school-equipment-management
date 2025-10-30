@@ -1,7 +1,9 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="/">
-            <strong>Middle School Equipment Management</strong>
+<!-- Main Navigation Header -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-blue);">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="fas fa-graduation-cap me-2"></i>
+            HỆ THỐNG QUẢN LÝ THIẾT BỊ TRƯỜNG THCS
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -11,22 +13,47 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Trang chủ</a>
+                    <a class="nav-link <%= (currentPage === 'home') ? 'active' : '' %>" href="/borrow/teacher-home">
+                        <i class="fas fa-home me-1"></i>Trang chủ
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/devices">Thiết bị</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/borrow">Mượn/Trả</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/reports">Báo cáo</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle <%= (currentPage && currentPage.startsWith('borrow')) ? 'active' : '' %>" 
+                       href="#" id="borrowDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-clipboard-list me-1"></i>Mượn/Trả
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/borrow/register">
+                            <i class="fas fa-plus-circle me-2"></i>Đăng ký mượn
+                        </a></li>
+                        <li><a class="dropdown-item" href="/borrow/history">
+                            <i class="fas fa-history me-2"></i>Lịch sử mượn
+                        </a></li>
+                        <li><a class="dropdown-item" href="/borrow/status">
+                            <i class="fas fa-star me-2"></i>Tình trạng phiếu
+                        </a></li>
+                    </ul>
                 </li>
             </ul>
             
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/auth/login">Đăng nhập</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-2 fs-5"></i>
+                        <span>Giáo viên bộ môn</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/profile">
+                            <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                        </a></li>
+                        <li><a class="dropdown-item" href="/settings">
+                            <i class="fas fa-cog me-2"></i>Cài đặt
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/auth/logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                        </a></li>
+                    </ul>
                 </li>
             </ul>
         </div>
