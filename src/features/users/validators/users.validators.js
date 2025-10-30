@@ -1,18 +1,36 @@
-import Joi from "joi";
+const { body } = require('express-validator');
 
-export const validateCreateUser = (data) => {
-  const schema = Joi.object({
-    fullname: Joi.string().required(),
-    phone: Joi.string().required(),
-    address: Joi.string().required(),
-    username: Joi.string().min(3).required(),
-    password: Joi.string().min(6).required(),
-    role: Joi.string().required(),
-    experience: Joi.string().required(),
-    specialization: Joi.string().required(),
-    gender: Joi.string().required(),
-    vision: Joi.string().required(),
-    dob: Joi.string().required()
-  });
-  return schema.validate(data);
+const validateCreateUser = [
+  body('fullname')
+    .trim()
+    .notEmpty().withMessage('Vui lòng nhập họ và tên.'),
+  body('phone')
+    .trim()
+    .notEmpty().withMessage('Vui lòng nhập số điện thoại.'),
+  body('address')
+    .trim()
+    .notEmpty().withMessage('Vui lòng nhập địa chỉ.'),
+  body('username')
+    .trim()
+    .notEmpty().withMessage('Vui lòng nhập tên người dùng.')
+    .isLength({ min: 3 }).withMessage('Tên người dùng tối thiểu 3 ký tự.'),
+  body('password')
+    .notEmpty().withMessage('Vui lòng nhập mật khẩu.')
+    .isLength({ min: 6, max: 32 }).withMessage('Mật khẩu phải từ 6-32 ký tự.'),
+  body('role')
+    .notEmpty().withMessage('Vui lòng chọn chức vụ.'),
+  body('experience')
+    .notEmpty().withMessage('Vui lòng chọn số năm kinh nghiệm.'),
+  body('specialization')
+    .trim(), // không required
+  body('gender')
+    .notEmpty().withMessage('Vui lòng chọn giới tính.'),
+  body('subject')
+    .trim(), // không required
+  body('dob')
+    .notEmpty().withMessage('Vui lòng chọn ngày sinh.')
+];
+
+module.exports = {
+  validateCreateUser
 };

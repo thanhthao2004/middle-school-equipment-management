@@ -1,13 +1,12 @@
-import * as repo from "../repositories/users.repo.js";
-import * as validator from "../validators/users.validators.js";
+const repo = require('../repositories/users.repo');
 
-export const createUser = async (data) => {
-  const { error } = validator.validateCreateUser(data);
-  if (error) throw new Error(error.message);
-
-  // Kiểm tra trùng username
+exports.createUser = async (data) => {
+  // Chỉ duy nhất kiểm tra nghiệp vụ, không validate field ở đây nữa!
   const exists = await repo.findByUsername(data.username);
-  if (exists) throw new Error("Tên người dùng đã tồn tại!");
-
+  if (exists) throw new Error('Tên người dùng đã tồn tại!');
   return repo.create(data);
+};
+
+exports.getAllUsers = async () => {
+  return await repo.getAll();
 };

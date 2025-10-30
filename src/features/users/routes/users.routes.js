@@ -1,9 +1,11 @@
-import express from "express";
-import * as controller from "../controllers/users.controller.js";
-
+const express = require('express');
 const router = express.Router();
+const userController = require('../controllers/users.controller');
+const { validateCreateUser } = require('../validators/users.validators');
+const { validationResult } = require('express-validator');
 
-router.get("/create", controller.showCreateForm);
-router.post("/create", controller.createUser);
+router.get('/', userController.renderUserList);
+router.get('/create', userController.renderCreateForm);
+router.post('/create', validateCreateUser, userController.createUser);
 
-export default router;
+module.exports = router;
