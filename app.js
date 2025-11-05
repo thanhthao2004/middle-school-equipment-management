@@ -22,12 +22,8 @@ app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 
-// Use feature routes
-const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
-app.use('/purchasing-plans', purchasingRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
 // ==========================
 // ⚙️ ROUTES
 // ==========================
@@ -67,6 +63,14 @@ app.get('/borrow/cancel', (req, res) => {
 const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
 app.use('/categories', categoriesRoutes);
 
+// Auth feature routes (change-password, login, etc.)
+const authRoutes = require('./src/features/auth/routes/auth.routes');
+app.use('/auth', authRoutes);
+
+
+// Purchasing-plans fearure 
+const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
+app.use('/purchasing-plans', purchasingRoutes);
 // ==========================
 // Khởi động server
 // ==========================
