@@ -1,0 +1,208 @@
+<%
+  const report = report || {
+    code: "NT001",
+    details: [
+      { category: "Thiết bị dạy học", code: "TB001", name: "Bộ thí nghiệm vật lý", expected: 5, actual: 5, quality: "Tốt", reason: "" },
+      { category: "Thiết bị Hóa", code: "TB002", name: "Bộ hóa chất cơ bản", expected: 3, actual: 2, quality: "Khá", reason: "Thiếu 1 bộ" },
+    ]
+  };
+%>
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chi tiết biên bản nghiệm thu</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* --- TOP BAR --- */
+    .top-bar {
+      background: #0d47a1;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+    }
+
+    .top-bar .logo {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    /* --- MAIN LAYOUT --- */
+    .main-layout {
+      display: flex;
+      flex: 1;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: 230px;
+      background: linear-gradient(180deg, #1565c0, #0d47a1);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .sidebar-item:hover,
+    .sidebar-item.active {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* --- CONTENT --- */
+    .content {
+      flex: 1;
+      padding: 25px;
+    }
+
+    h2 {
+      color: #212121;
+      margin-bottom: 20px;
+    }
+
+    /* --- TABLE --- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+    }
+
+    thead {
+      background: #f0f0f0;
+      font-weight: 600;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #e3f2fd;
+    }
+
+    tbody tr:hover {
+      background: #bbdefb;
+    }
+
+    .info {
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+
+    .btn-back {
+      background: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 14px;
+    }
+
+    .btn-back:hover {
+      background: #0d47a1;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="logo"><i class="fas fa-graduation-cap"></i> EduEquip</div>
+    <div><i class="fas fa-user-circle"></i> QLTB</div>
+  </div>
+
+  <!-- MAIN BODY -->
+  <div class="main-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-item"><i class="fas fa-chart-bar"></i> Bảng chọn</div>
+      <div class="sidebar-item active"><i class="fas fa-file-contract"></i> Biên bản nghiệm thu</div>
+      <div class="sidebar-item"><i class="fas fa-laptop"></i> Mượn thiết bị</div>
+      <div class="sidebar-item"><i class="fas fa-chart-pie"></i> Báo cáo thống kê thiết bị</div>
+      <div class="sidebar-item"><i class="fas fa-graduation-cap"></i> Kế hoạch đào tạo</div>
+      <div class="sidebar-item"><i class="fas fa-shopping-cart"></i> Kế hoạch mua sắm</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="header-bar">
+        <h2>Chi tiết biên bản nghiệm thu</h2>
+        <button class="btn-back" onclick="window.location.href='/acceptance'">
+          <i class="fas fa-arrow-left"></i> Quay lại
+        </button>
+      </div>
+
+      <div class="info">
+        <strong>Mã biên bản:</strong> <%= report.code %>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên danh mục</th>
+            <th>Mã thiết bị</th>
+            <th>Tên thiết bị</th>
+            <th>Số lượng dự kiến</th>
+            <th>Số lượng thực tế</th>
+            <th>Chất lượng</th>
+            <th>Lý do</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (report.details && report.details.length > 0) { %>
+            <% report.details.forEach((d, i) => { %>
+              <tr>
+                <td><%= i + 1 %></td>
+                <td><%= d.category %></td>
+                <td><%= d.code %></td>
+                <td><%= d.name %></td>
+                <td><%= d.expected %></td>
+                <td><%= d.actual %></td>
+                <td><%= d.quality %></td>
+                <td><%= d.reason || "-" %></td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="8">Không có dữ liệu để hiển thị</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

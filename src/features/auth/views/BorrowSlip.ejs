@@ -1,0 +1,256 @@
+<%
+  const user = { name: "Nguyễn Văn A" };
+  const departments = ["Tin học", "Vật lý", "Hóa học", "Sinh học"];
+  const requests = [
+    { code: "PM001", teacher: "Nguyễn Văn A", department: "Tin học", borrowDate: "2025-10-01", returnDate: "2025-10-05", status: "Chờ duyệt" },
+    { code: "PM002", teacher: "Trần Thị B", department: "Vật lý", borrowDate: "2025-10-02", returnDate: "2025-10-06", status: "Đang mượn" },
+    { code: "PM003", teacher: "Lê Văn C", department: "Hóa học", borrowDate: "2025-10-03", returnDate: "2025-10-07", status: "Đã duyệt" }
+  ];
+  const selectedDetails = [
+    { name: "Bộ dụng cụ thí nghiệm", department: "Tin học", position: "Phòng Lab 1", source: "Trường", borrowDate: "2025-10-01", returnDate: "2025-10-05", quantity: 2, unit: "bộ", location: "Phòng học 203", condition: "Tốt" },
+    { name: "Laptop Dell", department: "Tin học", position: "Kho thiết bị", source: "Dự án", borrowDate: "2025-10-01", returnDate: "2025-10-05", quantity: 1, unit: "chiếc", location: "Phòng 205", condition: "Tốt" }
+  ];
+  const modal = { teacher: "Nguyễn Văn A", department: "Tin học", createdAt: "2025-10-01" };
+%>
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phiếu Mượn Thiết Bị</title>
+  <style>
+    body { font-family: "Segoe UI", Arial, sans-serif; background: #f5f6fa; margin: 0; }
+
+    /* TOP BAR */
+    .top-bar {
+      background: #0d47a1;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+    }
+    .top-bar .logo { font-weight: bold; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+
+    /* LAYOUT */
+    .main-layout { display: flex; min-height: calc(100vh - 50px); }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: linear-gradient(180deg, #1565c0, #0d47a1);
+      color: white;
+      width: 230px;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+    }
+    .nav-item {
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s;
+    }
+    .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.2); }
+
+    /* CONTENT */
+    .content-area { flex: 1; padding: 25px; }
+    h1 { color: #212121; font-size: 22px; margin-bottom: 20px; }
+
+    .filter-section { display: flex; align-items: center; margin-bottom: 15px; }
+    select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+
+    .btn {
+      border: none; border-radius: 5px; padding: 8px 14px;
+      cursor: pointer; font-size: 14px; transition: 0.3s;
+    }
+    .btn-primary { background: #1565c0; color: white; }
+    .btn-primary:hover { background: #0d47a1; }
+    .btn-secondary { background: #ccc; color: black; }
+
+    /* TABLE */
+    table {
+      width: 100%; border-collapse: collapse;
+      background: white; border-radius: 8px;
+      overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    th, td { padding: 10px; border-bottom: 1px solid #e0e0e0; text-align: center; }
+    thead { background: #f0f0f0; font-weight: 600; }
+    tbody tr:nth-child(even) { background: #e3f2fd; }
+    tbody tr:hover { background: #bbdefb; }
+
+    .link-view { color: #1565c0; text-decoration: underline; cursor: pointer; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+      justify-content: center; align-items: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: white; border-radius: 8px; width: 90%;
+      max-width: 1000px; overflow: auto;
+    }
+    .modal-header {
+      background: #1976d2; color: white;
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 10px 20px;
+      border-radius: 8px 8px 0 0;
+    }
+    .modal-body { padding: 20px; }
+    .modal-footer {
+      border-top: 1px solid #ddd; padding: 10px 20px;
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .info-row { display: flex; justify-content: space-between; padding: 4px 0; }
+    .info-label { font-weight: bold; color: #333; }
+
+    .btn-approve { background: #2e7d32; color: white; }
+    .btn-reject { background: #c62828; color: white; }
+    .btn-cancel { background: #757575; color: white; }
+
+    .btn-approve:hover { background: #1b5e20; }
+    .btn-reject:hover { background: #b71c1c; }
+    .btn-cancel:hover { background: #616161; }
+
+  </style>
+</head>
+<body>
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="logo">🎓 EduEquip</div>
+    <div>👤 <%= user.name %></div>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="main-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="nav-item"><i class="fas fa-chart-bar"></i> Bảng chọn</div>
+      <div class="nav-item"><i class="fas fa-file-contract"></i> Biên bản nghiệm thu</div>
+      <div class="nav-item"><i class="fas fa-chart-line"></i> Báo cáo định kỳ</div>
+      <div class="nav-item active"><i class="fas fa-laptop"></i> Mượn thiết bị</div>
+      <div class="nav-item"><i class="fas fa-chart-pie"></i> Báo cáo thống kê thiết bị</div>
+      <div class="nav-item"><i class="fas fa-graduation-cap"></i> Kế hoạch đào tạo</div>
+      <div class="nav-item"><i class="fas fa-shopping-cart"></i> Kế hoạch mua sắm</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-area">
+      <h1>Danh sách Phiếu Mượn Thiết bị</h1>
+
+      <div class="filter-section">
+        <select>
+          <option>Bộ môn</option>
+          <% departments.forEach(dep => { %>
+            <option><%= dep %></option>
+          <% }) %>
+        </select>
+        <div style="flex:1;"></div>
+        <button class="btn btn-primary">Duyệt tất cả</button>
+        <button class="btn btn-secondary">Tìm kiếm</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Mã Phiếu</th>
+            <th>Tên Giáo Viên</th>
+            <th>Bộ Môn</th>
+            <th>Ngày Mượn</th>
+            <th>Ngày Trả Dự Kiến</th>
+            <th>Trạng Thái</th>
+            <th>Xem Chi Tiết</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% requests.forEach(req => { %>
+            <tr>
+              <td><%= req.code %></td>
+              <td><%= req.teacher %></td>
+              <td><%= req.department %></td>
+              <td><%= req.borrowDate %></td>
+              <td><%= req.returnDate %></td>
+              <td><%= req.status %></td>
+              <td><span class="link-view" onclick="showDetail('<%= req.teacher %>', '<%= req.department %>')">Xem</span></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+
+      <div style="margin-top:15px;">
+        <button class="btn btn-primary">Thêm vào phiếu mượn</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Chi tiết Phiếu mượn</h2>
+        <span style="cursor:pointer;font-size:20px;" onclick="closeModal()">×</span>
+      </div>
+
+      <div class="modal-body">
+        <table style="width:100%; border-collapse:collapse; margin-bottom:15px;">
+          <thead>
+            <tr>
+              <th>STT</th><th>Tên Thiết Bị</th><th>Bộ Môn</th><th>Vị trí</th><th>Nguồn</th>
+              <th>Ngày Mượn</th><th>Ngày Trả</th><th>SL</th><th>Đơn vị</th><th>Nơi dùng</th><th>Tình trạng</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% selectedDetails.forEach((d, i) => { %>
+              <tr>
+                <td><%= i+1 %></td>
+                <td><%= d.name %></td>
+                <td><%= d.department %></td>
+                <td><%= d.position %></td>
+                <td><%= d.source %></td>
+                <td><%= d.borrowDate %></td>
+                <td><%= d.returnDate %></td>
+                <td><%= d.quantity %></td>
+                <td><%= d.unit %></td>
+                <td><%= d.location %></td>
+                <td><%= d.condition %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+
+        <div class="info-row"><div class="info-label">Giáo viên mượn:</div><div id="detailTeacher"><%= modal.teacher %></div></div>
+        <div class="info-row"><div class="info-label">Tổ bộ môn:</div><div id="detailDepartment"><%= modal.department %></div></div>
+        <div class="info-row"><div class="info-label">Ngày tạo phiếu:</div><div><%= modal.createdAt %></div></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-approve" onclick="approveRequest()">Duyệt</button>
+        <button class="btn-reject" onclick="rejectRequest()">Không duyệt</button>
+        <button class="btn-cancel" onclick="closeModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showDetail(teacher, department) {
+      document.getElementById('detailTeacher').textContent = teacher;
+      document.getElementById('detailDepartment').textContent = department;
+      document.getElementById('modalOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      document.getElementById('modalOverlay').classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+    function approveRequest() { alert('✅ Đã duyệt phiếu mượn!'); closeModal(); }
+    function rejectRequest() { alert('❌ Đã từ chối phiếu mượn!'); closeModal(); }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+</body>
+</html>

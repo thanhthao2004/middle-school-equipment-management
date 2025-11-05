@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo Định kỳ</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+    }
+
+    /* ===== TOP BAR ===== */
+    .top-bar {
+      background: #0d47a1;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+    }
+    .logo {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main-layout {
+      display: flex;
+      min-height: calc(100vh - 50px);
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      background: linear-gradient(180deg, #1565c0, #0d47a1);
+      color: white;
+      width: 230px;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ===== CONTENT ===== */
+    .content-area {
+      flex: 1;
+      padding: 25px;
+    }
+
+    .page-header {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .page-header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #212121;
+    }
+
+    /* ===== FILTER ===== */
+    .filter-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    select {
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .btn-filter {
+      background: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn-filter:hover {
+      background: #0d47a1;
+    }
+
+    /* ===== TABLE ===== */
+    .table-section {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    thead {
+      background: #f0f0f0;
+      font-weight: 600;
+    }
+    tbody tr:nth-child(even) {
+      background: #e3f2fd;
+    }
+    tbody tr:hover {
+      background: #bbdefb;
+    }
+    .row-number {
+      font-weight: 600;
+    }
+
+    /* ===== STATUS ===== */
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+    }
+    .status-imported { background: #4caf50; }
+    .status-purchased { background: #2196f3; }
+    .status-damaged { background: #f44336; }
+    .status-pending { background: #ff9800; }
+
+    /* ===== BUTTONS ===== */
+    .btn-edit {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+      padding: 4px 8px;
+      transition: 0.3s;
+    }
+    .btn-edit:hover {
+      background: #f5f5f5;
+    }
+
+    /* ===== FOOTER ===== */
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-top: 1px solid #ddd;
+      background: #fafafa;
+    }
+    .btn-export {
+      background: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn-export:hover {
+      background: #0d47a1;
+    }
+    .export-options {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .radio-group {
+      display: flex;
+      gap: 15px;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="logo">🎓 EduEquip</div>
+    <div>👤 <%= user.name %></div>
+  </div>
+
+  <!-- Layout -->
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="nav-item"><i class="fas fa-chart-bar"></i> Bảng chọn</div>
+      <div class="nav-item"><i class="fas fa-file-contract"></i> Biên bản nghiệm thu</div>
+      <div class="nav-item active"><i class="fas fa-chart-line"></i> Báo cáo định kỳ</div>
+      <div class="nav-item"><i class="fas fa-pie-chart"></i> Báo cáo thống kê thiết bị</div>
+      <div class="nav-item"><i class="fas fa-graduation-cap"></i> Kế hoạch đào tạo</div>
+      <div class="nav-item"><i class="fas fa-shopping-cart"></i> Kế hoạch mua sắm</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-area">
+      <div class="page-header">
+        <h1>📈 Báo cáo Định kỳ</h1>
+      </div>
+
+      <div class="filter-section">
+        <label>Lọc theo:</label>
+        <select>
+          <option selected disabled>Chọn năm học</option>
+          <% years.forEach(y => { %>
+            <option><%= y %></option>
+          <% }) %>
+        </select>
+        <button class="btn-filter">🔍 Lọc dữ liệu</button>
+      </div>
+
+      <div class="table-section">
+        <table>
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Mã biên bản</th>
+              <th>Danh mục</th>
+              <th>Tên thiết bị</th>
+              <th>Ngày thu</th>
+              <th>Nguồn gốc</th>
+              <th>Số lượng</th>
+              <th>Trạng thái</th>
+              <th>Người thu</th>
+              <th>Ghi chú</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (reports && reports.length > 0) { %>
+              <% reports.forEach((r, i) => { %>
+                <tr>
+                  <td class="row-number"><%= i + 1 %></td>
+                  <td><%= r.code %></td>
+                  <td><%= r.category %></td>
+                  <td><%= r.name %></td>
+                  <td><%= r.date %></td>
+                  <td><span class="status-badge status-<%= r.originClass %>"><%= r.origin %></span></td>
+                  <td><%= r.quantity %></td>
+                  <td><span class="status-badge status-<%= r.statusClass %>"><%= r.status %></span></td>
+                  <td><%= r.collector %></td>
+                  <td><%= r.note || '-' %></td>
+                  <td><button class="btn-edit">✏️</button></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="11" style="text-align:center;">Không có dữ liệu</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+
+        <div class="table-footer">
+          <div class="export-options">
+            <span>Xuất file:</span>
+            <div class="radio-group">
+              <label><input type="radio" name="export" value="excel" checked> Excel</label>
+              <label><input type="radio" name="export" value="pdf"> PDF</label>
+            </div>
+          </div>
+          <button class="btn-export">📥 Xuất báo cáo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

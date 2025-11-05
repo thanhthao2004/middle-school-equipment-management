@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Phiếu Trả Thiết Bị</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+    }
+
+    /* ====== TOP BAR ====== */
+    .top-bar {
+      background: #0d47a1;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+    }
+    .top-bar .logo {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+    }
+
+    /* ====== LAYOUT ====== */
+    .main-layout {
+      display: flex;
+      min-height: calc(100vh - 50px);
+    }
+
+    /* ====== SIDEBAR ====== */
+    .sidebar {
+      background: linear-gradient(180deg, #1565c0, #0d47a1);
+      color: white;
+      width: 230px;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* ====== CONTENT ====== */
+    .content-area {
+      flex: 1;
+      padding: 25px;
+    }
+    h1 {
+      color: #212121;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    /* ====== TABLE ====== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+    }
+    thead {
+      background: #f0f0f0;
+      font-weight: 600;
+    }
+    tbody tr:nth-child(even) {
+      background: #e3f2fd;
+    }
+    tbody tr:hover {
+      background: #bbdefb;
+    }
+
+    /* ====== BUTTONS ====== */
+    .btn-primary {
+      background: #1565c0;
+      border: none;
+    }
+    .btn-primary:hover {
+      background: #0d47a1;
+    }
+    .btn-outline-primary {
+      border-color: #1565c0;
+      color: #1565c0;
+    }
+    .btn-outline-primary:hover {
+      background: #1565c0;
+      color: white;
+    }
+
+    /* ====== MODAL ====== */
+    .modal-header {
+      background: #1976d2;
+      color: white;
+    }
+    .modal-title {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="logo">🎓 EduEquip</div>
+    <div>👤 <%= user.name %></div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="nav-item"><i class="fas fa-file-contract"></i> Biên bản nghiệm thu</div>
+      <div class="nav-item"><i class="fas fa-chart-line"></i> Báo cáo định kỳ</div>
+      <div class="nav-item"><i class="fas fa-laptop"></i> Mượn thiết bị</div>
+      <div class="nav-item active"><i class="fas fa-undo-alt"></i> Trả thiết bị</div>
+      <div class="nav-item"><i class="fas fa-chart-pie"></i> Báo cáo thống kê thiết bị</div>
+      <div class="nav-item"><i class="fas fa-graduation-cap"></i> Kế hoạch đào tạo</div>
+      <div class="nav-item"><i class="fas fa-shopping-cart"></i> Kế hoạch mua sắm</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-area">
+      <h1>Danh sách Phiếu Trả Thiết Bị</h1>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div></div>
+        <div class="d-flex gap-2">
+          <input type="text" class="form-control" placeholder="Tìm kiếm..." style="width: 200px;">
+          <button class="btn btn-outline-primary">Tìm kiếm</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Mã Phiếu</th>
+            <th>Giáo Viên</th>
+            <th>Bộ Môn</th>
+            <th>Ngày Mượn</th>
+            <th>Ngày Trả Dự Kiến</th>
+            <th>Ngày Trả Thực Tế</th>
+            <th>Trạng Thái</th>
+            <th>Chi Tiết</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (phieuTraList && phieuTraList.length > 0) { %>
+            <% phieuTraList.forEach(p => { %>
+              <tr>
+                <td><%= p.maPhieu %></td>
+                <td><%= p.tenGiaoVien %></td>
+                <td><%= p.boMon %></td>
+                <td><%= p.ngayMuon %></td>
+                <td><%= p.ngayTraDuKien %></td>
+                <td><%= p.ngayTraThucTe %></td>
+                <td><%= p.trangThai %></td>
+                <td>
+                  <button class="btn btn-sm btn-link text-primary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modalChiTiet"
+                          data-phieu='<%- JSON.stringify(p) %>'>Xem</button>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="8" class="text-center">Không có dữ liệu</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+
+      <div class="mt-3">
+        <button class="btn btn-primary">Thêm vào phiếu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CHI TIẾT -->
+  <div class="modal fade" id="modalChiTiet" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">XÁC NHẬN TRẢ THIẾT BỊ</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="chiTietContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('modalChiTiet');
+    modal.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget;
+      const data = JSON.parse(button.getAttribute('data-phieu'));
+      const html = `
+        <div class="border rounded p-3 mb-3 bg-light">
+          <p><b>Mã Phiếu:</b> ${data.maPhieu}</p>
+          <p><b>Giáo viên:</b> ${data.tenGiaoVien}</p>
+          <p><b>Bộ môn:</b> ${data.boMon}</p>
+          <p><b>Ngày mượn:</b> ${data.ngayMuon}</p>
+          <p><b>Ngày trả dự kiến:</b> ${data.ngayTraDuKien}</p>
+          <p><b>Ngày trả thực tế:</b> ${data.ngayTraThucTe}</p>
+        </div>
+        <table class="table table-bordered table-striped text-center align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tên thiết bị</th>
+              <th>Đơn vị</th>
+              <th>Vị trí</th>
+              <th>Ngày trả</th>
+              <th>SL</th>
+              <th>Tình trạng</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.dsThietBi.map((t, i) => `
+              <tr>
+                <td>${i+1}</td>
+                <td>${t.ten}</td>
+                <td>${t.donVi}</td>
+                <td>${t.viTri}</td>
+                <td>${t.ngayTra}</td>
+                <td>${t.soLuong}</td>
+                <td>${t.tinhTrang}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div class="text-center mt-3">
+          <button class="btn btn-success me-2">✅ Xác nhận trả đủ</button>
+          <button class="btn btn-danger">⚠️ Trả hỏng / thiếu</button>
+        </div>
+      `;
+      document.getElementById('chiTietContainer').innerHTML = html;
+    });
+  </script>
+</body>
+</html>
