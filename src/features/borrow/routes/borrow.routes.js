@@ -2,13 +2,13 @@
 const express = require('express');
 const router = express.Router();
 const borrowController = require('../controllers/borrow.controller');
-const authMiddleware = require('../../../core/middlewares/auth.middleware');
-const validationMiddleware = require('../../../core/middlewares/validation.middleware');
+const { authenticate } = require('../../../core/middlewares/auth.middleware');
+const { validate } = require('../../../core/middlewares/validation.middleware');
 const borrowValidators = require('../validators/borrow.validators');
 
 // Apply auth middleware to all routes
-router.use(authMiddleware);
-
+router.use(authenticate);
+router.use(validate);
 // GET Routes - Pages
 router.get('/register', borrowController.getRegisterPage);
 router.get('/history', borrowController.getHistoryPage);
@@ -19,7 +19,7 @@ router.get('/slip/:id', borrowController.getBorrowSlip);
 
 // POST Routes - Actions
 router.post('/register', 
-    validationMiddleware(borrowValidators.createBorrowRequest),
+    validate(borrowValidators.createBorrowRequest),
     borrowController.createBorrowRequest
 );
 

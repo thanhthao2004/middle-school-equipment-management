@@ -42,6 +42,8 @@ const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchas
 app.use('/purchasing-plans', purchasingRoutes);
 
 // Borrow (mượn thiết bị)
+const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
+app.use('/borrow', borrowRoutes);
 app.get('/', (req, res) => res.redirect('/teacher/home'));
 
 app.get('/teacher/home', (req, res) => {
