@@ -14,7 +14,6 @@ const PeriodicReportSchema = new Schema(
 	{ timestamps: true }
 );
 
-module.exports = model('PeriodicReport', PeriodicReportSchema);
 
 PeriodicReportSchema.pre('validate', async function ensureMaBC(next) {
 	try {
@@ -26,3 +25,4 @@ PeriodicReportSchema.pre('validate', async function ensureMaBC(next) {
 		next(e);
 	}
 });
+module.exports = model('PeriodicReport', PeriodicReportSchema);

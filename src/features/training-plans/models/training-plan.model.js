@@ -13,8 +13,6 @@ const TrainingPlanSchema = new Schema(
 	{ timestamps: true }
 );
 
-module.exports = model('TrainingPlan', TrainingPlanSchema);
-
 TrainingPlanSchema.pre('validate', async function ensureMaDT(next) {
 	try {
 		if (!this.maKeHoachDaoTao) {
@@ -25,3 +23,5 @@ TrainingPlanSchema.pre('validate', async function ensureMaDT(next) {
 		next(e);
 	}
 });
+
+module.exports = model('TrainingPlan', TrainingPlanSchema);

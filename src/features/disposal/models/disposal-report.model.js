@@ -43,7 +43,6 @@ const DisposalTicket = model('DisposalTicket', DisposalTicketSchema);
 const DisposalReport = model('DisposalReport', DisposalReportSchema);
 const DisposalDetail = model('DisposalDetail', DisposalDetailSchema);
 
-module.exports = { DisposalTicket, DisposalReport, DisposalDetail };
 
 DisposalTicketSchema.pre('validate', async function ensureMaTL(next) {
 	try {
@@ -66,3 +65,4 @@ DisposalReportSchema.pre('validate', async function ensureMaTLBC(next) {
 		next(e);
 	}
 });
+module.exports = { DisposalTicket, DisposalReport, DisposalDetail };

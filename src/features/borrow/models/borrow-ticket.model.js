@@ -58,7 +58,6 @@ const BorrowDetail = model('BorrowDetail', BorrowDetailSchema);
 const ReturnSlip = model('ReturnSlip', ReturnSlipSchema);
 const ReturnDetail = model('ReturnDetail', ReturnDetailSchema);
 
-module.exports = { BorrowTicket, BorrowDetail, ReturnSlip, ReturnDetail };
 
 BorrowTicketSchema.pre('validate', async function ensureMaPM(next) {
 	try {
@@ -81,3 +80,4 @@ ReturnSlipSchema.pre('validate', async function ensureMaPT(next) {
 		next(e);
 	}
 });
+module.exports = { BorrowTicket, BorrowDetail, ReturnSlip, ReturnDetail };

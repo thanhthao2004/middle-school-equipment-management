@@ -19,8 +19,6 @@ const DeviceSchema = new Schema(
 	{ timestamps: true }
 );
 
-module.exports = model('Device', DeviceSchema);
-
 DeviceSchema.pre('validate', async function ensureMaTB(next) {
 	try {
 		if (!this.maTB) {
@@ -31,3 +29,4 @@ DeviceSchema.pre('validate', async function ensureMaTB(next) {
 		next(e);
 	}
 });
+module.exports = model('Device', DeviceSchema);

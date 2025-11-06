@@ -11,7 +11,6 @@ const CategorySchema = new Schema(
 	{ timestamps: true }
 );
 
-module.exports = model('Category', CategorySchema);
 
 CategorySchema.pre('validate', async function ensureMaDM(next) {
 	try {
@@ -23,3 +22,4 @@ CategorySchema.pre('validate', async function ensureMaDM(next) {
 		next(e);
 	}
 });
+module.exports = model('Category', CategorySchema);

@@ -15,7 +15,6 @@ const SupplierSchema = new Schema(
 	{ timestamps: true }
 );
 
-module.exports = model('Supplier', SupplierSchema);
 
 SupplierSchema.pre('validate', async function ensureMaNCC(next) {
 	try {
@@ -27,3 +26,4 @@ SupplierSchema.pre('validate', async function ensureMaNCC(next) {
 		next(e);
 	}
 });
+module.exports = model('Supplier', SupplierSchema);
