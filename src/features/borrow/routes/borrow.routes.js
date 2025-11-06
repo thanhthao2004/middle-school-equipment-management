@@ -8,7 +8,6 @@ const borrowValidators = require('../validators/borrow.validators');
 
 // Apply auth middleware to all routes
 router.use(authenticate);
-router.use(validate);
 // GET Routes - Pages
 router.get('/register', borrowController.getRegisterPage);
 router.get('/history', borrowController.getHistoryPage);

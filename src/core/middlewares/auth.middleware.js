@@ -1,8 +1,10 @@
 /**
  * Authentication middleware
  */
-const { ERROR_CODES, getErrorMessage } = require('../constants/error-codes');
-const { sendError } = require('../utils/response');
+
+// KHÔNG require 'error-codes' và 'response' ở đây
+// const { ERROR_CODES, getErrorMessage } = require('../constants/error-codes');
+// const { sendError } = require('../utils/response');
 
 // Placeholder - implement with your auth strategy (JWT, session, etc.)
 const authenticate = async (req, res, next) => {
@@ -17,6 +19,9 @@ const authenticate = async (req, res, next) => {
 		// Remove this and implement actual auth
 		next();
 	} catch (error) {
+		// Tải module tại runtime (khi hàm được gọi)
+		const { ERROR_CODES, getErrorMessage } = require('../constants/error-codes');
+		const { sendError } = require('../utils/response');
 		return sendError(res, getErrorMessage(ERROR_CODES.UNAUTHORIZED), 401);
 	}
 };
@@ -27,6 +32,8 @@ const requireRole = (...allowedRoles) => {
 		// TODO: Get user from req.user (set by authenticate middleware)
 		// const userRole = req.user?.role;
 		// if (!userRole || !allowedRoles.includes(userRole)) {
+		//   const { ERROR_CODES, getErrorMessage } = require('../constants/error-codes');
+		//   const { sendError } = require('../utils/response');
 		//   return sendError(res, getErrorMessage(ERROR_CODES.FORBIDDEN), 403);
 		// }
 		next();
@@ -39,6 +46,8 @@ const requirePermission = (permission) => {
 		// TODO: Get user from req.user and check permission
 		// const userRole = req.user?.role;
 		// if (!hasPermission(userRole, permission)) {
+		//   const { ERROR_CODES, getErrorMessage } = require('../constants/error-codes');
+		//   const { sendError } = require('../utils/response');
 		//   return sendError(res, getErrorMessage(ERROR_CODES.FORBIDDEN), 403);
 		// }
 		next();
