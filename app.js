@@ -44,35 +44,7 @@ app.use('/purchasing-plans', purchasingRoutes);
 // Borrow (mượn thiết bị)
 const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
 app.use('/borrow', borrowRoutes);
-app.get('/', (req, res) => res.redirect('/teacher/home'));
-
-app.get('/teacher/home', (req, res) => {
-  res.render('borrow/views/teacher-home', { title: 'Trang chủ giáo viên', currentPage: 'teacher-home' });
-});
-
-app.get('/borrow/register', (req, res) => {
-  res.render('borrow/views/register', { title: 'Đăng ký mượn thiết bị', currentPage: 'register' });
-});
-
-app.get('/borrow/slip/:id', (req, res) => {
-  res.render('borrow/views/slip', { title: 'Phiếu mượn thiết bị', slipId: req.params.id, from: req.query.from || '' });
-});
-
-app.get('/borrow/history', (req, res) => {
-  res.render('borrow/views/history', { title: 'Lịch sử mượn/trả', currentPage: 'history' });
-});
-
-app.get('/borrow/pending-approvals', (req, res) => {
-  res.render('borrow/views/pending-approvals', { title: 'Chờ duyệt', currentPage: 'status' });
-});
-
-app.get('/borrow/detail/:id', (req, res) => {
-  res.render('borrow/views/detail', { title: 'Chi tiết phiếu', id: req.params.id });
-});
-
-app.get('/borrow/cancel', (req, res) => {
-  res.render('borrow/views/cancel', { title: 'Hủy phiếu' });
-});
+// app.get('/', (req, res) => res.redirect('/teacher/home'));
 
 // Categories feature
 const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
