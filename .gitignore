@@ -17,8 +17,8 @@ pids
 
 # Environment files
 .env
-.env.*
-!.env.example
+.env.local
+.env.*.local
 
 # Build and cache
 dist/

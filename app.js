@@ -1,9 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const config = require('./src/config/env');
-const logger = require('./src/config/logger');
-const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware');
+require('dotenv').config();
 
 const app = express();
 
@@ -23,53 +21,46 @@ app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist
 app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// ==========================
-//  Kết nối MongoDB
-// ==========================
-try {
-	const { connectMongo } = require('./src/config/db');
-	connectMongo();
-} catch (e) {
-	logger.error('MongoDB init failed:', e);
-}
-
-// ==========================
-//  ROUTES
-// ==========================
-
-// Borrow (mượn thiết bị)
-app.get('/', (req, res) => res.redirect('/teacher/home'));
 
 // Use feature routes
 const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
 app.use('/purchasing-plans', purchasingRoutes);
 
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+// ==========================
+// ⚙️ ROUTES
+// ==========================
+
+// Borrow (mượn thiết bị)
+app.get('/', (req, res) => res.redirect('/teacher/home'));
+
 app.get('/teacher/home', (req, res) => {
-	res.render('borrow/views/teacher-home', { title: 'Trang chủ giáo viên', currentPage: 'teacher-home' });
+  res.render('borrow/views/teacher-home', { title: 'Trang chủ giáo viên', currentPage: 'teacher-home' });
 });
 
 app.get('/borrow/register', (req, res) => {
-	res.render('borrow/views/register', { title: 'Đăng ký mượn thiết bị', currentPage: 'register' });
+  res.render('borrow/views/register', { title: 'Đăng ký mượn thiết bị', currentPage: 'register' });
 });
 
 app.get('/borrow/slip/:id', (req, res) => {
-	res.render('borrow/views/slip', { title: 'Phiếu mượn thiết bị', slipId: req.params.id, from: req.query.from || '' });
+  res.render('borrow/views/slip', { title: 'Phiếu mượn thiết bị', slipId: req.params.id, from: req.query.from || '' });
 });
 
 app.get('/borrow/history', (req, res) => {
-	res.render('borrow/views/history', { title: 'Lịch sử mượn/trả', currentPage: 'history' });
+  res.render('borrow/views/history', { title: 'Lịch sử mượn/trả', currentPage: 'history' });
 });
 
 app.get('/borrow/pending-approvals', (req, res) => {
-	res.render('borrow/views/pending-approvals', { title: 'Chờ duyệt', currentPage: 'status' });
+  res.render('borrow/views/pending-approvals', { title: 'Chờ duyệt', currentPage: 'status' });
 });
 
 app.get('/borrow/detail/:id', (req, res) => {
-	res.render('borrow/views/detail', { title: 'Chi tiết phiếu', id: req.params.id });
+  res.render('borrow/views/detail', { title: 'Chi tiết phiếu', id: req.params.id });
 });
 
 app.get('/borrow/cancel', (req, res) => {
-	res.render('borrow/views/cancel', { title: 'Hủy phiếu' });
+  res.render('borrow/views/cancel', { title: 'Hủy phiếu' });
 });
 
 // Categories feature (từ develop)
@@ -77,15 +68,7 @@ const categoriesRoutes = require('./src/features/categories/routes/categories.ro
 app.use('/categories', categoriesRoutes);
 
 // ==========================
-// Error Handling
-// ==========================
-app.use(notFoundHandler);
-app.use(errorHandler);
-
-// ==========================
 // Khởi động server
 // ==========================
-app.listen(config.port, () => {
-	logger.info(`Server đang chạy tại: http://localhost:${config.port}`);
-	logger.info(`Environment: ${config.nodeEnv}`);
-});
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Server đang chạy tại: http://localhost:${PORT}`));
