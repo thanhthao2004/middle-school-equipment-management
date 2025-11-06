@@ -7,6 +7,7 @@ const viewPath = path.join(__dirname, "../views");
 
 // Trang danh sách danh mục
 router.get("/", (req, res) => {
+  //mấy cái này là check model hoi
   const categories = [
     { id: "DM01", name: "ThietBiTinHoc", location: "Phong IT" },
     { id: "DM02", name: "ThietBiHoaHoc", location: "Phong HoaHoc" },
