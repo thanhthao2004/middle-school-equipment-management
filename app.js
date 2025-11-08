@@ -26,12 +26,17 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // ==========================
 //  Kết nối MongoDB
 // ==========================
-try {
-	const { connectMongo } = require('./src/config/db'); // FIX 4: Thêm lại kết nối DB
-	connectMongo();
-} catch (e) {
-	logger.error('MongoDB init failed:', e);
-}
+(async () => {
+	try {
+		const { connectMongo } = require('./src/config/db');
+		await connectMongo();
+		logger.info('MongoDB connection initiated');
+	} catch (e) {
+		logger.error('MongoDB init failed:', e.message);
+		logger.warn(' ** Server vẫn chạy nhưng chưa kết nối được MongoDB');
+		logger.warn(' ** Hướng dẫn: Chạy "npm run db:up" để khởi động MongoDB');
+	}
+})();
 
 // ==========================
 // ⚙️ ROUTES
