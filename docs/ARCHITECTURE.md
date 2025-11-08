@@ -329,7 +329,7 @@ Models định nghĩa cấu trúc dữ liệu trong MongoDB sử dụng Mongoose
 
 ---
 
-## 🔧 CORE (Các thành phần cốt lõi)
+##  CORE (Các thành phần cốt lõi)
 
 Thư mục `src/core/` chứa các thành phần dùng chung cho toàn bộ ứng dụng.
 
