@@ -50,6 +50,10 @@ app.use('/borrow', borrowRoutes);
 const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
 app.use('/categories', categoriesRoutes);
 
+// Suppliers feature
+const suppliersRoutes = require('./src/features/suppliers/routes/suppliers.routes');
+app.use('/suppliers', suppliersRoutes);
+
 // ==========================
 // Error Handling
 // ==========================
