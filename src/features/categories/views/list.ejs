@@ -11,73 +11,14 @@
     <!-- Font Awesome 6.4.0 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <style>
-        /* --- Reset & Global Style --- */
-        * {margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
-        body {background-color:#f8fafc;color:#0f172a;line-height:1.5;}
-
-        /* --- Sidebar --- */
-        .sidebar {width:230px;height:100vh;background-color:#1e3a8a;color:#fff;position:fixed;top:0;left:0;box-shadow:3px 0 8px rgba(0,0,0,0.08);display:flex;flex-direction:column;transition:0.3s;}
-        .sidebar h3 {padding:20px;font-size:18px;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.5px;color:white;}
-        .sidebar ul {list-style:none;margin-top:10px;padding-left:0;flex-grow:1;}
-        .sidebar ul li {padding:12px 20px;transition:background-color 0.25s,transform 0.1s;border-left:4px solid transparent;}
-        .sidebar ul li a {color:#ffffff;text-decoration:none;display:block;font-size:15px;font-weight:500;}
-        .sidebar ul li:hover {background-color:#2563eb;border-left:4px solid #93c5fd;}
-        .sidebar ul li.active {background-color:#1d4ed8;border-left:4px solid #60a5fa;}
-
-        /* --- Main content --- */
-        .main {margin-left:250px;padding:32px 40px;background-color:#f8fafc;min-height:100vh;transition:0.3s;}
-        .main-header {display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:2px solid #e2e8f0;padding-bottom:12px;}
-        .main-header h2 {font-size:26px;font-weight:700;color:#1e3a8a;letter-spacing:0.3px;}
-        .user {font-weight:600;color:#2563eb;background-color:#e0e7ff;padding:6px 12px;border-radius:6px;}
-
-        /* --- Sidebar toggle button --- */
-        .btn-menu {background:none;border:none;color:white;font-size:20px;cursor:pointer;margin-right:15px;}
-
-        /* --- Ô tìm kiếm --- */
-        .search-box {display:flex;justify-content:flex-end;margin-top:10px;margin-bottom:15px;}
-        .search-box input {padding:8px 12px;border:1px solid #e2e8f0;border-radius:6px 0 0 6px;outline:none;background-color:#fff;color:#0f172a;transition:0.2s;}
-        .search-box input:focus {border-color:#1d4ed8;box-shadow:0 0 0 2px rgba(30,58,138,0.2);}
-        .search-box button {padding:8px 14px;border:1px solid #1e3a8a;background-color:#e0e7ff;color:#1e3a8a;border-radius:0 6px 6px 0;cursor:pointer;font-weight:500;transition:0.25s ease;}
-        .search-box button:hover {background-color:#1d4ed8;border-color:#1d4ed8;color:#fff;}
-
-        /* --- Bảng dữ liệu --- */
-        table {width:100%;border-collapse:collapse;background-color:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(30,58,138,0.08);}
-        th, td {border:1px solid #e2e8f0;text-align:left;padding:10px 12px;font-size:15px;}
-        th {background-color:#f1f5f9;text-align:center;font-weight:600;color:#0f172a;letter-spacing:0.3px;}
-        tr:nth-child(even){background-color:#f8fafc;}
-        tr:hover{background-color:#e0e7ff;transition:0.25s ease;}
-        td a {text-decoration:none;color:#1e3a8a;font-weight:500;}
-        td a:hover {color:#1d4ed8;text-decoration:underline;}
-
-        /* --- Nút thêm --- */
-        .btn-add {display:inline-block;margin-top:30px;margin-left:auto;background-color:#1e3a8a;color:#fff !important;border:2px solid #1e40af;border-radius:8px;padding:10px 22px;cursor:pointer;font-weight:600;text-decoration:none;transition:background-color 0.25s ease, transform 0.2s ease;}
-        .btn-add:hover {background-color:#1d4ed8;color:#fff !important;transform:translateY(-2px);}
-        .btn-add:focus {outline:none;box-shadow:0 0 0 3px rgba(30,58,138,0.3);}
-
-        /* --- Modal Xóa --- */
-        #deleteModal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;}
-        #deleteModal .modal-box {background:#fff;padding:30px;border-radius:10px;text-align:center;max-width:400px;}
-        #deleteModal h3 {color:#dc2626;margin-bottom:20px;}
-        #deleteModal p {margin-bottom:30px;}
-        #deleteModal button {padding:10px 20px;border:none;border-radius:6px;font-weight:600;cursor:pointer;margin:0 10px;}
-        #deleteModal .confirm {background:#dc2626;color:white;}
-        #deleteModal .confirm:hover {background:#b91c1c;}
-        #deleteModal .cancel {background:#e0e7ff;color:#1e3a8a;}
-        #deleteModal .cancel:hover {background:#c7d2fe;}
-    </style>
+    <link rel="stylesheet" href="/public/stylesheets/categories.css">
+    <link rel="stylesheet" href="/public/stylesheets/style.css">   
+</head>   
 </head>
 
 <body>
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <h3><i class="fas fa-table"></i> Bảng chọn</h3>
-        <ul>
-            <li><a href="/reports"><i class="fas fa-chart-line"></i> Báo cáo thanh lý</a></li>
-            <li><a href="/suppliers"><i class="fas fa-building"></i> Quản lý nhà cung cấp</a></li>
-            <li><a href="/categories" class="active"><i class="fas fa-folder"></i> Danh mục thiết bị</a></li>
-        </ul>
-    </div>
+    <%- include('../../../views/partials/categories-sidebar') %>
 
     <!-- Main content -->
     <div class="main">
@@ -133,38 +74,6 @@
         </div>
     </div>
 
-    <script>
-        // Toggle sidebar
-        const sidebar = document.getElementById("sidebar");
-        const toggleBtn = document.getElementById("toggleSidebar");
-        toggleBtn.addEventListener("click", () => {
-            if(sidebar.style.left === "-250px"){
-                sidebar.style.left = "0";
-            } else {
-                sidebar.style.left = "-250px";
-            }
-        });
-
-        // Modal Xóa
-        const deleteModal = document.getElementById("deleteModal");
-        const deleteText = document.getElementById("deleteText");
-        const deleteForm = document.getElementById("deleteForm");
-        const cancelBtn = document.getElementById("cancelBtn");
-
-        document.querySelectorAll(".btn-delete").forEach(btn => {
-            btn.addEventListener("click", function(e) {
-                e.preventDefault();
-                const id = this.dataset.id;
-                const name = this.dataset.name;
-                deleteText.textContent = `Bạn có chắc chắn muốn xóa danh mục "${name}" không?`;
-                deleteForm.action = `/categories/delete/${id}`;
-                deleteModal.style.display = "flex";
-            });
-        });
-
-        cancelBtn.addEventListener("click", () => {
-            deleteModal.style.display = "none";
-        });
-    </script>
+    <script src="/public/javascripts/categories.js"></script>
 </body>
 </html>
