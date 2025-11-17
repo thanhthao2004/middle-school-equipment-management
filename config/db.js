@@ -6,7 +6,7 @@ const connectDB = async () => {
     console.log('MongoDB connected...');
   } catch (err) {
     console.error('MongoDB connection error:', err);
-    console.log('💡 Hướng dẫn: Cài đặt và chạy MongoDB:');
+    console.log('** Hướng dẫn: Cài đặt và chạy MongoDB:');
     console.log('   1. brew install mongodb-community (macOS)');
     console.log('   2. brew services start mongodb-community');
     console.log('   3. Hoặc tải MongoDB Compass và chạy local');
