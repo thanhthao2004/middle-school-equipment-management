@@ -1,0 +1,21 @@
+<!-- Suppliers Feature Sidebar -->
+<div class="sidebar">
+    <h3><i class="fas fa-table"></i> Bảng chọn</h3>
+    <ul>
+        <li>
+            <a class="<%= (typeof currentPage !== 'undefined' && currentPage === 'reports') ? 'active' : '' %>" href="/reports">
+                <i class="fas fa-chart-line me-2"></i> Báo cáo thanh lý
+            </a>
+        </li>
+        <li>
+            <a class="<%= (typeof currentPage !== 'undefined' && currentPage === 'suppliers') ? 'active' : '' %>" href="/suppliers">
+                <i class="fas fa-building me-2"></i> Quản lý nhà cung cấp
+            </a>
+        </li>
+        <li>
+            <a class="<%= (typeof currentPage !== 'undefined' && currentPage === 'categories') ? 'active' : '' %>" href="/categories">
+                <i class="fas fa-folder me-2"></i> Danh mục thiết bị
+            </a>
+        </li>
+    </ul>
+</div>
