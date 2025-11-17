@@ -1,47 +1,24 @@
 const express = require('express');
 const router = express.Router();
+const authController = require('../controllers/auth.controller');
+// const { validate } = require('../../../core/middlewares/validation.middleware');
+// const authValidators = require('../validators/auth.validators'); // Tương lai sẽ thêm validator
 
-// Render change password page
-router.get('/change-password', (req, res) => {
-	res.render('auth/views/change-password', {
-		title: 'Đổi mật khẩu',
-		errors: [],
-		success: null
-	});
-});
+// GET /auth/login - Hiển thị form đăng nhập
+router.get('/login', authController.getLoginPage);
 
-// Handle change password submission (basic validation only)
-router.post('/change-password', (req, res) => {
-	const { currentPassword, newPassword, confirmPassword } = req.body || {};
-	const errors = [];
+// POST /auth/login - Xử lý đăng nhập
+router.post('/login', authController.handleLogin);
 
-	if (!currentPassword || currentPassword.trim() === '') {
-		errors.push('Vui lòng nhập mật khẩu hiện tại.');
-	}
+// GET /auth/logout - Xử lý đăng xuất
+router.get('/logout', authController.handleLogout);
 
-	if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 8) {
-		errors.push('Mật khẩu mới phải có ít nhất 8 ký tự.');
-	}
+// GET /auth/change-password - Vẫn giữ lại để tránh lỗi
+router.get('/change-password', authController.getChangePasswordPage);
 
-	if (newPassword !== confirmPassword) {
-		errors.push('Mật khẩu mới và xác nhận không khớp.');
-	}
+// POST /auth/change-password - Vẫn giữ lại để tránh lỗi
+router.post('/change-password', authController.getChangePasswordPage);
 
-	if (errors.length) {
-		return res.render('auth/views/change-password', {
-			title: 'Đổi mật khẩu',
-			errors,
-			success: null
-		});
-	}
-
-	// TODO: Thực hiện thay đổi mật khẩu thực sự bằng cách gọi service/controller.
-	// Ở đây tạm mô phỏng thành công.
-	return res.render('auth/views/change-password', {
-		title: 'Đổi mật khẩu',
-		errors: [],
-		success: 'Mật khẩu đã được cập nhật thành công.'
-	});
-});
+// ĐÃ LOẠI BỎ: /forgot-password và /register
 
 module.exports = router;
