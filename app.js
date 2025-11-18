@@ -1,6 +1,7 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 require('dotenv').config();
 
 const app = express();
@@ -8,60 +9,65 @@ const app = express();
 // ==========================
 // ⚙️ Cấu hình view engine
 // ==========================
+// THAY ĐỔI QUAN TRỌNG: Cấu hình views về thư mục gốc chứa views
+app.set('views', path.join(__dirname, 'src/views')); 
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'src/features'));
 
 // ==========================
-// ⚙️ Middleware & Static
+// ⚙️ Middleware & Static Files
 // ==========================
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
 app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ==========================
-// ⚙️ ROUTES
+// ⚙️ Routes cấu hình
 // ==========================
+const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
+const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
 
-// Borrow (mượn thiết bị)
-app.get('/', (req, res) => res.redirect('/teacher/home'));
+app.use('/borrow', borrowRoutes);
+app.use('/purchasing-plans', purchasingRoutes); // Thêm route của Purchasing Plans
+// Thêm các route khác tại đây...
 
-app.get('/teacher/home', (req, res) => {
-  res.render('borrow/views/teacher-home', { title: 'Trang chủ giáo viên', currentPage: 'teacher-home' });
-});
-
-app.get('/borrow/register', (req, res) => {
-  res.render('borrow/views/register', { title: 'Đăng ký mượn thiết bị', currentPage: 'register' });
-});
-
-app.get('/borrow/slip/:id', (req, res) => {
-  res.render('borrow/views/slip', { title: 'Phiếu mượn thiết bị', slipId: req.params.id, from: req.query.from || '' });
-});
-
-app.get('/borrow/history', (req, res) => {
-  res.render('borrow/views/history', { title: 'Lịch sử mượn/trả', currentPage: 'history' });
-});
-
-app.get('/borrow/pending-approvals', (req, res) => {
-  res.render('borrow/views/pending-approvals', { title: 'Chờ duyệt', currentPage: 'status' });
-});
-
-app.get('/borrow/detail/:id', (req, res) => {
-  res.render('borrow/views/detail', { title: 'Chi tiết phiếu', id: req.params.id });
-});
-
-app.get('/borrow/cancel', (req, res) => {
-  res.render('borrow/views/cancel', { title: 'Hủy phiếu' });
-});
-
-// Categories feature (từ develop)
-const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
-app.use('/categories', categoriesRoutes);
+app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
 
 // ==========================
-// Khởi động server
+// ⚙️ 404 & Error Handling
 // ==========================
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server đang chạy tại: http://localhost:${PORT}`));
+// 404 Handler
+app.use((req, res, next) => {
+    // THAY ĐỔI QUAN TRỌNG: Gọi file view chung 'error_page'
+    res.status(404).render('error_page', { 
+        title: '404 - Không tìm thấy trang',
+        message: 'Trang bạn yêu cầu không tồn tại.',
+        status: 404
+    });
+});
+
+// 500 Handler (Error middleware)
+app.use((err, req, res, next) => {
+    console.error('❌ SERVER ERROR:', err.stack);
+    
+    // Đảm bảo status được set là 500
+    const status = err.status || 500;
+    
+    // THAY ĐỔI QUAN TRỌNG: Gọi file view chung 'error_page'
+    res.status(status).render('error_page', { 
+        title: `${status} - Lỗi máy chủ`,
+        message: 'Đã xảy ra lỗi nội bộ trên server.',
+        status: status,
+        // Chỉ hiển thị stack trace nếu không phải môi trường production
+        errorDetail: app.get('env') === 'development' ? err.stack : undefined 
+    });
+});
+
+// ==========================
+// ⚙️ Xuất app cho bin/www
+// ==========================
+module.exports = app;
