@@ -1,9 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const config = require('./src/config/env'); 
+const config = require('./src/config/env');
 const logger = require('./src/config/logger');
-const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware'); 
+const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware');
 
 const app = express();
 
@@ -45,6 +45,9 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // Use feature routes
 const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
 app.use('/purchasing-plans', purchasingRoutes);
+// Training-plans feature
+const trainingRoutes = require('./src/features/training-plans/routes/training.routes');
+app.use('/training-plans', trainingRoutes);
 
 // Borrow (mượn thiết bị)
 const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
@@ -58,13 +61,13 @@ app.use('/categories', categoriesRoutes);
 // ==========================
 // Error Handling
 // ==========================
-app.use(notFoundHandler); 
+app.use(notFoundHandler);
 app.use(errorHandler);
 
 // ==========================
 // Khởi động server
 // ==========================
 app.listen(config.port, () => {
-  logger.info(`Server đang chạy tại: http://localhost:${config.port}`);
-  logger.info(`Environment: ${config.nodeEnv}`);
+	logger.info(`Server đang chạy tại: http://localhost:${config.port}`);
+	logger.info(`Environment: ${config.nodeEnv}`);
 });
