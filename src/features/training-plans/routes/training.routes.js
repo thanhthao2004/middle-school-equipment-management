@@ -1,0 +1,43 @@
+const express = require('express');
+const router = express.Router();
+
+// Temporary sample data for training plans
+function sampleTrainingPlans() {
+    return [
+        { id: 1, code: 'KHDT001', schoolYear: '2019-2020', createdAt: '2019-08-07' },
+        { id: 2, code: 'KHDT002', schoolYear: '2020-2021', createdAt: '2020-08-07' },
+        { id: 3, code: 'KHDT003', schoolYear: '2021-2022', createdAt: '2021-08-07' },
+        { id: 4, code: 'KHDT004', schoolYear: '2022-2023', createdAt: '2022-08-07' },
+        { id: 5, code: 'KHDT005', schoolYear: '2023-2024', createdAt: '2023-08-07' },
+        { id: 6, code: 'KHDT006', schoolYear: '2024-2025', createdAt: '2024-08-07' },
+        { id: 7, code: 'KHDT007', schoolYear: '2025-2026', createdAt: '2025-08-07' }
+    ];
+}
+
+function sampleYears() {
+    return ['2019-2020', '2020-2021', '2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
+}
+
+function getPlanById(id) {
+    const plans = sampleTrainingPlans();
+    return plans.find(p => String(p.id) === String(id)) || null;
+}
+
+// List training plans
+router.get('/', (req, res) => {
+    const trainingPlans = sampleTrainingPlans();
+    const years = sampleYears();
+    const queryYear = req.query.year || '';
+    // Simple filter by year if provided
+    const filtered = queryYear ? trainingPlans.filter(p => p.schoolYear === queryYear) : trainingPlans;
+    res.render('training-plans/views/list', { title: 'Xem kế hoạch đào tạo', trainingPlans: filtered, years, queryYear });
+});
+
+// View single plan
+router.get('/:id', (req, res) => {
+    const plan = getPlanById(req.params.id);
+    if (!plan) return res.status(404).send('Kế hoạch không tồn tại');
+    res.render('training-plans/views/view', { title: 'Xem kế hoạch', plan });
+});
+
+module.exports = router;

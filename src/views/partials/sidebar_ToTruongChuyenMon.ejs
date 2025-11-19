@@ -2,15 +2,15 @@
     <div class="menu-title">☰ &nbsp; BẢNG CHỌN</div>
     <nav class="menu">
         <a href="/reports/device-stats" class="nav-link">
-            <span class="icon">📊</span>
+            <span class="icon"><i class="fa-solid fa-chart-bar" aria-hidden="true"></i></span>
             <span class="text">Xem báo cáo thống kê thiết bị hỏng</span>
         </a>
-        <a href="/training-plans" class="nav-link">
-            <span class="icon">📅</span>
+        <a href="/training-plans" class="nav-link <%= (active && active==='trainingPlans') ? 'active' : '' %>">
+            <span class="icon"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>
             <span class="text">Xem kế hoạch đào tạo</span>
         </a>
         <a href="/purchasing-plans" class="nav-link <%= (active && active==='purchasing') ? 'active' : '' %>">
-            <span class="icon">🛒</span>
+            <span class="icon"><i class="fa-solid fa-shopping-cart" aria-hidden="true"></i></span>
             <span class="text">Quản lý kế hoạch mua sắm</span>
         </a>
     </nav>
