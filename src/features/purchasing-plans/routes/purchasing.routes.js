@@ -1,10 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-// NOTE: controllers are not implemented yet in this project. To keep
-// behavior consistent with the previous temporary routes in `app.js`
-// we return sample data and render the existing views under
-// `purchasing-plans/views`.
+// Temporary routes for purchasing plans (using in-memory sample data)
 
 function samplePlans() {
     return [
@@ -20,6 +17,11 @@ function samplePlans() {
 
 function sampleYears() {
     return ['2019-2020', '2020-2021', '2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
+}
+
+function getPlanById(id) {
+    const plans = samplePlans();
+    return plans.find(p => String(p.id) === String(id)) || null;
 }
 
 // List purchasing plans
@@ -42,20 +44,19 @@ router.post('/', (req, res) => {
 
 // View a single plan (render edit view in read-only mode)
 router.get('/:id', (req, res) => {
-    const plans = samplePlans();
-    const plan = plans.find(p => String(p.id) === String(req.params.id)) || null;
+    const plan = getPlanById(req.params.id);
     if (!plan) return res.status(404).send('Kế hoạch không tồn tại');
-    // reuse edit view for display with a flag
     res.render('purchasing-plans/views/edit', { title: 'Xem kế hoạch', plan, readOnly: true });
 });
 
 // Render edit form
 router.get('/:id/edit', (req, res) => {
-    const plans = samplePlans();
-    const plan = plans.find(p => String(p.id) === String(req.params.id)) || null;
+    const plan = getPlanById(req.params.id);
     if (!plan) return res.status(404).send('Kế hoạch không tồn tại');
     res.render('purchasing-plans/views/edit', { title: 'Sửa kế hoạch', plan, readOnly: false });
 });
+
+
 
 // Update action (temporary)
 router.put('/:id', (req, res) => {
@@ -71,8 +72,7 @@ router.delete('/:id', (req, res) => {
 
 // Approve page
 router.get('/:id/approve', (req, res) => {
-    const plans = samplePlans();
-    const plan = plans.find(p => String(p.id) === String(req.params.id)) || null;
+    const plan = getPlanById(req.params.id);
     if (!plan) return res.status(404).send('Kế hoạch không tồn tại');
     res.render('purchasing-plans/views/approve', { title: 'Duyệt kế hoạch', plan });
 });

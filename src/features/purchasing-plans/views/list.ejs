@@ -8,19 +8,14 @@
         <%= title %>
     </title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="/public/stylesheets/style.css" rel="stylesheet">
-    <style>
-        /* local small overrides if needed */
-        .action-btn {
-            min-width: 40px;
-            text-align: center
-        }
-    </style>
+    <link href="/public/stylesheets/purchasing-plans.css" rel="stylesheet">
 </head>
 
 <body>
     <div class="app-shell">
-        <%- include('../../../views/partials/sidebar', { active: 'purchasing' }) %>
+        <%- include('../../../views/partials/sidebar_ToTruongChuyenMon', { active: 'purchasing' }) %>
 
             <main class="main-content">
                 <div class="page-header">
@@ -39,12 +34,15 @@
                                     <% }); %>
                                         <% } %>
                         </select>
-                        <button id="year-filter-btn" class="btn btn-outline-primary"><span
-                                class="search-icon">🔍</span></button>
+                        <button id="year-filter-btn" class="btn btn-outline-primary">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
                     </div>
 
                     <div>
-                        <a href="/purchasing-plans/create" class="btn-register">+ Lập kế hoạch mua sắm mới</a>
+                        <a href="/purchasing-plans/create" class="btn-register">
+                            <i class="fa-solid fa-plus"></i> Lập kế hoạch mua sắm mới
+                        </a>
                     </div>
                 </div>
 
@@ -86,19 +84,21 @@
                                                                     <% } %>
                                                 </td>
                                                 <td class="float-right">
-                                                    <a href="/purchasing-plans/<%= plan.id %>" class="action-btn"
-                                                        title="Xem">👁️</a>
+                                                    <a href="/purchasing-plans/<%= plan.id %>"
+                                                        class="action-btn btn-view" title="Xem">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </a>
                                                     <% if (plan.status==='pending' ) { %>
                                                         <a href="/purchasing-plans/<%= plan.id %>/edit"
-                                                            class="action-btn" title="Sửa">✏️</a>
-                                                        <form action="/purchasing-plans/<%= plan.id %>?_method=DELETE"
-                                                            method="post" style="display:inline-block"
-                                                            class="delete-form">
-                                                            <!-- use a button that triggers the confirmation modal -->
-                                                            <button type="button" class="btn-cancel delete-btn"
-                                                                data-plan-code="<%= plan.code %>"
-                                                                title="Xóa">🗑️</button>
-                                                        </form>
+                                                            class="action-btn btn-edit" title="Sửa">
+                                                            <i class="fa-solid fa-pen"></i>
+                                                        </a>
+
+                                                        <a href="#" data-plan-id="<%= plan.id %>"
+                                                            data-plan-code="<%= plan.code %>"
+                                                            class="action-btn btn-delete" title="Xóa">
+                                                            <i class="fa-solid fa-trash-can"></i>
+                                                        </a>
                                                         <% } %>
                                                 </td>
                                             </tr>
@@ -107,8 +107,7 @@
                                 </table>
                             </div>
                             <div id="no-results" class="alert alert-warning mt-3" style="display:none">Không có kế hoạch
-                                mua
-                                sắm cho năm học đã chọn.</div>
+                                mua sắm cho năm học đã chọn.</div>
                             <% } else { %>
                                 <div class="alert alert-info">Chưa có kế hoạch mua sắm nào.</div>
                                 <% } %>
@@ -117,70 +116,31 @@
             </main>
     </div>
 
-    <script src="/js/bootstrap.bundle.min.js"></script>
-    <!-- Confirmation modal for delete actions -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    <!-- Delete confirmation modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteLabel">Xác nhận xóa</h5>
+                    <h5>Xác nhận xóa kế hoạch</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa Kế hoạch mua sắm này không?
-                    <div id="modal-plan-code" class="mt-2 fw-bold"></div>
+                    <p>Bạn có chắc chắn muốn xóa kế hoạch sau không?</p>
+                    <p class="confirm-code">Mã kế hoạch: <span id="modalPlanCode"></span></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" id="confirm-delete" class="btn btn-danger">Xóa</button>
+                    <form id="deleteForm" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="/js/bootstrap.bundle.min.js"></script>
     <script>
-        (function () {
-            const deleteModalEl = document.getElementById('confirmDeleteModal');
-            let deleteModal = null;
-            try {
-                deleteModal = new bootstrap.Modal(deleteModalEl);
-            } catch (e) {
-                // bootstrap not available or error; fallback to native confirm later
-                deleteModal = null;
-            }
-
-            let formToSubmit = null;
-
-            document.addEventListener('click', function (e) {
-                const target = e.target;
-                if (target && target.classList.contains('delete-btn')) {
-                    // find the parent form
-                    const form = target.closest('form');
-                    const planCode = target.getAttribute('data-plan-code') || '';
-                    if (deleteModal) {
-                        formToSubmit = form;
-                        const codeEl = document.getElementById('modal-plan-code');
-                        codeEl.textContent = planCode ? `Mã kế hoạch: ${planCode}` : '';
-                        deleteModal.show();
-                    } else {
-                        // fallback to native confirm
-                        const ok = confirm('Bạn có chắc chắn muốn xóa Kế hoạch mua sắm này không?');
-                        if (ok && form) form.submit();
-                    }
-                }
-            });
-
-            const confirmBtn = document.getElementById('confirm-delete');
-            if (confirmBtn) {
-                confirmBtn.addEventListener('click', function () {
-                    if (formToSubmit) formToSubmit.submit();
-                });
-            }
-        })();
-    </script>
-    <script>
-        // Year filter: show only rows that match selected year
+        // Year filter
         (function () {
             const yearSelect = document.getElementById('year-filter');
             const yearBtn = document.getElementById('year-filter-btn');
@@ -204,12 +164,29 @@
                 if (noResults) noResults.style.display = any ? 'none' : 'block';
             }
 
-            // Only filter when user clicks the search button.
             if (yearBtn) {
                 yearBtn.addEventListener('click', function () {
                     filterByYear(yearSelect ? yearSelect.value : '');
                 });
             }
+        })();
+
+        // Delete confirmation modal
+        (function () {
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            const modalPlanCode = document.getElementById('modalPlanCode');
+            const deleteForm = document.getElementById('deleteForm');
+
+            document.querySelectorAll('.action-btn.btn-delete').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const planId = btn.dataset.planId;
+                    const planCode = btn.dataset.planCode;
+                    modalPlanCode.textContent = planCode;
+                    deleteForm.action = '/purchasing-plans/' + planId + '?_method=DELETE';
+                    deleteModal.show();
+                });
+            });
         })();
     </script>
 </body>
