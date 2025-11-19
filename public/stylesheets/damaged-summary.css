@@ -1,0 +1,72 @@
+.table th,
+.table td {
+    text-align: center;
+    /* Căn giữa theo chiều ngang */
+    vertical-align: middle;
+    /* Căn giữa theo chiều dọc */
+    white-space: nowrap;
+    /* Không xuống dòng */
+}
+
+.table th:first-child,
+.table td:first-child {
+    text-align: left;
+    /* Nếu muốn cột Mã kế hoạch để trái */
+}
+
+/* Badge cho mức độ hỏng */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-weight: 600;
+}
+
+.status-high {
+    /* Nặng */
+    background: rgba(220, 53, 69, 0.12);
+    color: var(--error-red);
+}
+
+.status-medium {
+    /* Khá */
+    background: rgba(59, 130, 246, 0.12);
+    color: var(--primary-blue-hover);
+}
+
+.status-normal {
+    /* Trung bình */
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-unknown {
+    /* Không xác định */
+    background: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+.export-btn {
+    border-radius: 25px;
+    /* bo tròn nhỏ gọn */
+    padding: 6px 16px;
+    /* padding nhỏ hơn */
+    font-size: 0.9rem;
+    /* chữ nhỏ vừa */
+    font-weight: 600;
+    background: linear-gradient(90deg, #4e73df 0%, #1cc88a 100%);
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.export-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+    color: #fff;
+}
+
+.export-btn i {
+    vertical-align: middle;
+}
