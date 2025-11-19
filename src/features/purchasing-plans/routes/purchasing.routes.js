@@ -56,7 +56,7 @@ router.get('/:id/edit', (req, res) => {
     res.render('purchasing-plans/views/edit', { title: 'Sửa kế hoạch', plan, readOnly: false });
 });
 
-// Note: delete confirmation handled inline in the list view now
+
 
 // Update action (temporary)
 router.put('/:id', (req, res) => {
