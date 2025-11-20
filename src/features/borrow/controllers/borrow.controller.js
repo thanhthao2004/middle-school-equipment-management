@@ -5,7 +5,7 @@ class BorrowController {
     // GET /borrow/register - Đăng ký mượn thiết bị
     async getRegisterPage(req, res) {
         try {
-            res.render('borrow/register', {
+            res.render('borrow/views/register', { 
                 title: 'Đăng ký mượn thiết bị',
                 currentPage: 'register',
                 sidebarType: 'borrow-sidebar',
@@ -14,19 +14,16 @@ class BorrowController {
             });
         } catch (error) {
             console.error('Error rendering register page:', error);
-            res.status(500).render('error', { 
-                message: 'Lỗi khi tải trang đăng ký mượn',
-                error: process.env.NODE_ENV === 'development' ? error : {}
-            });
+            res.status(500).send(error.message); // Sửa lỗi render
         }
     }
 
     // GET /borrow/pending-approvals - Danh sách phiếu chờ duyệt
     async getPendingApprovalsPage(req, res) {
         try {
-            const userId = req.user?.id || 1;
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
             const slips = await borrowService.getPendingApprovals(userId, {});
-            res.render('borrow/pending-approvals', {
+            res.render('borrow/views/pending-approvals', { // <-- ĐÃ SỬA
                 title: 'Phiếu mượn chờ duyệt',
                 currentPage: 'status',
                 sidebarType: 'borrow-sidebar',
@@ -35,17 +32,14 @@ class BorrowController {
             });
         } catch (error) {
             console.error('Error rendering pending approvals page:', error);
-            res.status(500).render('error', {
-                message: 'Lỗi khi tải trang chờ duyệt',
-                error: process.env.NODE_ENV === 'development' ? error : {}
-            });
+            res.status(500).send(error.message); // Sửa lỗi render
         }
     }
 
     // API: GET /borrow/api/pending-approvals
     async getPendingApprovals(req, res) {
         try {
-            const userId = req.user?.id || 1;
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
             const { id, createdFrom, createdTo, search } = req.query;
             const slips = await borrowService.getPendingApprovals(userId, { id, createdFrom, createdTo, search });
             res.json({ success: true, data: slips });
@@ -70,7 +64,7 @@ class BorrowController {
     // GET /borrow/history - Lịch sử mượn/trả
     async getHistoryPage(req, res) {
         try {
-            res.render('borrow/history', {
+            res.render('borrow/views/history', { 
                 title: 'Lịch sử mượn/trả',
                 currentPage: 'history',
                 sidebarType: 'borrow-sidebar',
@@ -79,17 +73,16 @@ class BorrowController {
             });
         } catch (error) {
             console.error('Error rendering history page:', error);
-            res.status(500).render('error', { 
-                message: 'Lỗi khi tải trang lịch sử',
-                error: process.env.NODE_ENV === 'development' ? error : {}
-            });
+            res.status(500).send(error.message); // Sửa lỗi render
         }
     }
 
     // GET /borrow/status - Tình trạng phiếu mượn
     async getStatusPage(req, res) {
         try {
-            res.render('borrow/status', {
+            // LƯU Ý: file 'borrow/status.ejs' không tồn tại.
+            // Tạm thời render trang 'pending-approvals'
+            res.render('borrow/views/pending-approvals', { // <-- ĐÃ SỬA
                 title: 'Tình trạng phiếu mượn',
                 currentPage: 'status',
                 sidebarType: 'borrow-sidebar',
@@ -98,17 +91,14 @@ class BorrowController {
             });
         } catch (error) {
             console.error('Error rendering status page:', error);
-            res.status(500).render('error', { 
-                message: 'Lỗi khi tải trang tình trạng',
-                error: process.env.NODE_ENV === 'development' ? error : {}
-            });
+            res.status(500).send(error.message); // Sửa lỗi render
         }
     }
 
     // GET /borrow/teacher-home - Trang chủ giáo viên
     async getTeacherHomePage(req, res) {
         try {
-            res.render('borrow/teacher-home', {
+            res.render('borrow/views/teacher-home', { // <-- ĐÃ SỬA
                 title: 'Trang chủ giáo viên',
                 currentPage: 'teacher-home',
                 sidebarType: 'borrow-sidebar',
@@ -117,10 +107,7 @@ class BorrowController {
             });
         } catch (error) {
             console.error('Error rendering teacher home page:', error);
-            res.status(500).render('error', { 
-                message: 'Lỗi khi tải trang chủ giáo viên',
-                error: process.env.NODE_ENV === 'development' ? error : {}
-            });
+            res.status(500).send(error.message); // Sửa lỗi render
         }
     }
 
@@ -128,7 +115,7 @@ class BorrowController {
     async createBorrowRequest(req, res) {
         try {
             const borrowData = req.body;
-            const userId = req.user?.id || 1; // Mock user ID
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
             
             const result = await borrowService.createBorrowRequest(userId, borrowData);
             
@@ -153,7 +140,7 @@ class BorrowController {
             const slipId = req.params.id;
             const slip = await borrowService.getBorrowSlip(slipId);
             
-            res.render('borrow/slip', {
+            res.render('borrow/views/slip', { // <-- ĐÃ SỬA
                 title: `Phiếu mượn ${slipId}`,
                 currentPage: 'slip',
                 sidebarType: 'borrow-sidebar',
@@ -163,17 +150,14 @@ class BorrowController {
             });
         } catch (error) {
             console.error('Error rendering borrow slip:', error);
-            res.status(500).render('error', { 
-                message: 'Lỗi khi tải phiếu mượn',
-                error: process.env.NODE_ENV === 'development' ? error : {}
-            });
+            res.status(500).send(error.message); // Sửa lỗi render
         }
     }
 
     // API: GET /borrow/api/history
     async getHistoryApi(req, res) {
         try {
-            const userId = req.user?.id || 1;
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
             const { status, createdFrom, createdTo, search } = req.query;
             const items = await borrowService.getBorrowHistory(userId, { status, createdFrom, createdTo, search });
             res.json({ success: true, data: items });

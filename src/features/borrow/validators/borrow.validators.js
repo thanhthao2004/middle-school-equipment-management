@@ -18,11 +18,17 @@ const createBorrowRequest = [
         .isISO8601()
         .withMessage('Ngày mượn không hợp lệ')
         .custom((value) => {
+            // Reset time về 00:00:00 để chỉ so sánh ngày
             const borrowDate = new Date(value);
+            borrowDate.setHours(0, 0, 0, 0);
+            
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
             
+            // Phải đăng ký ít nhất 1 ngày trước (tức là >= tomorrow)
             if (borrowDate < tomorrow) {
                 throw new Error('Cần đăng ký sớm hơn (≥1 ngày) trước buổi dạy');
             }

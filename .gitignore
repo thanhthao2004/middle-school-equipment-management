@@ -40,4 +40,4 @@ Thumbs.db
 *.swp
 
 # Optional: if using Docker
-docker-compose.override.yml
+docker-compose.override.ymllogs/
