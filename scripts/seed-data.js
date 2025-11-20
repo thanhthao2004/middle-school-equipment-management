@@ -296,4 +296,17 @@ async function seedData() {
 }
 
 // Chạy script
-if (require.main === mod
+if (require.main === module) {
+    seedData()
+        .then(() => {
+            console.log('\n✅ Script hoàn thành!');
+            process.exit(0);
+        })
+        .catch((error) => {
+            console.error('\n❌ Script thất bại:', error);
+            process.exit(1);
+        });
+}
+
+module.exports = { seedData };
+
