@@ -23,7 +23,7 @@ const config = {
 		uploadDir: process.env.UPLOAD_DIR || 'uploads',
 	},
 	rabbitmq: {
-		uri: process.env.RABBITMQ_URI || 'amqp://localhost:5672',
+		uri: process.env.RABBITMQ_URI
 	},
 };
 

@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const compression = require('compression');
 const path = require('path');
 const config = require('./src/config/env'); 
 const logger = require('./src/config/logger');
@@ -16,17 +17,32 @@ app.set('views', path.join(__dirname, 'src/features'));
 // ==========================
 //  Middleware & Static
 // ==========================
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// Compression middleware - nén response để giảm băng thông
+app.use(compression({
+	filter: (req, res) => {
+		// Chỉ nén nếu client hỗ trợ
+		if (req.headers['x-no-compression']) {
+			return false;
+		}
+		// Sử dụng compression mặc định
+		return compression.filter(req, res);
+	},
+	level: 6, // Mức độ nén (1-9, 6 là cân bằng tốt)
+	threshold: 1024 // Chỉ nén response > 1KB
+}));
+
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
 
 app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
 app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // ==========================
-//  Kết nối MongoDB
+//  Kết nối MongoDB (không block app startup)
 // ==========================
-(async () => {
+// Kết nối MongoDB trong background, không chờ đợi
+setImmediate(async () => {
 	try {
 		const { connectMongo } = require('./src/config/db');
 		await connectMongo();
@@ -36,7 +52,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 		logger.warn(' ** Server vẫn chạy nhưng chưa kết nối được MongoDB');
 		logger.warn(' ** Hướng dẫn: Chạy "npm run db:up" để khởi động MongoDB');
 	}
-})();
+});
 
 // ==========================
 //  ROUTES
@@ -67,4 +83,7 @@ app.use(errorHandler);
 app.listen(config.port, () => {
   logger.info(`Server đang chạy tại: http://localhost:${config.port}`);
   logger.info(`Environment: ${config.nodeEnv}`);
+  if (process.send) {
+    process.send('ready');
+  }
 });

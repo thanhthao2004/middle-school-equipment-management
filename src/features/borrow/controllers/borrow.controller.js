@@ -5,7 +5,7 @@ class BorrowController {
     // GET /borrow/register - Đăng ký mượn thiết bị
     async getRegisterPage(req, res) {
         try {
-            res.render('borrow/views/register', { // <-- ĐÃ SỬA
+            res.render('borrow/views/register', { 
                 title: 'Đăng ký mượn thiết bị',
                 currentPage: 'register',
                 sidebarType: 'borrow-sidebar',
@@ -64,7 +64,7 @@ class BorrowController {
     // GET /borrow/history - Lịch sử mượn/trả
     async getHistoryPage(req, res) {
         try {
-            res.render('borrow/views/history', { // <-- ĐÃ SỬA
+            res.render('borrow/views/history', { 
                 title: 'Lịch sử mượn/trả',
                 currentPage: 'history',
                 sidebarType: 'borrow-sidebar',

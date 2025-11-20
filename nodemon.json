@@ -1,7 +1,17 @@
 {
-  "watch": ["src", "app.js"],
+  "watch": [
+    "src",
+    "app.js"
+  ],
   "ext": "js,ejs",
-  "ignore": ["node_modules", "public", "docs", "*.log"],
-  "delay": 2000
+  "ignore": [
+    "node_modules",
+    "public",
+    "docs",
+    "*.log",
+    ".git"
+  ],
+  "delay": 1000,
+  "exec": "node app.js",
+  "verbose": false
 }
-

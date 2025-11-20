@@ -1,11 +1,21 @@
 // Borrow Service
 const borrowRepo = require('../repositories/borrow.repo');
 const { publishMessage } = require('../../../config/rabbitmq');
+const cache = require('../../../core/utils/cache');
 
 class BorrowService {
-    // Lấy danh sách thiết bị với bộ lọc
+    // Lấy danh sách thiết bị với bộ lọc - Tối ưu với caching
     async getDevices(filters = {}) {
         try {
+            // Tạo cache key từ filters
+            const cacheKey = `devices:${JSON.stringify(filters)}`;
+            
+            // Kiểm tra cache trước
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return cached;
+            }
+
             // Mock data - trong thực tế sẽ gọi database
             const mockDevices = [
                 {
@@ -125,6 +135,9 @@ class BorrowService {
                 );
             }
 
+            // Lưu vào cache (TTL 2 phút cho dữ liệu thiết bị)
+            cache.set(cacheKey, filteredDevices, 120000);
+
             return filteredDevices;
         } catch (error) {
             console.error('Error in getDevices service:', error);
@@ -141,9 +154,16 @@ class BorrowService {
                 throw new Error('Vui lòng chọn ít nhất một thiết bị');
             }
 
+            // Reset time về 00:00:00 để chỉ so sánh ngày
             const borrowDate = new Date(borrowData.borrowDate);
+            borrowDate.setHours(0, 0, 0, 0);
+            
             const returnDate = new Date(borrowData.returnDate);
+            returnDate.setHours(0, 0, 0, 0);
+            
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -151,6 +171,7 @@ class BorrowService {
                 throw new Error('Ngày trả phải sau hoặc bằng ngày mượn');
             }
 
+            // Phải đăng ký ít nhất 1 ngày trước (tức là >= tomorrow)
             if (borrowDate < tomorrow) {
                 throw new Error('Cần đăng ký sớm hơn (≥1 ngày) trước buổi dạy');
             }

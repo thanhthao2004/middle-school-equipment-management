@@ -65,4 +65,16 @@ async function publishMessage(msg) {
     }
     
     try {
-        const msgBuffer = Buffer
+        const msgBuffer = Buffer.from(JSON.stringify(msg));
+        channel.publish(exchangeName, routingKey, msgBuffer, { persistent: true });
+        logger.info(`Message published to ${exchangeName} (${routingKey})`);
+    } catch (err) {
+        logger.error('Failed to publish message:', err.message);
+        throw err;
+    }
+}
+
+module.exports = {
+    connectRabbitMQ,
+    publishMessage
+};

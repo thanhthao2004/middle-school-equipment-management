@@ -136,15 +136,115 @@
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
+
+/* Borrow Form Modal - Full width on large screens */
+.borrow-form-modal {
+    max-width: 95%;
+    width: 95%;
+}
+
+@media (min-width: 992px) {
+    .borrow-form-modal {
+        max-width: 98%;
+        width: 98%;
+    }
+}
+
+@media (min-width: 1400px) {
+    .borrow-form-modal {
+        max-width: 95%;
+        width: 95%;
+    }
+}
+
+/* Borrow form table wrapper */
+.borrow-form-table-wrapper {
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+/* Borrow form table styling */
+.borrow-form-table {
+    font-size: 0.85rem;
+    min-width: 1600px;
+    table-layout: fixed;
+}
+
+.borrow-form-table th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    vertical-align: middle;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.borrow-form-table td {
+    padding: 0.75rem 0.5rem;
+    vertical-align: middle;
+    word-wrap: break-word;
+    overflow: hidden;
+}
+
+.borrow-form-table td input,
+.borrow-form-table td select,
+.borrow-form-table td textarea {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.5rem;
+    width: 100%;
+    min-width: 100px;
+    box-sizing: border-box;
+}
+
+/* Đặc biệt cho cột Dạy tiết */
+.borrow-form-table td:nth-child(11) {
+    min-width: 120px;
+}
+
+.borrow-form-table td:nth-child(11) select {
+    min-width: 120px;
+    width: 100%;
+}
+
+/* Đặc biệt cho cột Nội dung */
+.borrow-form-table td:nth-child(12) {
+    min-width: 200px;
+}
+
+.borrow-form-table td:nth-child(12) textarea {
+    min-width: 200px;
+    width: 100%;
+    resize: vertical;
+}
+
+.borrow-form-table .device-name {
+    font-weight: 600;
+    color: #212529;
+}
+
+.borrow-form-table .device-code {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
 .modal-header {
     background-color: var(--light-gray);
     border-bottom: 1px solid var(--border-gray);
     border-radius: 12px 12px 0 0;
+    padding: 1rem 1.5rem;
 }
+
 .modal-footer {
     border-top: 1px solid var(--border-gray);
     background-color: var(--light-gray);
     border-radius: 0 0 12px 12px;
+    padding: 1rem 1.5rem;
 }
 .borrow-slip {
             background-color: #f8f9fa;
