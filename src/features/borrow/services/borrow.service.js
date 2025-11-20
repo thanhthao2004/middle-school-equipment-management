@@ -277,6 +277,43 @@ class BorrowService {
         // In real app: validate permissions, update DB, restore quantities
         return { id: slipId, status: 'canceled' };
     }
+      // API cho QLTB: Lấy danh sách phiếu mượn đang chờ duyệt
+    async getPendingBorrows() {
+        // Mock data
+        return [
+            { id: 'PM001', createdAt: '15/11/2025', note: 'Dạy Tin học 7A', status: 'pending' },
+            { id: 'PM002', createdAt: '16/11/2025', note: 'Bộ thí nghiệm Hóa 9B', status: 'pending' }
+        ];
+    }
+
+    // API cho QLTB: Lấy danh sách phiếu trả đang chờ duyệt
+    async getPendingReturns() {
+        // Mock data
+        return [
+            { id: 'PT001', maPhieuMuon: 'PM001', ngayTra: '18/11/2025', status: 'pending' },
+            { id: 'PT002', maPhieuMuon: 'PM003', ngayTra: '19/11/2025', status: 'pending' }
+        ];
+    }
+
+    // API cho QLTB: Duyệt phiếu mượn (Mock)
+    async approveBorrow(slipId, approvedBy) {
+        console.log(`✅ QLTB approved borrow ${slipId} by ${approvedBy}`);
+        return { id: slipId, status: 'approved' };
+    }
+
+    // API cho QLTB: Từ chối phiếu mượn (Mock)
+    async rejectBorrow(slipId, reason) {
+        console.log(`❌ QLTB rejected borrow ${slipId} because: ${reason}`);
+        return { id: slipId, status: 'rejected' };
+    }
+
+    // API cho QLTB: Xác nhận trả phiếu (Mock)
+    async approveReturn(slipId, confirmedBy) {
+        console.log(`✅ QLTB confirmed return ${slipId} by ${confirmedBy}`);
+        return { id: slipId, status: 'confirmed' };
+    }
+
+    
 }
 
 module.exports = new BorrowService();
