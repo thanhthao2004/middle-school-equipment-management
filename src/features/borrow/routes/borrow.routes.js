@@ -22,10 +22,4 @@ router.post('/register',
     borrowController.createBorrowRequest
 );
 
-// API Routes
-router.get('/api/devices', borrowController.getDevices);
-router.get('/api/pending-approvals', borrowController.getPendingApprovals);
-router.post('/api/cancel/:id', borrowController.cancelBorrow);
-router.get('/api/history', borrowController.getHistoryApi);
-
 module.exports = router;

@@ -1,0 +1,27 @@
+{
+  "watch": [
+    "src",
+    "app.js"
+  ],
+  "ext": "js,ejs",
+  "ignore": [
+    "node_modules",
+    "public",
+    "docs",
+    "logs",
+    "scripts",
+    "*.log",
+    ".git",
+    "**/*.swp",
+    "**/*.swo",
+    "**/.DS_Store",
+    "**/node_modules/**",
+    "**/.git/**"
+  ],
+  "delay": 3000,
+  "exec": "node app.js",
+  "verbose": false,
+  "restartable": "rs",
+  "colours": true,
+  "legacyWatch": true
+}

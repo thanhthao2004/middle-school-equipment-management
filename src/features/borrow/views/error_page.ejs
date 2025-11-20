@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Lỗi Hệ thống' %></title>
+    <!-- Giả định bạn có file CSS Bootstrap tại /css/bootstrap.min.css -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; }
+        .error-container { max-width: 600px; padding: 40px; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { font-size: 80px; color: #dc3545; margin-bottom: 0; }
+        h2 { color: #343a40; margin-bottom: 20px; }
+        p { color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <% 
+            // Sử dụng giá trị truyền vào hoặc giá trị mặc định
+            const statusCode = typeof status !== 'undefined' ? status : 500;
+            const errorTitle = typeof message !== 'undefined' ? message : 'Đã có lỗi nội bộ trên server.';
+        %>
+        <h1><%= statusCode %></h1>
+        <h2><%= errorTitle %></h2>
+        <p>Vui lòng thử lại hoặc liên hệ quản trị viên để được hỗ trợ.</p>
+        <% if (typeof errorDetail !== 'undefined' && errorDetail) { %>
+            <pre class="text-start p-3 bg-light rounded text-muted small"><%= errorDetail %></pre>
+        <% } %>
+        <a href="/" class="btn btn-primary mt-3">Quay về Trang chủ</a>
+    </div>
+</body>
+</html>

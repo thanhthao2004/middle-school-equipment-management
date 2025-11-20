@@ -4,77 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang chủ giáo viên - Mượn thiết bị</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="/public/stylesheets/borrow.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg" style="background-color: var(--primary-blue);">
-        <div class="container">
-            <a class="navbar-brand text-white fw-bold" href="/teacher/home">Thiết bị Trường THCS</a>
-        </div>
-    </nav>
+    <%- include('../../../views/partials/borrow-sidebar', { currentPage: 'teacher-home' }) %>
 
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="h3 mb-1" style="color: var(--dark-gray);">Trang chủ giáo viên</h1>
-                <p class="text-muted mb-0">Quản lý mượn trả thiết bị dạy học</p>
-            </div>
-        </div>
+    <div class="main-content">
+        
+        <%- include('../../../views/partials/header', { currentPage: 'home' }) %>
 
-        <div class="row g-4">
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card feature-card h-100">
-                    <div class="card-body d-flex gap-3 align-items-start">
-                        <div class="feature-icon">
-                            <i class="bi bi-clipboard-check"></i>
-                        </div>
-                        <div>
-                            <h5 class="card-title mb-1">Đăng ký mượn</h5>
-                            <p class="card-text text-muted mb-3">Chọn thiết bị và tạo phiếu mượn.</p>
-                            <a class="feature-link" href="/borrow/register">Đi tới đăng ký →</a>
-                        </div>
-                    </div>
+        <div class="container py-5">
+            <div 
+ class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-1" style="color: var(--dark-gray);">Trang chủ giáo viên</h1>
+                    <p class="text-muted mb-0">Quản lý mượn trả thiết bị dạy học</p>
                 </div>
             </div>
 
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card feature-card h-100">
-                    <div class="card-body d-flex gap-3 align-items-start">
-                        <div class="feature-icon">
-                            <i class="bi bi-hourglass-split"></i>
-                        </div>
-                        <div>
-                            <h5 class="card-title mb-1">Chờ duyệt</h5>
-                            <p class="card-text text-muted mb-3">Theo dõi phiếu mượn đang chờ duyệt.</p>
-                            <a class="feature-link" href="/borrow/pending-approvals">Xem danh sách →</a>
+            <div class="row g-4">
+           
+      <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body d-flex gap-3 align-items-start">
+                            <div class="feature-icon">
+                            
+     <i class="bi bi-clipboard-check"></i>
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-1">Đăng ký mượn</h5>
+                  
+               <p class="card-text text-muted mb-3">Chọn thiết bị và tạo phiếu mượn.</p>
+                                <a class="feature-link" href="/borrow/register">Đi tới đăng ký →</a>
+                            </div>
+                       
+  </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body d-flex gap-3 align-items-start">
+                 
+            <div class="feature-icon">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                            <div>
+              
+                   <h5 class="card-title mb-1">Chờ duyệt</h5>
+                                <p class="card-text text-muted mb-3">Theo dõi phiếu mượn đang chờ duyệt.</p>
+                                <a class="feature-link" href="/borrow/pending-approvals">Xem danh sách →</a>
+             
+                </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card feature-card h-100">
-                    <div class="card-body d-flex gap-3 align-items-start">
-                        <div class="feature-icon">
-                            <i class="bi bi-clock-history"></i>
-                        </div>
-                        <div>
-                            <h5 class="card-title mb-1">Lịch sử mượn/trả</h5>
-                            <p class="card-text text-muted mb-3">Xem lại các phiếu đã mượn/trả.</p>
-                            <a class="feature-link" href="/borrow/history">Xem lịch sử →</a>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card feature-card h-100">
+       
+                  <div class="card-body d-flex gap-3 align-items-start">
+                            <div class="feature-icon">
+                                <i class="bi bi-clock-history"></i>
+                            
+ </div>
+                            <div>
+                                <h5 class="card-title mb-1">Lịch sử mượn/trả</h5>
+                                <p class="card-text text-muted mb-3">Xem lại các phiếu đã mượn/trả.</p>
+            
+                     <a class="feature-link" href="/borrow/history">Xem lịch sử →</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Usecase extend (xem chi tiết, hủy) sẽ thực hiện trong màn Chờ duyệt -->
+            </div>
         </div>
-    </div>
 
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <script src="/js/bootstrap.bundle.min.js"></script>
+        <%- include('../../../views/partials/footer') %>
+        
+    </div> 
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
