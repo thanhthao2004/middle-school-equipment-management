@@ -242,40 +242,38 @@ Where to start in a feature
 This matrix shows where each documented use case should be implemented.
 
 - Đăng nhập/Đăng xuất/Đổi mật khẩu/Quên mật khẩu → `features/auth`
-  - `/login`, `/logout`, `/password/change`, `/password/forgot`
+  enpoint:`/login`, `/logout`, `/password/change`, `/password/forgot`
 - Quản lý biên bản nghiệm thu thiết bị mới (xem/sửa/xóa chi tiết) → `features/acceptance`
-  - `/acceptance`, item operations inside feature
+  enpoint: `/acceptance`, item operations inside feature
 - Quản lý báo cáo tình trạng thiết bị định kỳ → `features/periodic-reports`
-  - `/periodic-reports` list/detail/create/edit
+  enpoint: `/periodic-reports` list/detail/create/edit
 - Duyệt mượn thiết bị / Duyệt trả thiết bị → `features/borrow`
-  - `/borrow/approve`, `/borrow/return`
+  enpoint: `/borrow/approve`, `/borrow/return`
 - Đăng ký mượn, Xem chờ duyệt, Lịch sử mượn/trả, Xem chi tiết, Hủy phiếu → `features/borrow`
-  - `/borrow`, `/borrow/pending`, `/borrow/history`, `/borrow/:id`, `/borrow/:id/cancel`
+  enpoint: `/borrow`, `/borrow/pending`, `/borrow/history`, `/borrow/:id`, `/borrow/:id/cancel`
 - Báo cáo thanh lý thiết bị hỏng (tìm kiếm/xem/sửa/thêm/xóa) → `features/disposal`
-  - `/disposal` search/list/detail/create/edit/delete
+  enpoint: `/disposal` search/list/detail/create/edit/delete
 - Xét duyệt thanh lý thiết bị hỏng → `features/disposal`
-  - `/disposal/approve`
+  enpoint: `/disposal/approve`
 - Quản lý nhà cung cấp (tìm kiếm/xem/thêm/sửa/xóa) → `features/suppliers`
-  - `/suppliers`
+  enpoint: `/suppliers`
 - Quản lý danh mục thiết bị (tìm kiếm/xem/thêm/sửa/xóa) → `features/categories`
-  - `/categories`
+  enpoint:`/categories`
 - Quản lý thiết bị (xem danh sách/tìm kiếm/thêm/sửa/xóa) → `features/devices`
-  - `/devices`
+  enpoint: `/devices`
 - Xem báo cáo thống kê thiết bị hỏng → `features/reports`
-  - `/reports/damaged-summary`
+  enpoint: `/reports/damaged-summary`
 -- Thống kê thiết bị (tổng hợp theo danh mục/tình trạng/nhà cung cấp, v.v.) → `features/device-stats`
-  - `/device-stats` (overview) và các nhánh con nếu cần
+  enpoint: `/device-stats` (overview) và các nhánh con nếu cần
 - Quản lý kế hoạch đào tạo + Xem báo cáo kế hoạch đào tạo → `features/training-plans`
-  - `/training-plans`, `/training-plans/report`
+  enpoint:`/training-plans`, `/training-plans/report`
 - Quản lý thông tin cá nhân/Đổi mật khẩu cá nhân → `features/profile`
-  - `/profile`, `/profile/password`
+  enpoint:`/profile`
 - Quản lý kế hoạch mua sắm (lập/sửa/xóa/xem) → `features/purchasing-plans`
-  - `/purchasing-plans`
+  enpoint:`/purchasing-plans`
 - Xét duyệt mua sắm thiết bị → `features/purchasing-plans`
-  - `/purchasing-plans/approve`
+  enpoint: `/purchasing-plans/approve`
 - Quản lý thông tin người dùng (tạo/sửa/xóa) → `features/users`
-  - `/users`
-
-If a use case is not listed above, open an issue or PR to map it to a feature; default rule: align with the closest domain feature and extract shared logic into `src/core` when more than one feature needs it.
+  enpoint:`/users`
 
 
