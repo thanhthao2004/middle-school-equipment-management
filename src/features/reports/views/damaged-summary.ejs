@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="/public/stylesheets/damaged-summary.css" rel="stylesheet">
+    <link href="/public/stylesheets/purchasing-plans.css" rel="stylesheet">
+    <link href="/public/stylesheets/tranining-plans.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+    <div class="app-shell">
+        <%- include('../../../views/partials/sidebar_ToTruongChuyenMon', { active: 'reports' }) %>
+
+            <main class="main-content">
+                <div class="page-header">
+                    <h1>Xem báo cáo thống kê thiết bị hỏng</h1>
+                </div>
+
+                <div class="controls">
+                    <!-- Reserved for future filters -->
+                </div>
+
+                <div class="card card-table mt-3">
+                    <div class="card-body">
+                        <% const _items=items || rows || damagedItems || []; if (_items && _items.length) { %>
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên Danh Mục TB</th>
+                                            <th>Mã TB</th>
+                                            <th>Tên TB</th>
+                                            <th class="text-center">Số lượng</th>
+                                            <th>ĐVT</th>
+                                            <th class="text-end">Mức độ hỏng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% _items.forEach(function(it, idx) { %>
+                                            <tr>
+                                                <td>
+                                                    <%= it.categoryName || it.catName || it.category || '-' %>
+                                                </td>
+                                                <td>
+                                                    <%= it.code || it.itemCode || '-' %>
+                                                </td>
+                                                <td>
+                                                    <%= it.name || it.itemName || '-' %>
+                                                </td>
+                                                <td class="text-center">
+                                                    <%= it.quantity !=null ? it.quantity : '-' %>
+                                                </td>
+                                                <td>
+                                                    <%= it.unit || it.uom || '-' %>
+                                                </td>
+                                                <td class="text-end">
+                                                    <span class="status-badge 
+                                                <% if(it.severity === 'nang' || it.severity === 'high'){ %>status-high<% } 
+                                                   else if(it.severity === 'kha' || it.severity === 'medium'){ %>status-medium<% } 
+                                                   else if(it.severity === 'trungbinh' || it.severity === 'normal'){ %>status-normal<% } 
+                                                   else { %>status-unknown<% } %>">
+                                                        <% if(it.severity==='nang' || it.severity==='high' ){ %>Nặng<% }
+                                                                else if(it.severity==='kha' || it.severity==='medium' ){
+                                                                %>Khá<% } else if(it.severity==='trungbinh' ||
+                                                                    it.severity==='normal' ){ %>Trung bình<% } else { %>
+                                                                        -<% } %>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <% } else { %>
+                                <div class="alert alert-info">Không có dữ liệu báo cáo.</div>
+                                <% } %>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a href="/reports/damaged-summary/export" class="btn btn-primary btn-lg export-btn">
+                        <i class="fas fa-file-export me-2"></i> Xuất báo cáo
+                    </a>
+                </div>
+            </main>
+    </div>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
