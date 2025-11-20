@@ -1,0 +1,7 @@
+{
+  "watch": ["src", "app.js"],
+  "ext": "js,ejs",
+  "ignore": ["node_modules", "public", "docs", "*.log"],
+  "delay": 2000
+}
+

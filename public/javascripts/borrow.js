@@ -258,17 +258,20 @@ function resetFilters() {
 
 function toggleAdvancedFilters() {
     const advancedFilters = document.getElementById('advancedFilters');
+    const advancedButtons = document.getElementById('advancedFilterButtons'); // Thêm dòng này
     const toggleBtn = document.getElementById('toggleAdvancedBtn');
     
-    if (advancedFilters && toggleBtn) {
+    if (advancedFilters && toggleBtn && advancedButtons) { // Thêm advancedButtons vào
         const icon = toggleBtn.querySelector('i');
         
         if (advancedFilters.style.display === 'none') {
             advancedFilters.style.display = 'block';
+            advancedButtons.style.display = 'block'; 
             icon.className = 'fas fa-chevron-up me-1';
             toggleBtn.innerHTML = '<i class="fas fa-chevron-up me-1"></i>Ẩn bộ lọc nâng cao';
         } else {
             advancedFilters.style.display = 'none';
+            advancedButtons.style.display = 'none'; 
             icon.className = 'fas fa-chevron-down me-1';
             toggleBtn.innerHTML = '<i class="fas fa-chevron-down me-1"></i>Bộ lọc nâng cao';
         }

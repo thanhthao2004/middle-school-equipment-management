@@ -1,5 +1,6 @@
 // Borrow Service
 const borrowRepo = require('../repositories/borrow.repo');
+const { publishMessage } = require('../../../config/rabbitmq');
 
 class BorrowService {
     // Lấy danh sách thiết bị với bộ lọc
@@ -134,12 +135,12 @@ class BorrowService {
     // Tạo yêu cầu mượn mới
     async createBorrowRequest(userId, borrowData) {
         try {
-            // Validate borrow data
+            // --- Phần 1: Validation (Vẫn giữ lại) ---
+            // (Phần logic này chạy đồng bộ trước khi gửi)
             if (!borrowData.devices || borrowData.devices.length === 0) {
                 throw new Error('Vui lòng chọn ít nhất một thiết bị');
             }
 
-            // Validate dates
             const borrowDate = new Date(borrowData.borrowDate);
             const returnDate = new Date(borrowData.returnDate);
             const today = new Date();
@@ -153,28 +154,25 @@ class BorrowService {
             if (borrowDate < tomorrow) {
                 throw new Error('Cần đăng ký sớm hơn (≥1 ngày) trước buổi dạy');
             }
-
-            // Generate borrow slip ID
-            const slipId = `PM${Date.now().toString().slice(-6)}`;
-
-            // Create borrow request
-            const borrowRequest = {
-                id: slipId,
+            
+            // --- Phần 2: Thay đổi logic ---
+            // Thay vì tạo slipId và lưu vào DB/mock...
+            // ...chúng ta tạo một payload (gói tin)
+            const messagePayload = {
                 userId: userId,
-                devices: borrowData.devices,
-                borrowDate: borrowDate,
-                returnDate: returnDate,
-                sessionTime: borrowData.sessionTime,
-                content: borrowData.content,
-                status: 'pending',
-                createdAt: new Date(),
-                updatedAt: new Date()
+                borrowData: borrowData,
+                requestedAt: new Date().toISOString()
             };
 
-            // In real application, save to database
-            // await borrowRepo.createBorrowRequest(borrowRequest);
+            // Gửi message tới RabbitMQ
+            await publishMessage(messagePayload);
+            
+            // Trả về thông báo thành công ngay lập...
+            return { 
+                success: true, 
+                message: 'Yêu cầu mượn của bạn đã được tiếp nhận và đang chờ xử lý.' 
+            };
 
-            return borrowRequest;
         } catch (error) {
             console.error('Error in createBorrowRequest service:', error);
             throw error;

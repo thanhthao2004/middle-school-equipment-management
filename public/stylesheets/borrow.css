@@ -1,70 +1,8 @@
 /* Borrow Feature Styles */
-/* CSS Variables theo COLOR_GUIDELINES.md */
-:root {
-    --primary-blue: #1e3a8a;
-    --primary-blue-hover: #3b82f6;
-    --primary-blue-light: #007bff;
-    --white: #ffffff;
-    --light-gray: #f8f9fa;
-    --medium-gray: #e9ecef;
-    --border-gray: #dee2e6;
-    --text-gray: #6c757d;
-    --dark-gray: #495057;
-    --success-green: #28a745;
-    --error-red: #dc3545;
-}
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--light-gray);
-}
-
-/* Sidebar */
-.sidebar {
-    background-color: var(--primary-blue);
-    min-height: 100vh;
-    padding: 0;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-}
-.sidebar .nav-link {
-    color: var(--white);
-    padding: 15px 20px;
-    border-radius: 0;
-    transition: all 0.3s ease;
-    border-left: 3px solid transparent;
-}
-.sidebar .nav-link:hover {
-    background-color: var(--primary-blue-hover);
-    border-left-color: var(--white);
-}
-.sidebar .nav-link.active {
-    background-color: var(--primary-blue-hover);
-    border-left-color: var(--white);
-}
-
-/* Main Content */
-.main-content {
-    background-color: var(--white);
-    min-height: 100vh;
-}
-
-/* Header */
-.page-header {
-    background: linear-gradient(135deg, var(--primary-blue-light), var(--primary-blue));
-    color: var(--white);
-    padding: 2rem 0;
-    margin-bottom: 2rem;
-}
-
-/* Cards */
-.card {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-    transition: all 0.3s ease;
-}
-.card:hover {
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+/* SỬA LỖI DỒN CHỮ (TEXT WRAP) TRÊN CÁC NÚT */
+.card .card-body .btn {
+    white-space: nowrap;
 }
 
 /* Tables */
@@ -149,6 +87,7 @@ body {
     font-weight: 600;
     border-radius: 8px;
     transition: all 0.3s ease;
+    white-space: nowrap; /* Đảm bảo nút "Đăng ký" không bị dồn chữ */
 }
 .btn-register:hover {
     background-color: #0056b3;
@@ -164,6 +103,7 @@ body {
     font-weight: 600;
     border-radius: 8px;
     transition: all 0.3s ease;
+    white-space: nowrap; /* Đảm bảo nút "Hủy chọn" không bị dồn chữ */
 }
 .btn-cancel:hover {
     background-color: #c82333;
@@ -177,10 +117,6 @@ body {
     background-color: var(--primary-blue-light);
     border-color: var(--primary-blue-light);
 }
-.form-check-input:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
 
 /* Selection counter */
 .selection-counter {
@@ -192,44 +128,6 @@ body {
     font-weight: 600;
     display: inline-block;
     margin-left: 1rem;
-}
-
-/* Loading spinner */
-.spinner-border-sm {
-    width: 1rem;
-    height: 1rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .equipment-table {
-        font-size: 0.8rem;
-    }
-    .equipment-table th,
-    .equipment-table td {
-        padding: 0.5rem 0.25rem;
-    }
-    .btn-register,
-    .btn-cancel {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-    }
-}
-
-/* Animation for table rows */
-.table-row-enter {
-    animation: slideInUp 0.3s ease;
-}
-
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 /* Modal improvements */
@@ -248,41 +146,51 @@ body {
     background-color: var(--light-gray);
     border-radius: 0 0 12px 12px;
 }
-
-/* Alert styles */
-.alert {
-    border: none;
-    border-radius: 8px;
-    font-weight: 500;
-}
-.alert-success {
-    background-color: rgba(40, 167, 69, 0.1);
-    color: var(--success-green);
-    border-left: 4px solid var(--success-green);
-}
-.alert-danger {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: var(--error-red);
-    border-left: 4px solid var(--error-red);
-}
-
-/* Toast notification styles */
-.toast-container {
-    z-index: 9999;
-}
-.toast {
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-.toast-body {
-    font-weight: 500;
-}
-
-/* Row highlight animation */
-@keyframes highlightRow {
-    0% { background-color: rgba(0, 123, 255, 0.1); }
-    100% { background-color: transparent; }
-}
-.row-highlight {
-    animation: highlightRow 2s ease-out;
-}
+.borrow-slip {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+ }
+        .slip-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .slip-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #495057;
+        }
+        .slip-id {
+            font-size: 1.1rem;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+        .equipment-table {
+            font-size: 0.9rem;
+        }
+        .equipment-table th {
+            background-color: #e9ecef;
+            font-weight: 600;
+            text-align: center;
+        }
+        .equipment-table td {
+            vertical-align: middle;
+        }
+        .borrower-info {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .btn-close.slip-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #dc3545;
+            cursor: pointer;
+        }
