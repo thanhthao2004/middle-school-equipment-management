@@ -1,0 +1,557 @@
+/* ---------------------------- */
+/* supplier.css - Full styles   */
+/* ---------------------------- */
+
+/* --- Reset & Global --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    /* removed outer whitespace so layout spans full viewport */
+    min-height: 100vh;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    background: var(--light-gray);
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    box-shadow: 3px 0 12px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    transition: 0.3s;
+}
+
+.sidebar h3 {
+    padding: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: white;
+}
+
+.sidebar ul {
+    list-style: none;
+    margin-top: 10px;
+    padding-left: 0;
+    flex-grow: 1;
+}
+
+.sidebar ul li {
+    width: 100%;
+    padding: 12px 20px;
+    transition: background-color 0.3s, transform 0.2s, border-left 0.3s;
+    border-left: 4px solid transparent;
+    border-radius: 0 8px 8px 0;
+}
+
+.sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* --- hover --- */
+.sidebar ul li:hover {
+    background-color: rgba(37, 99, 235, 0.2);
+    border-left: 4px solid #93c5fd;
+    transform: translateX(3px);
+}
+
+.sidebar ul li.active {
+    background-color: rgba(37, 99, 235, 0.35);
+    border-left: 4px solid #60a5fa;
+    transform: none;
+}
+
+
+/* --- Sidebar toggle --- */
+.btn-menu {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+/* Sidebar collapse */
+.sidebar-collapsed {
+    left: -250px !important;
+    transition: left 0.3s ease;
+}
+
+
+/* --- Submenu (nếu cần) --- */
+.sidebar ul li ul {
+    display: none;
+    padding-left: 10px;
+}
+
+.sidebar ul li ul li {
+    padding: 8px 20px;
+}
+
+.sidebar ul li ul li a {
+    font-size: 14px;
+}
+
+.sidebar ul li.active ul {
+    display: block;
+}
+
+/* --- Main --- */
+.main {
+    margin-left: 250px;
+    padding: 32px 40px;
+    min-height: 100vh;
+    transition: 0.3s;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    border-bottom: 2px solid rgba(226, 232, 240, 0.6);
+    padding-bottom: 12px;
+}
+
+.main-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e3a8a;
+    letter-spacing: 0.3px;
+}
+
+.user {
+    font-weight: 600;
+    color: #2563eb;
+    background: #e0e7ff;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+
+/* --- Main content --- */
+.main {
+    margin-left: 250px;
+    padding: 32px 40px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+    transition: 0.3s;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 12px;
+}
+
+.main-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e3a8a;
+    letter-spacing: 0.3px;
+}
+
+.user {
+    font-weight: 600;
+    color: #2563eb;
+    background-color: #e0e7ff;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+
+/* --- Sidebar toggle --- */
+.btn-menu {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+/* Sidebar collapse */
+.sidebar-collapsed {
+    left: -250px !important;
+    transition: left 0.3s ease;
+}
+
+
+/* --- Form modern --- */
+form {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.12);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #1e3a8a;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: 0.25s;
+    outline: none;
+}
+
+input[type="text"]:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+input[readonly] {
+    background: #f1f5f9;
+    color: #475569;
+    cursor: not-allowed;
+}
+
+/* --- Input fields --- */
+input[type="text"],
+input[type="email"],
+input[type="date"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #0f172a;
+    outline: none;
+    transition: 0.25s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="date"]:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+input[readonly] {
+    background-color: #f1f5f9;
+    color: #475569;
+    cursor: not-allowed;
+}
+
+
+/* --- Readonly input --- */
+input[readonly] {
+    background-color: #f1f5f9;
+    color: #475569;
+    cursor: not-allowed;
+}
+
+/* --- Buttons modern --- */
+.btn-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+    gap: 20px;
+}
+
+button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease, transform 0.2s;
+}
+
+.btn-save {
+    background: #1e3a8a;
+    color: #fff;
+}
+
+.btn-save:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.btn-cancel {
+    background: #e11d48;
+    color: #fff;
+}
+
+.btn-cancel:hover {
+    background: #be123c;
+    transform: translateY(-2px);
+}
+
+.btn-add {
+    display: inline-block;
+    margin-top: 30px;
+    margin-left: auto;
+    background: #1e3a8a;
+    color: #fff !important;
+    border: 2px solid #1e40af;
+    border-radius: 8px;
+    padding: 10px 22px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.25s ease, transform 0.2s;
+}
+
+.btn-add:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.btn-add:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.3);
+}
+
+
+/* --- Table modern --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+}
+
+th,
+td {
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+th {
+    background: #f1f5f9;
+    text-align: center;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+tr:hover {
+    background: linear-gradient(to right, #e0e7ff, #dbeafe);
+    transition: 0.3s ease;
+}
+
+td a {
+    text-decoration: none;
+    color: #1e3a8a;
+    font-weight: 500;
+}
+
+td a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+/* --- Add button --- */
+.btn-add {
+    display: inline-block;
+    margin-top: 30px;
+    margin-left: auto;
+    background-color: #1e3a8a;
+    color: #fff !important;
+    border: 2px solid #1e40af;
+    border-radius: 8px;
+    padding: 10px 22px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.btn-add:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+/* --- Search Box đẹp hơn --- */
+.search-box {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    max-width: 400px;
+    /* giới hạn chiều rộng */
+    margin-left: auto;
+    /* đẩy sang phải */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: #0f172a;
+}
+
+.search-box input::placeholder {
+    color: #94a3b8;
+    /* màu placeholder nhẹ */
+}
+
+.search-box button {
+    padding: 10px 18px;
+    border: none;
+    background-color: #1e3a8a;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.25s ease;
+}
+
+.search-box button:hover {
+    background-color: #2563eb;
+}
+
+#deleteModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#deleteModal.active {
+    display: flex;
+}
+
+#deleteModal .modal-box {
+    background: #fff;
+    padding: 30px 25px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+#deleteModal h3 {
+    color: #dc2626;
+    margin-bottom: 20px;
+}
+
+#deleteModal p {
+    margin-bottom: 25px;
+}
+
+#deleteModal .confirm {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+#deleteModal .cancel {
+    background: #e0e7ff;
+    color: #1e3a8a;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#deleteModal {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+#deleteModal.active {
+    display: flex;
+    opacity: 1;
+}
+
+/* Mã NCC màu vàng */
+.code-box {
+    display: inline-block;
+    padding: 2px 8px;
+    /* giảm padding */
+    border: 2px solid #facc15;
+    /* viền vàng */
+    border-radius: 6px;
+    /* bo tròn vừa phải */
+    background: #fefce8;
+    /* nền vàng nhạt */
+    color: #b45309;
+    /* chữ vàng đậm */
+    font-weight: 700;
+    font-size: 13px;
+    /* nhỏ hơn trước */
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+/* Hover nâng hiệu ứng */
+.code-box:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 0 4px rgba(250, 204, 21, 0.5);
+}
+
+/* Badge trạng thái */
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.status-active {
+    background-color: #16a34a;
+    /* xanh lá */
+}
+
+.status-inactive {
+    background-color: #dc2626;
+    /* đỏ */
+}
+
+
