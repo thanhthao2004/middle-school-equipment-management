@@ -62,8 +62,8 @@ body {
 
 /* --- hover --- */
 .sidebar ul li:hover {
-    background-color: rgba(37, 99, 235, 0.2);  
-    border-left: 4px solid #93c5fd;          
+    background-color: rgba(37, 99, 235, 0.2);
+    border-left: 4px solid #93c5fd;
     transform: translateX(3px);
 }
 
@@ -495,3 +495,63 @@ td a:hover {
     border-radius: 6px;
     cursor: pointer;
 }
+
+#deleteModal {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+#deleteModal.active {
+    display: flex;
+    opacity: 1;
+}
+
+/* Mã NCC màu vàng */
+.code-box {
+    display: inline-block;
+    padding: 2px 8px;
+    /* giảm padding */
+    border: 2px solid #facc15;
+    /* viền vàng */
+    border-radius: 6px;
+    /* bo tròn vừa phải */
+    background: #fefce8;
+    /* nền vàng nhạt */
+    color: #b45309;
+    /* chữ vàng đậm */
+    font-weight: 700;
+    font-size: 13px;
+    /* nhỏ hơn trước */
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+/* Hover nâng hiệu ứng */
+.code-box:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 0 4px rgba(250, 204, 21, 0.5);
+}
+
+/* Badge trạng thái */
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.status-active {
+    background-color: #16a34a;
+    /* xanh lá */
+}
+
+.status-inactive {
+    background-color: #dc2626;
+    /* đỏ */
+}
+
+

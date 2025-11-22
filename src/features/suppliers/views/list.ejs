@@ -14,7 +14,7 @@
 
 <body>
     <!-- Sidebar -->
-    <%- include('../../../views/partials/suppliers-sidebar') %>
+    <%- include('../../../views/partials/nvqltb-sidebar') %>
 
         <!-- Main Content -->
         <div class="main">
@@ -47,7 +47,9 @@
                     <% suppliers.forEach(s=> { %>
                         <tr>
                             <td>
-                                <%= s.id %>
+                                <span class="code-box">
+                                    <%= s.id %>
+                                </span>
                             </td>
                             <td>
                                 <%= s.name %>
@@ -68,7 +70,10 @@
                                 <%= s.contractDate || '' %>
                             </td>
                             <td>
-                                <%= s.status || '' %>
+                                <span
+                                    class="status-badge <%= s.status === 'Ngừng hợp tác' ? 'status-inactive' : 'status-active' %>">
+                                    <%= s.status || '' %>
+                                </span>
                             </td>
                             <td>
                                 <a href="/suppliers/edit/<%= s.id %>"><i class="fas fa-edit"></i> Sửa</a> |
