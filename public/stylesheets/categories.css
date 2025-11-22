@@ -42,7 +42,7 @@ body {
 }
 
 .sidebar ul li {
-    width: 100%; 
+    width: 100%;
     padding: 12px 20px;
     transition: background-color 0.3s, transform 0.2s, border-left 0.3s;
     border-left: 4px solid transparent;
@@ -61,7 +61,7 @@ body {
     background-color: rgba(37, 99, 235, 0.2);
     border-left: 4px solid #93c5fd;
     transform: translateX(3px);
-    
+
 }
 
 .sidebar ul li.active {
@@ -87,18 +87,22 @@ body {
 
 /* Modal animation */
 #deleteModal {
-    display: none; /* ẩn mặc định */
+    display: none;
+    /* ẩn mặc định */
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 
 #deleteModal.active {
-    display: flex; /* hiện khi có class active */
+    display: flex;
+    /* hiện khi có class active */
 }
 
 #deleteModal .modal-box {
@@ -107,7 +111,7 @@ body {
     border-radius: 8px;
     width: 400px;
     max-width: 90%;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 #deleteModal .modal-box h3 {
@@ -457,3 +461,20 @@ button {
     background: #c7d2fe;
 }
 
+
+.code-box {
+    display: inline-block;
+    padding: 4px 10px;
+    /* giảm padding */
+    background: #dbeafe;
+    /* nền xanh nhạt */
+    color: #1e3a8a;
+    /* chữ xanh đậm */
+    border: 1.5px solid #1e3a8a;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    /* giảm font-size */
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
