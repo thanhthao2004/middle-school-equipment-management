@@ -136,6 +136,10 @@ app.use((req, res, next) => {
     });
 });
 
+// Devices feature
+const devicesRoutes = require('./src/features/devices/routes/devices.routes');
+app.use('/devices', devicesRoutes);
+
 // Root redirect
 app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
 

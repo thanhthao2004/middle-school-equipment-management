@@ -111,14 +111,13 @@ async function getTestData() {
 if (require.main === module) {
     getTestData()
         .then(() => {
-            console.log('\n✅ Script hoàn thành!');
+            console.log('\n Script hoàn thành!');
             process.exit(0);
         })
         .catch((error) => {
-            console.error('\n❌ Script thất bại:', error);
+            console.error('\n Script thất bại:', error);
             process.exit(1);
         });
 }
 
 module.exports = { getTestData };
-

@@ -13,12 +13,12 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link <%= (currentPage === 'home') ? 'active' : '' %>" href="/borrow/teacher-home">
+                    <a class="nav-link <%= (typeof currentPage !== 'undefined' && currentPage === 'home') ? 'active' : '' %>" href="/borrow/teacher-home">
                         <i class="fas fa-home me-1"></i>Trang chủ
                     </a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle <%= (currentPage && currentPage.startsWith('borrow')) ? 'active' : '' %>" 
+                    <a class="nav-link dropdown-toggle <%= (typeof currentPage !== 'undefined' && currentPage && currentPage.startsWith('borrow')) ? 'active' : '' %>" 
                        href="#" id="borrowDropdown" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-clipboard-list me-1"></i>Mượn/Trả
                     </a>

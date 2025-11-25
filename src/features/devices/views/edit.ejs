@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa thiết bị</title>
+    
+    <!-- Bootstrap 5.3.0 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6.4.0 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="/public/stylesheets/devices.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <%- include('../../../views/partials/header') %>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <%- include('../../../views/partials/device-sidebar') %>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="container py-4">
+                    <!-- Page Header with Back Button -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <a href="/devices" class="btn btn-link text-decoration-none" style="color: var(--dark-gray);">
+                            <i class="fas fa-chevron-left me-1"></i>
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        <h1 class="text-center mb-0 flex-grow-1" style="color: var(--dark-gray); font-weight: 700;">SỬA THIẾT BỊ</h1>
+                        <div style="width: 100px;"></div> <!-- Spacer for centering -->
+                    </div>
+
+                    <!-- Form Card -->
+                    <div class="card">
+                        <div class="card-body p-4 device-form">
+                            <form id="deviceForm" method="POST" action="/devices/<%= device._id || device.id %>" enctype="multipart/form-data">
+                                <input type="hidden" name="_method" value="PUT">
+                                
+                                <!-- Mã thiết bị (Readonly) -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="maTB" class="form-label fw-bold">Mã thiết bị:</label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="maTB" 
+                                               name="maTB" 
+                                               value="<%= device.maTB || device.id %>"
+                                               readonly
+                                               style="background-color: var(--light-gray);">
+                                    </div>
+                                </div>
+
+                                <div class="row g-4">
+                                    <!-- Left Column -->
+                                    <div class="col-md-6">
+                                        <!-- Tên thiết bị -->
+                                        <div class="mb-3">
+                                            <label for="tenTB" class="form-label fw-bold">
+                                                Tên thiết bị: <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="tenTB" 
+                                                   name="tenTB" 
+                                                   value="<%= device.tenTB || device.name || '' %>"
+                                                   placeholder="Nhập tên thiết bị"
+                                                   required>
+                                            <div class="invalid-feedback" id="tenTB-error"></div>
+                                        </div>
+
+                                        <!-- Danh mục -->
+                                        <div class="mb-3">
+                                            <label for="category" class="form-label fw-bold">
+                                                Danh mục: <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-select" id="category" name="category" required>
+                                                <option value="">Chọn danh mục</option>
+                                                <% if (categories && categories.length > 0) { %>
+                                                    <% categories.forEach(category => { %>
+                                                        <option value="<%= category._id %>" 
+                                                                <%= (device.category && (device.category._id || device.category).toString() === category._id.toString()) || 
+                                                                    (device.maDM && device.maDM === category.maDM) ? 'selected' : '' %>>
+                                                            <%= category.tenDM %>
+                                                        </option>
+                                                    <% }); %>
+                                                <% } else { %>
+                                                    <option value="chemistry" <%= device.category === 'chemistry' ? 'selected' : '' %>>Hóa học</option>
+                                                    <option value="it" <%= device.category === 'it' ? 'selected' : '' %>>Tin học</option>
+                                                    <option value="literature" <%= device.category === 'literature' ? 'selected' : '' %>>Ngữ văn</option>
+                                                    <option value="physics" <%= device.category === 'physics' ? 'selected' : '' %>>Vật lý</option>
+                                                <% } %>
+                                            </select>
+                                            <div class="invalid-feedback" id="category-error"></div>
+                                        </div>
+
+                                        <!-- Đơn vị -->
+                                        <div class="mb-3">
+                                            <label for="unit" class="form-label fw-bold">Đơn vị:</label>
+                                            <select class="form-select" id="unit" name="unit">
+                                                <option value="">Chọn đơn vị</option>
+                                                <option value="cái" <%= device.unit === 'cái' ? 'selected' : '' %>>cái</option>
+                                                <option value="bộ" <%= device.unit === 'bộ' ? 'selected' : '' %>>bộ</option>
+                                                <option value="chiếc" <%= device.unit === 'chiếc' ? 'selected' : '' %>>chiếc</option>
+                                                <option value="máy" <%= device.unit === 'máy' ? 'selected' : '' %>>máy</option>
+                                                <option value="cuốn" <%= device.unit === 'cuốn' ? 'selected' : '' %>>cuốn</option>
+                                                <option value="quyển" <%= device.unit === 'quyển' ? 'selected' : '' %>>quyển</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Lớp -->
+                                        <div class="mb-3">
+                                            <label for="classes" class="form-label fw-bold">Lớp:</label>
+                                            <select class="form-select" id="classes" name="classes" multiple>
+                                                <% 
+                                                const deviceClasses = device.classes ? (Array.isArray(device.classes) ? device.classes : device.classes.split(',').map(c => c.trim())) : [];
+                                                %>
+                                                <option value="6" <%= deviceClasses.includes('6') ? 'selected' : '' %>>Lớp 6</option>
+                                                <option value="7" <%= deviceClasses.includes('7') ? 'selected' : '' %>>Lớp 7</option>
+                                                <option value="8" <%= deviceClasses.includes('8') ? 'selected' : '' %>>Lớp 8</option>
+                                                <option value="9" <%= deviceClasses.includes('9') ? 'selected' : '' %>>Lớp 9</option>
+                                            </select>
+                                            <small class="text-muted">Giữ Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều lớp</small>
+                                        </div>
+
+                                        <!-- Số lượng tồn -->
+                                        <div class="mb-3">
+                                            <label for="soLuong" class="form-label fw-bold">
+                                                Số lượng tồn: <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="number" 
+                                                   class="form-control" 
+                                                   id="soLuong" 
+                                                   name="soLuong" 
+                                                   min="0" 
+                                                   value="<%= device.soLuong || device.quantity || 1 %>"
+                                                   required>
+                                            <div class="invalid-feedback" id="soLuong-error"></div>
+                                        </div>
+
+                                        <!-- Trạng thái mượn -->
+                                        <div class="mb-3">
+                                            <label for="status" class="form-label fw-bold">Trạng thái mượn:</label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="status" 
+                                                   name="status" 
+                                                   value="<%= device.status || 'Có sẵn' %>"
+                                                   readonly>
+                                        </div>
+                                    </div>
+
+                                    <!-- Right Column -->
+                                    <div class="col-md-6">
+                                        <!-- Nhà cung cấp -->
+                                        <div class="mb-3">
+                                            <label for="supplier" class="form-label fw-bold">
+                                                Nhà cung cấp: <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-select" id="supplier" name="supplier" required>
+                                                <option value="">Chọn nhà cung cấp</option>
+                                                <% if (suppliers && suppliers.length > 0) { %>
+                                                    <% suppliers.forEach(supplier => { %>
+                                                        <option value="<%= supplier._id %>" 
+                                                                <%= (device.supplier && (device.supplier._id || device.supplier).toString() === supplier._id.toString()) || 
+                                                                    (device.nguonGoc && device.nguonGoc === supplier.tenNCC) ? 'selected' : '' %>>
+                                                            <%= supplier.tenNCC %>
+                                                        </option>
+                                                    <% }); %>
+                                                <% } else { %>
+                                                    <option value="Bộ giáo dục" <%= device.nguonGoc === 'Bộ giáo dục' ? 'selected' : '' %>>Bộ giáo dục</option>
+                                                    <option value="GV Thanh Thả" <%= device.nguonGoc === 'GV Thanh Thả' ? 'selected' : '' %>>GV Thanh Thả</option>
+                                                    <option value="Cellphones" <%= device.nguonGoc === 'Cellphones' ? 'selected' : '' %>>Cellphones</option>
+                                                    <option value="Đại lý" <%= device.nguonGoc === 'Đại lý' ? 'selected' : '' %>>Đại lý</option>
+                                                    <option value="VTV" <%= device.nguonGoc === 'VTV' ? 'selected' : '' %>>VTV</option>
+                                                <% } %>
+                                            </select>
+                                            <div class="invalid-feedback" id="supplier-error"></div>
+                                        </div>
+
+                                        <!-- Hình ảnh -->
+                                        <div class="mb-3">
+                                            <label for="hinhAnh" class="form-label fw-bold">
+                                                Hình ảnh: <span class="text-danger" id="hinhAnhRequired" style="<%= device.hinhAnh ? 'display: none;' : '' %>">*</span>
+                                            </label>
+                                            <% if (device.hinhAnh) { %>
+                                                <div class="mb-2">
+                                                    <p class="text-muted small mb-1">Hình ảnh hiện tại:</p>
+                                                    <img src="<%= device.hinhAnh %>" alt="Hình ảnh thiết bị" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" id="currentImage">
+                                                </div>
+                                                <p class="text-muted small">Chọn hình ảnh mới để thay thế (tùy chọn):</p>
+                                            <% } else { %>
+                                                <p class="text-muted small mb-2">Vui lòng chọn hình ảnh thiết bị</p>
+                                            <% } %>
+                                            <div class="input-group">
+                                                <input type="file" 
+                                                       class="form-control" 
+                                                       id="hinhAnh" 
+                                                       name="hinhAnh" 
+                                                       accept="image/*"
+                                                       <%= !device.hinhAnh ? 'required' : '' %>>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('hinhAnh').click()">
+                                                    <i class="fas fa-folder-open me-1"></i>Browse
+                                                </button>
+                                            </div>
+                                            <div class="invalid-feedback" id="hinhAnh-error"></div>
+                                            <div id="imagePreview" class="mt-2" style="display: none;">
+                                                <p class="text-muted small mb-1">Hình ảnh mới:</p>
+                                                <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                                            </div>
+                                        </div>
+
+                                        <!-- Tình trạng -->
+                                        <div class="mb-3">
+                                            <label for="tinhTrang" class="form-label fw-bold">Tình trạng:</label>
+                                            <select class="form-select" id="tinhTrang" name="tinhTrang">
+                                                <option value="">Chọn Tình trạng</option>
+                                                <option value="Tốt" <%= (device.tinhTrangThietBi || device.condition) === 'Tốt' ? 'selected' : '' %>>Tốt</option>
+                                                <option value="Hỏng" <%= (device.tinhTrangThietBi || device.condition) === 'Hỏng' ? 'selected' : '' %>>Hỏng</option>
+                                                <option value="Đang sửa chữa" <%= (device.tinhTrangThietBi || device.condition) === 'Đang sửa chữa' ? 'selected' : '' %>>Đang sửa chữa</option>
+                                                <option value="Bảo trì" <%= (device.tinhTrangThietBi || device.condition) === 'Bảo trì' ? 'selected' : '' %>>Bảo trì</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Vị trí lưu trữ -->
+                                        <div class="mb-3">
+                                            <label for="viTriLuuTru" class="form-label fw-bold">
+                                                Vị trí lưu trữ: <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-select" id="viTriLuuTru" name="viTriLuuTru" required>
+                                                <option value="">Chọn vị trí</option>
+                                                <option value="Phòng thiết bị 20" <%= device.viTriLuuTru === 'Phòng thiết bị 20' ? 'selected' : '' %>>Phòng thiết bị 20</option>
+                                                <option value="Kho Hóa học" <%= device.viTriLuuTru === 'Kho Hóa học' ? 'selected' : '' %>>Kho Hóa học</option>
+                                                <option value="Phòng IT" <%= device.viTriLuuTru === 'Phòng IT' ? 'selected' : '' %>>Phòng IT</option>
+                                                <option value="Phòng 101" <%= device.viTriLuuTru === 'Phòng 101' ? 'selected' : '' %>>Phòng 101</option>
+                                                <option value="Phòng thiết bị 30" <%= device.viTriLuuTru === 'Phòng thiết bị 30' ? 'selected' : '' %>>Phòng thiết bị 30</option>
+                                                <option value="Thư viện" <%= device.viTriLuuTru === 'Thư viện' ? 'selected' : '' %>>Thư viện</option>
+                                            </select>
+                                            <div class="invalid-feedback" id="viTriLuuTru-error"></div>
+                                        </div>
+
+                                        <!-- Ngày nhập -->
+                                        <div class="mb-3">
+                                            <label for="ngayNhap" class="form-label fw-bold">
+                                                Ngày nhập: <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="date" 
+                                                   class="form-control" 
+                                                   id="ngayNhap" 
+                                                   name="ngayNhap" 
+                                                   value="<%= device.ngayNhap ? new Date(device.ngayNhap).toISOString().split('T')[0] : '' %>"
+                                                   required>
+                                            <div class="invalid-feedback" id="ngayNhap-error"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex justify-content-center gap-3 mt-4">
+                                    <button type="submit" class="btn btn-register text-white">
+                                        <i class="fas fa-save me-2"></i>Lưu
+                                    </button>
+                                    <button type="button" class="btn btn-cancel text-white" onclick="resetForm()">
+                                        <i class="fas fa-redo me-2"></i>Nhập lại
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../../../views/partials/footer') %>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Device Management JavaScript -->
+    <script src="/public/javascripts/devices.js"></script>
+    <script src="/public/javascripts/device-edit.js"></script>
+</body>
+</html>
+
