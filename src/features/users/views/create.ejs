@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tạo Tài Khoản Người Dùng</title>
+  <link rel="stylesheet" href="/public/stylesheets/style.css">
+  <style>
+    body {
+      background: #fff;
+      margin: 0; min-height: 100vh;
+    }
+    .sidebar {
+      width: 270px;
+      background: #2196f3;
+      color: #fff;
+      height: 100vh;
+      float: left;
+      padding: 0;
+      box-sizing: border-box;
+      border-right: 1px solid #97c5f5;
+    }
+    .sidebar h3 {
+      padding: 32px 0 14px 28px;
+      margin: 0; font-size: 17px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+    .sidebar .nav-section {
+      margin-bottom: 18px;
+    }
+    .sidebar a {
+      display: block;
+      color: #fff;
+      text-decoration: none;
+      font-size: 15px;
+      padding: 15px 0 15px 35px;
+      margin: 0 0 2px 0;
+      border-left: 4px solid transparent;
+      transition: background .13s, border .13s;
+    }
+    .sidebar a.active, .sidebar a:focus {
+      background: #156dc5;
+      border-left: 4px solid #fff;
+    }
+    .sidebar a:hover { background: #1976d2; }
+
+    .main { margin-left: 270px; padding: 0; min-height: 100vh; }
+    .form-title { font-size: 30px; font-weight: 700; color: #212529; margin: 48px 0 24px 100px; letter-spacing: .3px; }
+
+    .bigform-outer { display: flex; justify-content: center; align-items: flex-start; }
+    .bigform-box {
+      background: #fff;
+      border: 2px solid #97c5f5;
+      border-radius: 9px;
+      box-shadow: 1px 2px 8px #e1e8f2b5;
+      width: 620px;
+      margin: 0 0 60px 0;
+      padding: 0;
+    }
+    .bigform-tab {
+      background: #dbeafe;
+      padding: 10px 22px;
+      border-radius: 6px 6px 0 0;
+      font-weight: 500;
+      color: #212529; font-size: 15px;
+      margin-bottom: 0px;
+      border-bottom: 1px solid #bee1fd;
+      width: fit-content;
+      position: relative;
+      top: -1px; left: 0;
+    }
+    .form-body { padding: 32px 38px 28px 38px; }
+    label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 3px; color: #232323; }
+    .input-row { margin-bottom: 15px; }
+    input[type="text"],
+    input[type="password"],
+    input[type="date"],
+    select {
+      width: 100%;
+      font-size: 15px;
+      padding: 9px 12px;
+      border: 1.5px solid #b7c2d6;
+      border-radius: 5px;
+      outline: none;
+      background: #fafdff;
+      color: #222;
+      transition: border-color .14s;
+    }
+    input[type="text"].invalid,
+    input[type="password"].invalid,
+    input[type="date"].invalid,
+    select.invalid {
+      border: 1.5px solid #dc3545;
+      background: #fff6f7;
+    }
+    .error-msg { color:#dc3545; font-size:13px; margin:3px 0 0 2px; min-height:17px; }
+    .radio-row { margin-bottom: 15px; }
+    .radio-group label { font-weight: 400; display: inline-block; margin-right: 20px; }
+    .submit-row { margin-top: 22px; }
+    .submit-btn {
+      width: 100%;
+      background: #007bff;
+      color: #fff; font-size:18px; font-weight: 600;
+      border: none; border-radius: 6px;
+      padding: 13px 0;
+      cursor: pointer;
+      box-shadow: 0 1.5px 7px #e3eefa33;
+      transition: background .18s;
+    }
+    .submit-btn:hover { background: #156dc5; }
+    .form-note {
+      margin-top: 18px;
+      text-align: center; font-size: 14px;
+    }
+    .form-note a { color: #007bff; text-decoration: underline; }
+    .alert-box {
+      font-weight:bold; border-radius:5px; padding:8px 15px; margin-bottom: 16px;
+    }
+    .alert-error {
+      color: #dc3545;
+      background:#fdeaea;
+      border:1px solid #dc3545;
+    }
+    .alert-success {
+      color: #28a745;
+      background:#e7f8ef;
+      border:1px solid #28a745;
+    }
+    @media (max-width:900px){ .main{margin-left:0} .sidebar{position:static;width:100%;height:auto} .bigform-box{width:98vw;} }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h3>Bảng chọn</h3>
+    <div class="nav-section">
+      <a class="active" href="/users/create">Tạo Tài Khoản</a>
+    </div>
+    <div class="nav-section">
+      <a href="/users">Quản Lí Tài Khoản</a>
+    </div>
+  </div>
+  <div class="main">
+    <div class="form-title">Tạo Tài Khoản Người Dùng</div>
+    <div class="bigform-outer">
+      <div class="bigform-box">
+        <span class="bigform-tab">Tạo tài khoản</span>
+        <div class="form-body">
+          <% if (error) { %>
+            <div class="alert-box alert-error"><%= error %></div>
+          <% } %>
+          <% if (success) { %>
+            <div class="alert-box alert-success"><%= success %></div>
+          <% } %>
+          <form action="/users/create" method="POST" autocomplete="off">
+            <div class="input-row">
+              <label>Họ và tên:</label>
+              <input type="text" name="fullname" value="<%= form.fullname || '' %>" class="<%= errors && errors.fullname ? 'invalid' : '' %>" required>
+              <div class="error-msg"><%= errors && errors.fullname ? errors.fullname : '' %></div>
+            </div>
+            <div class="input-row">
+              <label>Số điện thoại:</label>
+              <input type="text" name="phone" value="<%= form.phone || '' %>" class="<%= errors && errors.phone ? 'invalid' : '' %>" required>
+              <div class="error-msg"><%= errors && errors.phone ? errors.phone : '' %></div>
+            </div>
+            <div class="input-row">
+              <label>Địa chỉ:</label>
+              <input type="text" name="address" value="<%= form.address || '' %>" class="<%= errors && errors.address ? 'invalid' : '' %>">
+              <div class="error-msg"><%= errors && errors.address ? errors.address : '' %></div>
+            </div>
+            <div class="input-row">
+              <label>Tên Người Dùng:</label>
+              <input type="text" name="username" value="<%= form.username || '' %>" class="<%= errors && errors.username ? 'invalid' : '' %>" required>
+              <div class="error-msg"><%= errors && errors.username ? errors.username : '' %></div>
+            </div>
+            <div class="input-row">
+              <label>Mật khẩu: <span style="font-weight:400;font-size:90%">(Nhập 6 đến 32 ký tự)</span></label>
+              <input type="password" name="password" minlength="6" maxlength="32" autocomplete="new-password" class="<%= errors && errors.password ? 'invalid' : '' %>" required>
+              <div class="error-msg"><%= errors && errors.password ? errors.password : '' %></div>
+            </div>
+            <div class="input-row" style="display:flex;gap:12px;">
+              <div style="flex:1;">
+                <label>Chức vụ:</label>
+                <select name="role" class="<%= errors && errors.role ? 'invalid' : '' %>" required>
+                  <option value="Hiệu trưởng" <%= form.role==='Hiệu trưởng' ? 'selected' : '' %>>Hiệu Trưởng</option>
+                  <option value="Giáo viên" <%= form.role==='Giáo viên' ? 'selected' : '' %>>Giáo Viên</option>
+                  <option value="Nhân viên" <%= form.role==='Nhân viên' ? 'selected' : '' %>>Nhân Viên</option>
+                </select>
+                <div class="error-msg"><%= errors && errors.role ? errors.role : '' %></div>
+              </div>
+              <div style="flex:1;">
+                <label>Năm Kinh Nghiệm:</label>
+                <select name="experience" class="<%= errors && errors.experience ? 'invalid' : '' %>" required>
+                  <option value="1 năm" <%= form.experience==='1 năm' ? 'selected' : '' %>>1 năm</option>
+                  <option value="2 năm" <%= form.experience==='2 năm' ? 'selected' : '' %>>2 năm</option>
+                  <option value="3 năm" <%= form.experience==='3 năm' ? 'selected' : '' %>>3 năm</option>
+                  <option value="Trên 5 năm" <%= form.experience==='Trên 5 năm' ? 'selected' : '' %>>Trên 5 năm</option>
+                </select>
+                <div class="error-msg"><%= errors && errors.experience ? errors.experience : '' %></div>
+              </div>
+            </div>
+            <div class="input-row">
+              <label>Trình độ chuyên môn:</label>
+              <input type="text" name="specialization" value="<%= form.specialization || '' %>" class="<%= errors && errors.specialization ? 'invalid' : '' %>">
+              <div class="error-msg"><%= errors && errors.specialization ? errors.specialization : '' %></div>
+            </div>
+            <div class="input-row radio-row">
+              <label>Giới Tính:</label>
+              <span class="radio-group">
+                <input type="radio" id="gioitinhnam" name="gender" value="Nam" <%= !form.gender || form.gender==='Nam' ? 'checked' : '' %>> <label for="gioitinhnam">Nam</label>
+                <input type="radio" id="gioitinhn" name="gender" value="Nữ" <%= form.gender==='Nữ' ? 'checked' : '' %>> <label for="gioitinhn">Nữ</label>
+              </span>
+              <div class="error-msg"><%= errors && errors.gender ? errors.gender : '' %></div>
+            </div>
+            <div class="input-row" style="display:flex;gap:12px;">
+              <div style="flex:1;">
+                <label>Bộ môn (nếu có):</label>
+                <select name="subject" class="<%= errors && errors.subject ? 'invalid' : '' %>">
+                  <option value="Không" <%= form.subject==='Không' ? 'selected' : '' %>>Không</option>
+                  <option value="Toán" <%= form.subject==='Toán' ? 'selected' : '' %>>Toán</option>
+                  <option value="Văn" <%= form.subject==='Văn' ? 'selected' : '' %>>Văn</option>
+                  <option value="Anh" <%= form.subject==='Anh' ? 'selected' : '' %>>Anh</option>
+                </select>
+                <div class="error-msg"><%= errors && errors.subject ? errors.subject : '' %></div>
+              </div>
+              <div style="flex:1;">
+                <label>Ngày sinh:</label>
+                <input type="date" name="dob" value="<%= form.dob || '' %>" class="<%= errors && errors.dob ? 'invalid' : '' %>" required>
+                <div class="error-msg"><%= errors && errors.dob ? errors.dob : '' %></div>
+              </div>
+            </div>
+            <div class="submit-row">
+              <button class="submit-btn" type="submit">Tạo tài khoản</button>
+            </div>
+            <div class="form-note">
+              <a href="#">Điều khoản sử dụng</a>
+            </div>
+          </form>
+        </div> <!-- form-body -->
+      </div> <!-- bigform-box -->
+    </div> <!-- bigform-outer -->
+  </div>
+</body>
+</html>

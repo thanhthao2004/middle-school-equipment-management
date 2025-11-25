@@ -69,6 +69,12 @@ setImmediate(async () => {
 });
 
 
+// Categories feature (từ develop)
+const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
+app.use('/categories', categoriesRoutes);
+
+const usersRoutes = require('./src/features/users/routes/users.routes');
+app.use('/users', usersRoutes);
 // ==========================
 // ROUTES
 // ==========================
