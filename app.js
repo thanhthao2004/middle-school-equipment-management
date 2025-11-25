@@ -81,6 +81,12 @@ const periodicReportsRoutes = require('./src/features/periodic-reports/routes/pe
 const acceptanceRoutes = require('./src/features/acceptance/routes/acceptance.routes');
 const disposalRoutes = require('./src/features/disposal/routes/disposal.routes');
 
+// Borrow feature (mượn thiết bị)
+const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
+app.use('/borrow', borrowRoutes);
+
+// Categories feature
+const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
 // Áp dụng Routes
 app.use('/borrow', borrowRoutes);
 app.use('/purchasing-plans', purchasingRoutes);
@@ -93,6 +99,10 @@ app.use('/disposal', disposalRoutes);
 // CHỌN: Chỉ giữ lại một Redirect trang chủ
 app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
 
+
+// Auth feature routes (login, change-password, etc.)
+const authRoutes = require('./src/features/auth/routes/auth.routes');
+app.use('/auth', authRoutes);
 
 // ==========================
 // Error Handling (Handlers 404 & 500)
