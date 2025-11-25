@@ -76,9 +76,29 @@ a {
   align-items: center;
   gap: 10px;
   font-size: 20px;
+  /* make the title a bit larger */
   letter-spacing: 0.6px;
+  /* improve readability */
   line-height: 1.1;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.12);
+  /* subtle text-shadow for improved contrast on the dark background */
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Normalize sidebar typography for consistency */
+.sidebar {
+  font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+  /* match main body */
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* end sidebar menu-title rules */
+
+.sidebar .nav-link .text {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .sidebar .nav-link {
@@ -88,6 +108,7 @@ a {
   padding: 12px 14px;
   border-radius: 12px;
   color: #ffffff;
+  /* Text trắng */
   text-decoration: none;
   margin-bottom: 12px;
   transition: background-color .18s ease, transform .08s ease;
@@ -117,6 +138,28 @@ a {
 }
 
 .sidebar .nav-link .text {
+  flex: 1
+}
+
+/* mobile narrow sidebar look (as in mock) */
+@media (max-width: 576px) {
+  .sidebar {
+    position: relative;
+    /* make sidebar flow on small screens */
+    width: 100%;
+    padding: 18px;
+    height: auto;
+  }
+
+  .app-shell {
+    flex-direction: column;
+  }
+
+  /* remove left margin on main content when sidebar is stacked */
+  .main-content {
+    margin-left: 0;
+    padding: 18px
+  }
   flex: 1;
   font-size: 14px;
   font-weight: 600;
@@ -129,6 +172,57 @@ a {
   flex: 1 1 auto;
   padding: 0; /* Header/Footer sẽ tự chiếm đủ 100% */
   box-sizing: border-box;
+  margin-left: 260px;
+  /* offset content to make room for fixed sidebar */
+}
+
+.page-header {
+  text-align: center;
+  margin: 0 0 18px 0;
+  padding-top: 6px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  color: var(--dark-gray);
+  font-weight: 700;
+  margin: 0
+}
+
+/* Controls row */
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px
+}
+
+.controls .left {
+  display: flex;
+  gap: 10px;
+  align-items: center
+}
+
+.search-select {
+  min-width: 200px
+}
+
+.btn-create {
+  background: var(--button-primary);
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: none
+}
+
+/* --- Buttons according to spec --- */
+.btn-register {
+  background-color: var(--button-primary);
+  border: 1px solid var(--button-primary);
+  color: var(--white);
+  padding: 8px 14px;
+  border-radius: 8px;
   margin-left: 260px; /* Bắt buộc: Né sidebar */
 }
 
@@ -181,6 +275,61 @@ a {
   color: var(--error-red)
 }
 
+/* Condition-specific text colors */
+.condition-good {
+  color: var(--success-green);
+  font-weight: 600
+}
+
+.condition-damaged {
+  color: var(--error-red);
+  font-weight: 600
+}
+
+.action-btn {
+  border-radius: 8px;
+  padding: 8px 10px;
+  border: none;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(10, 10, 10, 0.06);
+  margin-left: 6px
+}
+
+/* Text color utilities from spec */
+.slip-title {
+  color: var(--dark-gray);
+  font-weight: 700
+}
+
+.slip-id {
+  color: var(--text-gray)
+}
+
+.search-icon {
+  color: var(--text-gray)
+}
+
+/* Small utilities */
+.float-right {
+  display: flex;
+  align-items: center;
+  gap: 8px
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 18px
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch
+  }
+
+  .controls .left {
+    width: 100%
+  }
+}
 /* Teacher Home cards (Specific to borrow) */
 .feature-card { border: 1px solid var(--border-gray); transition: transform .15s ease, box-shadow .15s ease; }
 .feature-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.08); }
