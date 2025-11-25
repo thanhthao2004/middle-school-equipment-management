@@ -1,0 +1,74 @@
+<div class="col-md-3 col-lg-2 sidebar">
+    <div class="d-flex align-items-center p-3">
+        <i class="fas fa-bars me-2 text-white"></i>
+        <span class="text-white fw-bold">BẢNG CHỌN QLTB</span>
+    </div>
+
+    <nav class="nav flex-column mt-3">
+        <!-- TRANG CHỦ QLTB -->
+        <a class="nav-link <%= currentPage === 'manager-home' ? 'active' : '' %>" 
+           href="/borrow/manager/manager-home">
+            <i class="fas fa-home me-2"></i>
+            Trang chủ QLTB
+        </a>
+
+        <!-- BIÊN BẢN VÀ BÁO CÁO -->
+        <a class="nav-link <%= currentPage === 'reports-inspection' ? 'active' : '' %>" 
+           href="/acceptance">
+            <i class="fas fa-file-alt me-2"></i>
+            Biên bản nghiệm thu
+        </a>
+
+        <a class="nav-link <%= currentPage === 'reports-periodical' ? 'active' : '' %>" 
+           href="/periodic-reports">
+            <i class="fas fa-chart-line me-2"></i>
+            Báo cáo định kỳ
+        </a>
+
+        <!-- MƯỢN THIẾT BỊ -->
+        <h6 class="sidebar-heading text-muted mt-3 mb-1 px-3">Mượn thiết bị</h6>
+
+        <a class="nav-link <%= currentPage === 'borrow-approvals' ? 'active' : '' %>" 
+           href="/borrow/manager/approvals">
+            <i class="fas fa-clipboard-list me-2"></i>
+            Danh sách phiếu mượn
+        </a>
+
+        <!-- TRẢ THIẾT BỊ -->
+        <h6 class="sidebar-heading text-muted mt-3 mb-1 px-3">Trả thiết bị</h6>
+
+        <a class="nav-link <%= currentPage === 'return-slips' ? 'active' : '' %>" 
+           href="/borrow/manager/return-slips">
+            <i class="fas fa-undo-alt me-2"></i>
+            Trả thiết bị
+        </a>
+    </nav>
+</div>
+
+<style>
+    .sidebar-heading {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05rem;
+        font-weight: 700;
+        color: #94a3b8 !important;
+    }
+    .sidebar {
+        background-color: #1e3a8a;
+        min-height: 100vh;
+        padding: 0;
+    }
+    .sidebar .nav-link {
+        color: white;
+        padding: 10px 15px;
+        transition: background-color 0.2s;
+        font-size: 0.95rem;
+    }
+    .sidebar .nav-link:hover {
+        background-color: #3b82f6;
+    }
+    .sidebar .nav-link.active {
+        background-color: #3b82f6;
+        font-weight: bold;
+    }
+</style>

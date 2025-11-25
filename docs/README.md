@@ -52,7 +52,7 @@ touch .env
 ```env
 # Server Configuration
 NODE_ENV=development
-PORT=3001
+PORT=3000
 
 # Database Configuration (tùy chọn)
 MONGODB_URI=mongodb://127.0.0.1:27017/production_db
@@ -65,7 +65,7 @@ JWT_SECRET=your-jwt-secret-key-here
 # Application Settings
 APP_NAME="Middle School Equipment Management"
 APP_VERSION="1.0.0"
-APP_URL=http://localhost:3001
+APP_URL=http://localhost:3000
 
 # Security Settings
 BCRYPT_ROUNDS=12
@@ -102,9 +102,9 @@ PORT=3002 npm run dev
 
 Sau khi chạy thành công, truy cập:
 
-- **Trang chủ:** http://localhost:3001
-- **Quản lý thiết bị:** http://localhost:3001/devices
-- **Đăng nhập:** http://localhost:3001/auth/login
+- **Trang chủ:** http://localhost:3000
+- **Quản lý thiết bị:** http://localhost:3000/devices
+- **Đăng nhập:** http://localhost:3000/auth/login
 
 ## 📁 Cấu trúc dự án
 
@@ -215,7 +215,7 @@ touch .env
 ### **Kiểm tra trạng thái:**
 ```bash
 # Kiểm tra port
-lsof -i:3001
+lsof -i:3000
 
 # Kiểm tra process Node.js
 ps aux | grep node
