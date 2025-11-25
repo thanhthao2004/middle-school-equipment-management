@@ -94,7 +94,7 @@ touch .env
 ```env
 # Server Configuration
 NODE_ENV=development
-PORT=3001
+PORT=3000
 
 # Database Configuration (tùy chọn)
 MONGODB_URI=mongodb://127.0.0.1:27017/production_db
@@ -107,7 +107,7 @@ JWT_SECRET=your-jwt-secret-key-here-67890
 # Application Settings
 APP_NAME="Middle School Equipment Management"
 APP_VERSION="1.0.0"
-APP_URL=http://localhost:3001
+APP_URL=http://localhost:3000
 
 # Security Settings
 BCRYPT_ROUNDS=12
@@ -173,7 +173,7 @@ npm run dev
 ```
 
 ### **Bước 2: Kiểm tra kết quả**
-- Mở trình duyệt: http://localhost:3001
+- Mở trình duyệt: http://localhost:3000
 - Thấy trang chủ với giao diện Bootstrap
 - Không có lỗi trong terminal
 
@@ -195,12 +195,12 @@ Error: Node.js version < 18
 
 #### **2. Port đã được sử dụng**
 ```bash
-Error: listen EADDRINUSE: address already in use :::3001
+Error: listen EADDRINUSE: address already in use :::3000
 ```
 **Giải pháp:**
 ```bash
 # Tìm process đang dùng port
-lsof -i:3001
+lsof -i:3000
 
 # Tắt process
 kill -9 <PID>
@@ -248,7 +248,7 @@ MongoDB connection error: connect ECONNREFUSED
 - [ ] Dependencies đã cài (`npm install`)
 - [ ] File `.env` đã tạo và cấu hình
 - [ ] Ứng dụng chạy được (`npm run dev`)
-- [ ] Truy cập được http://localhost:3001
+- [ ] Truy cập được http://localhost:3000
 - [ ] Không có lỗi trong terminal
 
 ##  Bước tiếp theo
