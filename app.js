@@ -2,6 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const compression = require('compression');
 const path = require('path');
+const config = require('./src/config/env');
+const logger = require('./src/config/logger');
+const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware');
 
 // Từ HEAD
 const config = require('./src/config/env');
@@ -114,6 +117,32 @@ const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchas
 const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
 
 app.use('/borrow', borrowRoutes);
+
+// Categories
+const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
+app.use('/categories', categoriesRoutes);
+
+// ==========================
+//  Periodic Reports (Báo cáo định kỳ) — Added
+// ==========================
+const periodicReportsRoutes = require('./src/features/periodic-reports/routes/periodic-report.routes');
+app.use('/periodic-reports', periodicReportsRoutes);
+const acceptanceRoutes = require('./src/features/acceptance/routes/acceptance.routes');
+app.use('/acceptance', acceptanceRoutes);
+
+// ==========================
+//  Error Handling
+// ==========================
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+// ==========================
+//  Khởi động server
+// ==========================
+app.listen(config.port, () => {
+    logger.info(`Server đang chạy tại: http://localhost:${config.port}`);
+    logger.info(`Environment: ${config.nodeEnv}`);
+});
 app.use('/purchasing-plans', purchasingRoutes);
 app.use('/categories', categoriesRoutes);
 // app.get('/', (req, res) => res.redirect('/teacher/home'));
@@ -126,7 +155,7 @@ app.use('/disposal', disposalRoutes);
 app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
 
 // ==========================
-// ⚙️ 404 Handler
+//  404 Handler
 // ==========================
 app.use((req, res, next) => {
     res.status(404).render('error_page', {
@@ -140,7 +169,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
 
 // ==========================
-// ⚙️ 500 Handler
+//  500 Handler
 // ==========================
 app.use((err, req, res, next) => {
     console.error('SERVER ERROR:', err.stack);
@@ -155,7 +184,7 @@ app.use((err, req, res, next) => {
 });
 
 // ==========================
-// ⚙️ Start Server
+//  Start Server
 // ==========================
 app.listen(config.port, () => {
   logger.info(`Server đang chạy tại: http://localhost:${config.port}`);

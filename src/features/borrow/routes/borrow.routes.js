@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const borrowController = require('../controllers/borrow.controller');
-const { authenticate } = require('../../../core/middlewares/auth.middleware');
+const { authenticate,requireRole } = require('../../../core/middlewares/auth.middleware');
 const { validate } = require('../../../core/middlewares/validation.middleware');
 const borrowValidators = require('../validators/borrow.validators');
 
@@ -24,6 +24,82 @@ router.post('/register',
 /**
  * Authentication middleware
  */
+
+
+router.get(
+    '/manager/manager-home',
+    requireRole('ql_thiet_bi'),
+    borrowController.getManagerHomePage
+);
+
+// LIST Borrow Slips Pending
+router.get(
+    '/manager/approvals',
+    requireRole('ql_thiet_bi'),
+    borrowController.getApprovalsPage
+);
+
+// RETURN SLIPS LIST
+router.get(
+    '/manager/return-slips',
+    requireRole('ql_thiet_bi'),
+    borrowController.getReturnSlipsListPage
+);
+
+// BORROW DETAIL
+router.get(
+    '/manager/borrow/:id',
+    requireRole('ql_thiet_bi'),
+    borrowController.getBorrowDetailPage
+);
+
+// RETURN DETAIL
+router.get(
+    '/manager/return/:id',
+    requireRole('ql_thiet_bi'),
+    borrowController.getReturnSlipDetailPage
+);
+
+// =============================================
+// MANAGER API
+// =============================================
+
+// API Borrow Slips Pending
+router.get(
+    '/manager/api/borrow/pending',
+    requireRole('ql_thiet_bi'),
+    borrowController.getPendingBorrowSlips
+);
+
+// API Return Slips Pending
+router.get(
+    '/manager/api/return/pending',
+    requireRole('ql_thiet_bi'),
+    borrowController.getPendingReturnSlips
+);
+
+// APPROVE / REJECT
+router.post(
+    '/manager/api/borrow/approve/:id',
+    requireRole('ql_thiet_bi'),
+    borrowController.approveBorrowSlip
+);
+router.post(
+    '/manager/api/borrow/reject/:id',
+    requireRole('ql_thiet_bi'),
+    borrowController.rejectBorrowSlip
+);
+
+router.post(
+    '/manager/api/return/approve/:id',
+    requireRole('ql_thiet_bi'),
+    borrowController.approveReturnSlip
+);
+router.post(
+    '/manager/api/return/reject/:id',
+    requireRole('ql_thiet_bi'),
+    borrowController.rejectReturnSlip
+);
 
 module.exports = router;
 // KHÔNG require 'error-codes' và 'response' ở đây. 
