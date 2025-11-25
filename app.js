@@ -77,6 +77,9 @@ app.use('/borrow', borrowRoutes);
 // Purchasing Plans
 const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
 app.use('/purchasing-plans', purchasingRoutes);
+// Training-plans feature
+const trainingRoutes = require('./src/features/training-plans/routes/training.routes');
+app.use('/training-plans', trainingRoutes);
 // ⚙️ View Engine
 // ==========================
 app.set('views', path.join(__dirname, 'src/views'));
@@ -187,6 +190,9 @@ app.use((err, req, res, next) => {
 //  Start Server
 // ==========================
 app.listen(config.port, () => {
+	logger.info(`Server đang chạy tại: http://localhost:${config.port}`);
+	logger.info(`Environment: ${config.nodeEnv}`);
+});
   logger.info(`Server đang chạy tại: http://localhost:${config.port}`);
   logger.info(`Environment: ${config.nodeEnv}`);
   if (process.send) {
