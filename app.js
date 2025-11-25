@@ -47,7 +47,6 @@ app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/
 // CHỌN: Sử dụng prefix '/public' cho thư mục public để rõ ràng hơn
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-
 // ==========================
 // Kết nối MongoDB
 // ==========================
@@ -92,6 +91,10 @@ app.use('/disposal', disposalRoutes);
 
 // Redirect trang chủ
 app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
+
+// Suppliers feature
+const suppliersRoutes = require('./src/features/suppliers/routes/suppliers.routes');
+app.use('/suppliers', suppliersRoutes);
 
 // ==========================
 // Error Handling (Handlers 404 & 500)

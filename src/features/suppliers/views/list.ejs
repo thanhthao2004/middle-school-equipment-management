@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý nhà cung cấp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/stylesheets/suppliers.css">
+    <link rel="stylesheet" href="/public/stylesheets/style.css">
+
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <%- include('../../../views/partials/nvqltb-sidebar') %>
+
+        <!-- Main Content -->
+        <div class="main">
+            <div class="main-header">
+                <div style="display:flex; align-items:center;">
+                    <!-- <button class="btn-menu" id="toggleSidebar"></button> -->
+                    <h2>QUẢN LÝ NHÀ CUNG CẤP</h2>
+                </div>
+                <div class="user"><i class="fas fa-user"></i> QLTB</div>
+            </div>
+            <div class="search-box">
+                <input type="text" placeholder="Tìm kiếm...">
+                <button><i class="fas fa-search"></i> Tìm kiếm</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã NCC</th>
+                        <th>Tên NCC</th>
+                        <th>Địa Chỉ</th>
+                        <th>SĐT</th>
+                        <th>Email</th>
+                        <th>Loại Thiết Bị</th>
+                        <th>Ngày Hợp Tác</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% suppliers.forEach(s=> { %>
+                        <tr>
+                            <td>
+                                <span class="code-box">
+                                    <%= s.id %>
+                                </span>
+                            </td>
+                            <td>
+                                <%= s.name %>
+                            </td>
+                            <td>
+                                <%= s.address %>
+                            </td>
+                            <td>
+                                <%= s.phone %>
+                            </td>
+                            <td>
+                                <%= s.email || '' %>
+                            </td>
+                            <td>
+                                <%= s.type || '' %>
+                            </td>
+                            <td>
+                                <%= s.contractDate || '' %>
+                            </td>
+                            <td>
+                                <span
+                                    class="status-badge <%= s.status === 'Ngừng hợp tác' ? 'status-inactive' : 'status-active' %>">
+                                    <%= s.status || '' %>
+                                </span>
+                            </td>
+                            <td>
+                                <a href="/suppliers/edit/<%= s.id %>"><i class="fas fa-edit"></i> Sửa</a> |
+                                <a href="#" class="btn-delete" data-id="<%= s.id %>" data-name="<%= s.name %>"><i
+                                        class="fas fa-trash-alt"></i> Xóa</a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+            <a href="/suppliers/add" class="btn-add"><i class="fas fa-plus"></i> Thêm nhà cung cấp mới</a>
+        </div>
+        <!-- Modal Xóa -->
+        <div id="deleteModal">
+            <div class="modal-box">
+                <h3><i class="fas fa-triangle-exclamation"></i> Xác nhận xóa</h3>
+                <p id="deleteText"></p>
+                <form id="deleteForm" method="POST">
+                    <button type="submit" class="confirm"><i class="fas fa-trash-alt"></i> Xác nhận</button>
+                    <button id="cancelBtn" type="button" class="cancel"><i class="fas fa-times"></i> Hủy</button>
+                </form>
+            </div>
+        </div>
+
+        <script src="/public/javascripts/suppliers.js"></script>
+</body>
+
+</html>
