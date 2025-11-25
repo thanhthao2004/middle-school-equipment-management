@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duyệt Phiếu Mượn Thiết Bị</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .slip-box { border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9; max-width: 800px; margin: 20px auto; }
+        .slip-info { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; font-size: 1.1rem; }
+        .equipment-table th, .equipment-table td { font-size: 0.85rem; padding: 8px; }
+        .equipment-table th { background-color: #e9ecef; }
+        .btn-approve { background-color: #28a745; color: white; }
+        .btn-reject { background-color: #dc3545; color: white; }
+        .btn-close-modal { background-color: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <%- include('../../../../views/partials/header') %>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar QLTB -->
+            <%- include('../../../../views/partials/admin-sidebar', { currentPage: 'borrow-approvals' }) %>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="container py-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 mb-0">PHIẾU MƯỢN THIẾT BỊ</h1>
+                        <div class="d-flex align-items-center">
+                            <span class="text-muted small">QLTB</span>
+                        </div>
+                    </div>
+
+                    <div class="slip-box">
+                        <h4 class="text-center mb-4">Phiếu Mượn</h4>
+                        
+                        <!-- Thông tin Phiếu Mượn -->
+                        <div class="slip-info mb-3">
+                            <p><strong>Mã PM:</strong> <span id="slipId">PM_<%= id || '---' %></span></p>
+                            <p><strong>Giáo viên mượn:</strong> Thanh Thảo</p>
+                            <p><strong>Tổ bộ môn:</strong> Hóa học</p>
+                            <p><strong>Ngày tạo phiếu:</strong> 14:00 06/09/2025</p>
+                        </div>
+
+                        <!-- Chi tiết Thiết bị mượn -->
+                        <h6>Thiết bị mượn:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered equipment-table">
+                                <thead>
+                                    <tr>
+                                        <th>S</th>
+                                        <th>Tên Thiết Bị</th>
+                                        <th>Danh mục</th>
+                                        <th>Đơn vị</th>
+                                        <th>Vị trí</th>
+                                        <th>Nguồn</th>
+                                        <th>Ngày mượn</th>
+                                        <th>Ngày trả dự kiến</th>
+                                        <th>SL mượn</th>
+                                        <th>Dạy tiết</th>
+                                        <th>Nội dung</th>
+                                        <th>Tình trạng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Mock data theo ảnh -->
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Bộ dụng cụ thí nghiệm</td>
+                                        <td>Hóa học</td>
+                                        <td>cái</td>
+                                        <td>Phòng thí nghiệm</td>
+                                        <td>NCC</td>
+                                        <td>10/09/2025</td>
+                                        <td>30/09/2025</td>
+                                        <td>3</td>
+                                        <td>Sáng</td>
+                                        <td>Hóa học</td>
+                                        <td>tốt</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Bộ thí nghiệm H</td>
+                                        <td>Hóa học</td>
+                                        <td>bộ</td>
+                                        <td>Kho Hóa</td>
+                                        <td>GV</td>
+                                        <td>10/09/2025</td>
+                                        <td>30/09/2025</td>
+                                        <td>3</td>
+                                        <td>Chiều</td>
+                                        <td>Hóa học</td>
+                                        <td>tốt</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Laptop Dell Ins</td>
+                                        <td>Tin học</td>
+                                        <td>cái</td>
+                                        <td>Phòng IT</td>
+                                        <td>NCC</td>
+                                        <td>10/09/2025</td>
+                                        <td>10/10/2025</td>
+                                        <td>3</td>
+                                        <td>Sáng</td>
+                                        <td>AI</td>
+                                        <td>tốt</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="text-center mt-4 d-flex justify-content-center gap-3">
+                            <button class="btn btn-approve px-4" onclick="handleAction('approve')">Duyệt</button>
+                            <button class="btn btn-reject px-4" onclick="handleAction('reject')">Không duyệt</button>
+                            <button class="btn btn-close-modal px-4" onclick="window.history.back()">Đóng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../../../../views/partials/footer') %>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function handleAction(actionType) {
+            const slipId = document.getElementById('slipId').textContent.replace('PM_', '');
+            const actionText = actionType === 'approve' ? 'duyệt' : 'KHÔNG duyệt';
+            if (confirm(`Bạn có chắc chắn muốn ${actionText} phiếu mượn ${slipId} này không?`)) {
+                // Trong thực tế, gọi API POST /borrow/api/borrow/{actionType}/{slipId}
+                alert(`Đã gửi yêu cầu ${actionText} phiếu ${slipId}. (MOCK)`);
+                window.location.href = '/borrow/approvals'; // Quay lại trang danh sách
+            }
+        }
+    </script>
+</body>
+</html>

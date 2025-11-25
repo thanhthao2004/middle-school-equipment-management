@@ -138,7 +138,7 @@ Add these to `package.json` when ready:
 
 - Environment: Node 18+, MongoDB reachable from app.
 - Install deps: `npm ci`
-- Start process: `node app.js` or use PM2/systemd in production.
+- Start process: `node app.js` or use systemd in production.
 - Logging: implement `src/config/logger.js` bindings as needed (`pino`/`winston`).
 - Env configuration: keep secrets out of VCS; reference them in `config/env.js` or load from `.env`.
 
