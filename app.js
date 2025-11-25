@@ -51,9 +51,9 @@ const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
 app.use('/borrow', borrowRoutes);
 // app.get('/', (req, res) => res.redirect('/teacher/home'));
 
-// Categories feature
-const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
-app.use('/categories', categoriesRoutes);
+// Disposal feature
+const disposalRoutes = require('./src/features/disposal/routes/disposal.routes');
+app.use('/disposal', disposalRoutes);
 
 // ==========================
 // Error Handling
