@@ -77,6 +77,9 @@ const periodicReportsRoutes = require('./src/features/periodic-reports/routes/pe
 const acceptanceRoutes = require('./src/features/acceptance/routes/acceptance.routes');
 const disposalRoutes = require('./src/features/disposal/routes/disposal.routes');
 
+// Report feature (từ HEAD)
+const reportsRoutes = require('./src/features/reports/routes/reports.routes');
+
 // Áp dụng Routes
 app.use('/auth', authRoutes);
 app.use('/users', usersRoutes);
@@ -88,6 +91,7 @@ app.use('/training-plans', trainingRoutes);
 app.use('/periodic-reports', periodicReportsRoutes);
 app.use('/acceptance', acceptanceRoutes);
 app.use('/disposal', disposalRoutes);
+app.use('/reports', reportsRoutes);
 
 // Redirect trang chủ
 app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
