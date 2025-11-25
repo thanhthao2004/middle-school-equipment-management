@@ -2,20 +2,197 @@
 const borrowService = require("../services/borrow.service");
 
 class BorrowController {
-  // GET /borrow/register - Đăng ký mượn thiết bị
-  async getRegisterPage(req, res) {
-    try {
-      res.render("borrow/views/register", {
-        // <-- ĐÃ SỬA
-        title: "Đăng ký mượn thiết bị",
-        currentPage: "register",
-        sidebarType: "borrow-sidebar",
-        bodyClass: "",
-        user: req.user || { name: "Nguyễn Văn A", role: "Giáo viên bộ môn" },
-      });
-    } catch (error) {
-      console.error("Error rendering register page:", error);
-      res.status(500).send(error.message); // Sửa lỗi render
+    // GET /borrow/register - Đăng ký mượn thiết bị
+    async getRegisterPage(req, res) {
+        try {
+            res.render('borrow/views/register', { 
+                title: 'Đăng ký mượn thiết bị',
+                currentPage: 'register',
+                sidebarType: 'borrow-sidebar',
+                bodyClass: '',
+                user: req.user || { name: 'Nguyễn Văn A', role: 'Giáo viên bộ môn' }
+            });
+        } catch (error) {
+            console.error('Error rendering register page:', error);
+            res.status(500).send(error.message); // Sửa lỗi render
+        }
+    }
+
+    // GET /borrow/pending-approvals - Danh sách phiếu chờ duyệt
+    async getPendingApprovalsPage(req, res) {
+        try {
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
+            const slips = await borrowService.getPendingApprovals(userId, {});
+            res.render('borrow/views/pending-approvals', { // <-- ĐÃ SỬA
+                title: 'Phiếu mượn chờ duyệt',
+                currentPage: 'status',
+                sidebarType: 'borrow-sidebar',
+                bodyClass: '',
+                slips
+            });
+        } catch (error) {
+            console.error('Error rendering pending approvals page:', error);
+            res.status(500).send(error.message); // Sửa lỗi render
+        }
+    }
+
+    // API: GET /borrow/api/pending-approvals
+    async getPendingApprovals(req, res) {
+        try {
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
+            const { id, createdFrom, createdTo, search } = req.query;
+            const slips = await borrowService.getPendingApprovals(userId, { id, createdFrom, createdTo, search });
+            res.json({ success: true, data: slips });
+        } catch (error) {
+            console.error('Error fetching pending approvals:', error);
+            res.status(500).json({ success: false, message: 'Lỗi khi lấy danh sách chờ duyệt' });
+        }
+    }
+
+    // API: POST /borrow/api/cancel/:id
+    async cancelBorrow(req, res) {
+        try {
+            const slipId = req.params.id;
+            await borrowService.cancelBorrow(slipId);
+            res.json({ success: true, message: 'Hủy mượn thành công' });
+        } catch (error) {
+            console.error('Error canceling borrow:', error);
+            res.status(500).json({ success: false, message: 'Lỗi khi hủy phiếu mượn' });
+        }
+    }
+
+    // GET /borrow/history - Lịch sử mượn/trả
+    async getHistoryPage(req, res) {
+        try {
+            res.render('borrow/views/history', { 
+                title: 'Lịch sử mượn/trả',
+                currentPage: 'history',
+                sidebarType: 'borrow-sidebar',
+                bodyClass: '',
+                user: req.user || { name: 'Nguyễn Văn A', role: 'Giáo viên bộ môn' }
+            });
+        } catch (error) {
+            console.error('Error rendering history page:', error);
+            res.status(500).send(error.message); // Sửa lỗi render
+        }
+    }
+
+    // GET /borrow/status - Tình trạng phiếu mượn
+    async getStatusPage(req, res) {
+        try {
+            // LƯU Ý: file 'borrow/status.ejs' không tồn tại.
+            // Tạm thời render trang 'pending-approvals'
+            res.render('borrow/views/pending-approvals', { // <-- ĐÃ SỬA
+                title: 'Tình trạng phiếu mượn',
+                currentPage: 'status',
+                sidebarType: 'borrow-sidebar',
+                bodyClass: '',
+                user: req.user || { name: 'Nguyễn Văn A', role: 'Giáo viên bộ môn' }
+            });
+        } catch (error) {
+            console.error('Error rendering status page:', error);
+            res.status(500).send(error.message); // Sửa lỗi render
+        }
+    }
+
+    // GET /borrow/teacher-home - Trang chủ giáo viên
+    async getTeacherHomePage(req, res) {
+        try {
+            res.render('borrow/views/teacher-home', { // <-- ĐÃ SỬA
+                title: 'Trang chủ giáo viên',
+                currentPage: 'teacher-home',
+                sidebarType: 'borrow-sidebar',
+                bodyClass: '',
+                user: req.user || { name: 'Nguyễn Văn A', role: 'Giáo viên bộ môn' }
+            });
+        } catch (error) {
+            console.error('Error rendering teacher home page:', error);
+            res.status(500).send(error.message); // Sửa lỗi render
+        }
+    }
+
+    // POST /borrow/register - Xử lý đăng ký mượn
+    async createBorrowRequest(req, res) {
+        try {
+            const borrowData = req.body;
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
+            
+            const result = await borrowService.createBorrowRequest(userId, borrowData);
+            
+            res.json({
+                success: true,
+                message: 'Đăng ký mượn thành công!',
+                data: result
+            });
+        } catch (error) {
+            console.error('Error creating borrow request:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Lỗi khi đăng ký mượn',
+                error: process.env.NODE_ENV === 'development' ? error.message : 'Có lỗi xảy ra'
+            });
+        }
+    }
+
+    // GET /borrow/slip/:id - Xem phiếu mượn
+    async getBorrowSlip(req, res) {
+        try {
+            const slipId = req.params.id;
+            const slip = await borrowService.getBorrowSlip(slipId);
+            
+            res.render('borrow/views/slip', { // <-- ĐÃ SỬA
+                title: `Phiếu mượn ${slipId}`,
+                currentPage: 'slip',
+                sidebarType: 'borrow-sidebar',
+                bodyClass: '',
+                slip: slip,
+                user: req.user || { name: 'Nguyễn Văn A', role: 'Giáo viên bộ môn' }
+            });
+        } catch (error) {
+            console.error('Error rendering borrow slip:', error);
+            res.status(500).send(error.message); // Sửa lỗi render
+        }
+    }
+
+    // API: GET /borrow/api/history
+    async getHistoryApi(req, res) {
+        try {
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
+            const { status, createdFrom, createdTo, search } = req.query;
+            const items = await borrowService.getBorrowHistory(userId, { status, createdFrom, createdTo, search });
+            res.json({ success: true, data: items });
+        } catch (error) {
+            console.error('Error fetching history:', error);
+            res.status(500).json({ success: false, message: 'Lỗi khi lấy lịch sử mượn/trả' });
+        }
+    }
+    // GET /borrow/api/devices - API lấy danh sách thiết bị
+    async getDevices(req, res) {
+        try {
+            const { category, class: classFilter, status, condition, location, origin, search } = req.query;
+            
+            const devices = await borrowService.getDevices({
+                category,
+                class: classFilter,
+                status,
+                condition,
+                location,
+                origin,
+                search
+            });
+            
+            res.json({
+                success: true,
+                data: devices
+            });
+        } catch (error) {
+            console.error('Error fetching devices:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Lỗi khi lấy danh sách thiết bị',
+                error: process.env.NODE_ENV === 'development' ? error.message : 'Có lỗi xảy ra'
+            });
+        }
     }
   }
 

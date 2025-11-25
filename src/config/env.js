@@ -22,6 +22,9 @@ const config = {
 		allowedTypes: process.env.ALLOWED_FILE_TYPES?.split(',') || ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
 		uploadDir: process.env.UPLOAD_DIR || 'uploads',
 	},
+	rabbitmq: {
+		uri: process.env.RABBITMQ_URI
+	},
 };
 
 module.exports = config;

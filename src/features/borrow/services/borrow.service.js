@@ -1,130 +1,60 @@
 // Borrow Service
 const borrowRepo = require('../repositories/borrow.repo');
+const { publishMessage } = require('../../../config/rabbitmq');
+const cache = require('../../../core/utils/cache');
 
 class BorrowService {
-    // Lấy danh sách thiết bị với bộ lọc
+    // Lấy danh sách thiết bị với bộ lọc - Tối ưu với caching
     async getDevices(filters = {}) {
         try {
-            // Mock data - trong thực tế sẽ gọi database
-            const mockDevices = [
-                {
-                    id: 101,
-                    name: "Bộ dụng cụ thí nghiệm H2SO4",
-                    category: "chemistry",
-                    unit: "cái",
-                    class: "8,9",
-                    quantity: 3,
-                    status: "available",
-                    condition: "good",
-                    location: "Phòng thiết bị 2",
-                    origin: "CC",
-                    supplier: "Công ty TNHH Hóa Chất Việt"
-                },
-                {
-                    id: 102,
-                    name: "Bộ sách tuổi thơ lớp 8",
-                    category: "literature",
-                    unit: "bộ",
-                    class: "8",
-                    quantity: 10,
-                    status: "borrowed",
-                    condition: "good",
-                    location: "Phòng thiết bị 3",
-                    origin: "Bộ giáo dục",
-                    supplier: "Nhà xuất bản Giáo dục Việt Nam"
-                },
-                {
-                    id: 103,
-                    name: "Bộ thí nghiệm Hoá học cơ bản",
-                    category: "chemistry",
-                    unit: "bộ",
-                    class: "8,9",
-                    quantity: 5,
-                    status: "available",
-                    condition: "good",
-                    location: "Kho Hóa học",
-                    origin: "GV Thanh Th",
-                    supplier: "Công ty Thiết bị Giáo dục ABC"
-                },
-                {
-                    id: 104,
-                    name: "Laptop Dell Inspiron 3501",
-                    category: "it",
-                    unit: "cái",
-                    class: "6,7,8",
-                    quantity: 10,
-                    status: "available",
-                    condition: "good",
-                    location: "Phòng IT",
-                    origin: "NCC",
-                    supplier: "Công ty TNHH Công nghệ XYZ"
-                },
-                {
-                    id: 105,
-                    name: "Bảng tương tác thông minh",
-                    category: "it",
-                    unit: "cái",
-                    class: "6,7,8",
-                    quantity: 1,
-                    status: "available",
-                    condition: "damaged",
-                    location: "Phòng 101",
-                    origin: "NCC",
-                    supplier: "Công ty TNHH Công nghệ XYZ"
-                },
-                {
-                    id: 106,
-                    name: "Phim tư liệu về tác phẩm Nam quốc sơn hà",
-                    category: "literature",
-                    unit: "bộ",
-                    class: "1",
-                    quantity: 9,
-                    status: "borrowed",
-                    condition: "good",
-                    location: "Thư viện",
-                    origin: "NCC",
-                    supplier: "Công ty Sản xuất Phim Giáo dục"
-                }
-            ];
+            // Tạo cache key từ filters
+            const cacheKey = `devices:${JSON.stringify(filters)}`;
 
-            // Apply filters
-            let filteredDevices = mockDevices;
-
-            if (filters.category) {
-                filteredDevices = filteredDevices.filter(device => device.category === filters.category);
+            // Kiểm tra cache trước
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return cached;
             }
 
-            if (filters.class) {
-                filteredDevices = filteredDevices.filter(device => 
-                    device.class.includes(filters.class)
-                );
-            }
+            const devices = await borrowRepo.getDevices(filters);
+            const { BorrowDetail } = require('../models/borrow-ticket.model');
 
-            if (filters.status) {
-                filteredDevices = filteredDevices.filter(device => device.status === filters.status);
-            }
+            // Map MongoDB format sang format mà frontend mong đợi
+            const mappedDevices = await Promise.all(devices.map(async (device) => {
+                // Tính số lượng đã mượn (chưa trả) từ BorrowDetail
+                const borrowedDetails = await BorrowDetail.aggregate([
+                    { $match: { maTB: device.maTB } },
+                    { $group: { 
+                        _id: null, 
+                        totalBorrowed: { $sum: '$soLuongMuon' },
+                        totalReturned: { $sum: '$soLuongDaTra' }
+                    }}
+                ]);
+                
+                const totalBorrowed = borrowedDetails[0]?.totalBorrowed || 0;
+                const totalReturned = borrowedDetails[0]?.totalReturned || 0;
+                const soLuongDangMuon = totalBorrowed - totalReturned;
+                const soLuongConLai = Math.max(0, (device.soLuong || 0) - soLuongDangMuon);
+                
+                return {
+                    id: device.maTB || device._id.toString(),
+                    name: device.tenTB || '',
+                    quantity: soLuongConLai,
+                    category: device.category?.tenDM || device.maDM || '',
+                    condition: device.tinhTrangThietBi || 'Tốt',
+                    location: device.viTriLuuTru || '',
+                    origin: device.nguonGoc || '',
+                    status: soLuongConLai > 0 ? 'available' : 'borrowed',
+                    unit: 'cái', // Mặc định, có thể thêm vào model sau
+                    class: '', // Có thể thêm vào model sau
+                    description: device.huongDanSuDung || ''
+                };
+            }));
 
-            if (filters.condition) {
-                filteredDevices = filteredDevices.filter(device => device.condition === filters.condition);
-            }
+            // Lưu vào cache (TTL 2 phút cho dữ liệu thiết bị)
+            cache.set(cacheKey, mappedDevices, 120000);
 
-            if (filters.location) {
-                filteredDevices = filteredDevices.filter(device => device.location === filters.location);
-            }
-
-            if (filters.origin) {
-                filteredDevices = filteredDevices.filter(device => device.origin === filters.origin);
-            }
-
-            if (filters.search) {
-                const searchTerm = filters.search.toLowerCase();
-                filteredDevices = filteredDevices.filter(device => 
-                    device.name.toLowerCase().includes(searchTerm) ||
-                    device.id.toString().includes(searchTerm)
-                );
-            }
-
-            return filteredDevices;
+            return mappedDevices;
         } catch (error) {
             console.error('Error in getDevices service:', error);
             throw error;
@@ -134,15 +64,27 @@ class BorrowService {
     // Tạo yêu cầu mượn mới
     async createBorrowRequest(userId, borrowData) {
         try {
-            // Validate borrow data
+            // --- Phần 1: Validation ---
+            // Validate userId
+            const mongoose = require('mongoose');
+            if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+                throw new Error('Người dùng không hợp lệ. Vui lòng đăng nhập lại.');
+            }
+            
             if (!borrowData.devices || borrowData.devices.length === 0) {
                 throw new Error('Vui lòng chọn ít nhất một thiết bị');
             }
 
-            // Validate dates
+            // Reset time về 00:00:00 để chỉ so sánh ngày
             const borrowDate = new Date(borrowData.borrowDate);
+            borrowDate.setHours(0, 0, 0, 0);
+
             const returnDate = new Date(borrowData.returnDate);
+            returnDate.setHours(0, 0, 0, 0);
+
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -150,31 +92,26 @@ class BorrowService {
                 throw new Error('Ngày trả phải sau hoặc bằng ngày mượn');
             }
 
+            // Phải đăng ký ít nhất 1 ngày trước (tức là >= tomorrow)
             if (borrowDate < tomorrow) {
                 throw new Error('Cần đăng ký sớm hơn (≥1 ngày) trước buổi dạy');
             }
 
-            // Generate borrow slip ID
-            const slipId = `PM${Date.now().toString().slice(-6)}`;
-
-            // Create borrow request
-            const borrowRequest = {
-                id: slipId,
+            // --- Phần 2: Gửi message tới RabbitMQ ---
+            const messagePayload = {
                 userId: userId,
-                devices: borrowData.devices,
-                borrowDate: borrowDate,
-                returnDate: returnDate,
-                sessionTime: borrowData.sessionTime,
-                content: borrowData.content,
-                status: 'pending',
-                createdAt: new Date(),
-                updatedAt: new Date()
+                borrowData: borrowData,
+                requestedAt: new Date().toISOString()
             };
 
-            // In real application, save to database
-            // await borrowRepo.createBorrowRequest(borrowRequest);
+            // Gửi message tới RabbitMQ
+            await publishMessage(messagePayload);
 
-            return borrowRequest;
+            return {
+                success: true,
+                message: 'Yêu cầu mượn của bạn đã được tiếp nhận và đang chờ xử lý.'
+            };
+
         } catch (error) {
             console.error('Error in createBorrowRequest service:', error);
             throw error;
@@ -184,41 +121,11 @@ class BorrowService {
     // Lấy phiếu mượn theo ID
     async getBorrowSlip(slipId) {
         try {
-            // Mock data - trong thực tế sẽ gọi database
-            const mockSlip = {
-                id: slipId,
-                userId: 1,
-                userName: "Nguyễn Văn A",
-                userRole: "Giáo viên bộ môn",
-                devices: [
-                    {
-                        id: 101,
-                        name: "Bộ dụng cụ thí nghiệm H2SO4",
-                        category: "Hóa học",
-                        unit: "cái",
-                        quantity: 2,
-                        location: "Phòng thiết bị 2"
-                    },
-                    {
-                        id: 104,
-                        name: "Laptop Dell Inspiron 3501",
-                        category: "Tin học",
-                        unit: "cái",
-                        quantity: 1,
-                        location: "Phòng IT"
-                    }
-                ],
-                borrowDate: "2024-01-15",
-                returnDate: "2024-01-22",
-                sessionTime: "sang",
-                content: "Dạy thí nghiệm hóa học lớp 8A",
-                status: "approved",
-                createdAt: "2024-01-10T08:30:00Z",
-                approvedBy: "Cô Nguyễn Thị B",
-                approvedAt: "2024-01-10T14:20:00Z"
-            };
-
-            return mockSlip;
+            const slip = await borrowRepo.getBorrowSlipById(slipId);
+            if (!slip) {
+                throw new Error('Phiếu mượn không tồn tại');
+            }
+            return slip;
         } catch (error) {
             console.error('Error in getBorrowSlip service:', error);
             throw error;
@@ -228,27 +135,8 @@ class BorrowService {
     // Lấy lịch sử mượn của user
     async getBorrowHistory(userId, filters = {}) {
         try {
-            // Mock data - trong thực tế sẽ gọi database
-            const mockHistory = [
-                {
-                    id: "PM001",
-                    devices: ["Bộ dụng cụ thí nghiệm H2SO4", "Laptop Dell Inspiron 3501"],
-                    borrowDate: "2024-01-15",
-                    returnDate: "2024-01-22",
-                    status: "completed",
-                    createdAt: "2024-01-10T08:30:00Z"
-                },
-                {
-                    id: "PM002",
-                    devices: ["Bộ thí nghiệm Hoá học cơ bản"],
-                    borrowDate: "2024-01-20",
-                    returnDate: "2024-01-27",
-                    status: "pending",
-                    createdAt: "2024-01-18T10:15:00Z"
-                }
-            ];
-
-            return mockHistory;
+            const history = await borrowRepo.getBorrowHistoryByUserId(userId, filters);
+            return history;
         } catch (error) {
             console.error('Error in getBorrowHistory service:', error);
             throw error;
@@ -257,25 +145,30 @@ class BorrowService {
 
     // Lấy danh sách phiếu chờ duyệt của user
     async getPendingApprovals(userId, filters = {}) {
-        // Mock list of pending slips
-        const mock = [
-            { id: 'PM1', createdAt: '2025-09-10', status: 'pending' },
-            { id: 'PM2', createdAt: '2025-09-10', status: 'pending' },
-            { id: 'PM3', createdAt: '2025-09-10', status: 'pending' }
-        ];
-
-        let list = mock;
-        if (filters.id) list = list.filter(x => x.id.toLowerCase().includes(filters.id.toLowerCase()));
-        if (filters.search) list = list.filter(x => x.id.toLowerCase().includes(filters.search.toLowerCase()));
-        if (filters.createdFrom) list = list.filter(x => x.createdAt >= filters.createdFrom);
-        if (filters.createdTo) list = list.filter(x => x.createdAt <= filters.createdTo);
-        return list;
+        try {
+            // Force status filter to 'dang_muon' (pending) if not specified?
+            // Or just pass filters.
+            const pendingFilters = { ...filters, status: 'dang_muon' };
+            const list = await borrowRepo.getPendingApprovals(userId, pendingFilters);
+            return list;
+        } catch (error) {
+            console.error('Error in getPendingApprovals service:', error);
+            throw error;
+        }
     }
 
-    // Hủy phiếu mượn (mock)
+    // Hủy phiếu mượn
     async cancelBorrow(slipId) {
-        // In real app: validate permissions, update DB, restore quantities
-        return { id: slipId, status: 'canceled' };
+        try {
+            // In real app: validate permissions, check if status allows cancellation
+            // For now, just delete or update status to 'huy'
+            // Let's update status to 'huy'
+            const result = await borrowRepo.updateBorrowRequestStatus(slipId, 'huy');
+            return result;
+        } catch (error) {
+            console.error('Error in cancelBorrow service:', error);
+            throw error;
+        }
     }
       // API cho QLTB: Lấy danh sách phiếu mượn đang chờ duyệt
     async getPendingBorrows() {
