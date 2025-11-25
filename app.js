@@ -1,6 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const connectDB = require('./config/db');
 const path = require('path');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
@@ -39,10 +37,8 @@ app.use(compression({
 }));
 
 // Body Parsers
-app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 // Static files (Đã hợp nhất các định nghĩa)
@@ -67,48 +63,35 @@ setImmediate(async () => {
 		appLogger.warn(' ** Hướng dẫn: Chạy "npm run db:up" để khởi động MongoDB');
 	}
 });
-
-
-// Categories feature (từ develop)
-const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
-app.use('/categories', categoriesRoutes);
-
-const usersRoutes = require('./src/features/users/routes/users.routes');
-app.use('/users', usersRoutes);
 // ==========================
 // ROUTES
 // ==========================
 // Khai báo Routes
+const authRoutes = require('./src/features/auth/routes/auth.routes');
+const usersRoutes = require('./src/features/users/routes/users.routes');
+const profileRoutes = require('./src/features/profile/routes/profile.routes');
 const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
-const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
 const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
+const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
 const trainingRoutes = require('./src/features/training-plans/routes/training.routes');
 const periodicReportsRoutes = require('./src/features/periodic-reports/routes/periodic-report.routes');
 const acceptanceRoutes = require('./src/features/acceptance/routes/acceptance.routes');
 const disposalRoutes = require('./src/features/disposal/routes/disposal.routes');
 
-// Borrow feature (mượn thiết bị)
-const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
-app.use('/borrow', borrowRoutes);
-
-// Categories feature
-const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
 // Áp dụng Routes
+app.use('/auth', authRoutes);
+app.use('/users', usersRoutes);
+app.use('/profile', profileRoutes);
 app.use('/borrow', borrowRoutes);
-app.use('/purchasing-plans', purchasingRoutes);
 app.use('/categories', categoriesRoutes);
+app.use('/purchasing-plans', purchasingRoutes);
 app.use('/training-plans', trainingRoutes);
 app.use('/periodic-reports', periodicReportsRoutes);
 app.use('/acceptance', acceptanceRoutes);
 app.use('/disposal', disposalRoutes);
 
-// CHỌN: Chỉ giữ lại một Redirect trang chủ
+// Redirect trang chủ
 app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
-
-
-// Auth feature routes (login, change-password, etc.)
-const authRoutes = require('./src/features/auth/routes/auth.routes');
-app.use('/auth', authRoutes);
 
 // ==========================
 // Error Handling (Handlers 404 & 500)
@@ -140,15 +123,6 @@ app.use((err, req, res, next) => {
     });
 });
 */
-
-
-// Purchasing-plans fearure 
-const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
-app.use('/purchasing-plans', purchasingRoutes);
-
-// Profile feature
-const profileRoutes = require('./src/features/profile/routes/profile.routes');
-app.use('/profile', profileRoutes);
 
 // ==========================
 // Khởi động server

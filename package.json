@@ -9,7 +9,6 @@
     "db:down": "docker compose down",
     "worker:borrow": "node src/features/borrow/workers/borrow_request_worker.js",
     "seed": "node scripts/seed-data.js",
-    "seed:data": "node scripts/seed-data.js",
     "get:data": "node scripts/get-test-data.js"
   },
   "dependencies": {
