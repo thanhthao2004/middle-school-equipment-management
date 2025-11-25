@@ -136,6 +136,14 @@ app.use((err, req, res, next) => {
 */
 
 
+// Purchasing-plans fearure 
+const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
+app.use('/purchasing-plans', purchasingRoutes);
+
+// Profile feature
+const profileRoutes = require('./src/features/profile/routes/profile.routes');
+app.use('/profile', profileRoutes);
+
 // ==========================
 // Khởi động server
 // ==========================
