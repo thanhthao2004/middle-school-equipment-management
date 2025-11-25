@@ -5,7 +5,7 @@ class BorrowController {
     // GET /borrow/register - Đăng ký mượn thiết bị
     async getRegisterPage(req, res) {
         try {
-            res.render('borrow/views/register', { // <-- ĐÃ SỬA
+            res.render('borrow/views/register', { 
                 title: 'Đăng ký mượn thiết bị',
                 currentPage: 'register',
                 sidebarType: 'borrow-sidebar',
@@ -21,7 +21,7 @@ class BorrowController {
     // GET /borrow/pending-approvals - Danh sách phiếu chờ duyệt
     async getPendingApprovalsPage(req, res) {
         try {
-            const userId = req.user?.id || 1;
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
             const slips = await borrowService.getPendingApprovals(userId, {});
             res.render('borrow/views/pending-approvals', { // <-- ĐÃ SỬA
                 title: 'Phiếu mượn chờ duyệt',
@@ -39,7 +39,7 @@ class BorrowController {
     // API: GET /borrow/api/pending-approvals
     async getPendingApprovals(req, res) {
         try {
-            const userId = req.user?.id || 1;
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
             const { id, createdFrom, createdTo, search } = req.query;
             const slips = await borrowService.getPendingApprovals(userId, { id, createdFrom, createdTo, search });
             res.json({ success: true, data: slips });
@@ -64,7 +64,7 @@ class BorrowController {
     // GET /borrow/history - Lịch sử mượn/trả
     async getHistoryPage(req, res) {
         try {
-            res.render('borrow/views/history', { // <-- ĐÃ SỬA
+            res.render('borrow/views/history', { 
                 title: 'Lịch sử mượn/trả',
                 currentPage: 'history',
                 sidebarType: 'borrow-sidebar',
@@ -115,7 +115,7 @@ class BorrowController {
     async createBorrowRequest(req, res) {
         try {
             const borrowData = req.body;
-            const userId = req.user?.id || 1; // Mock user ID
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
             
             const result = await borrowService.createBorrowRequest(userId, borrowData);
             
@@ -157,7 +157,7 @@ class BorrowController {
     // API: GET /borrow/api/history
     async getHistoryApi(req, res) {
         try {
-            const userId = req.user?.id || 1;
+            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
             const { status, createdFrom, createdTo, search } = req.query;
             const items = await borrowService.getBorrowHistory(userId, { status, createdFrom, createdTo, search });
             res.json({ success: true, data: items });

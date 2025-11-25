@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Borrow Routes
 const express = require('express');
 const router = express.Router();
@@ -22,11 +21,11 @@ router.post('/register',
     validate(borrowValidators.createBorrowRequest),
     borrowController.createBorrowRequest
 );
-=======
 /**
  * Authentication middleware
  */
 
+module.exports = router;
 // KHÔNG require 'error-codes' và 'response' ở đây. 
 // Chúng sẽ được require bên trong các hàm xử lý để tránh vòng lặp phụ thuộc.
 
@@ -47,7 +46,6 @@ const authenticate = async (req, res, next) => {
         if (!req.user) {
             req.user = { id: 1, role: 'ql_thiet_bi', name: 'Quản lý Mock' };
         }
->>>>>>> features/borrow
 
 		// For now, skip auth check
 		next();

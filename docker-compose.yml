@@ -12,6 +12,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: mse-rabbitmq
+    ports:
+      - "5672:5672" # Cổng cho client kết nối
+      - "15672:15672" # Cổng cho giao diện quản lý web
 volumes:
   mongo_data:
 
