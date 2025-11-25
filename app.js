@@ -55,6 +55,11 @@ const categoriesRoutes = require('./src/features/categories/routes/categories.ro
 app.use('/borrow', borrowRoutes);
 app.use('/purchasing-plans', purchasingRoutes);
 app.use('/categories', categoriesRoutes);
+// app.get('/', (req, res) => res.redirect('/teacher/home'));
+
+// Disposal feature
+const disposalRoutes = require('./src/features/disposal/routes/disposal.routes');
+app.use('/disposal', disposalRoutes);
 
 // Redirect trang chủ
 app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
