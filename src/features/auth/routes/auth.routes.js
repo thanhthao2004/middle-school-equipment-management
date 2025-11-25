@@ -13,12 +13,20 @@ router.post('/login', authController.handleLogin);
 // GET /auth/logout - Xử lý đăng xuất
 router.get('/logout', authController.handleLogout);
 
-// GET /auth/change-password - Vẫn giữ lại để tránh lỗi
+// GET /auth/password/change - Hiển thị form đổi mật khẩu
+router.get('/password/change', authController.getChangePasswordPage);
+
+// POST /auth/password/change - Xử lý đổi mật khẩu
+router.post('/password/change', authController.handleChangePassword);
+
+// GET /auth/password/forgot - Hiển thị form quên mật khẩu
+router.get('/password/forgot', authController.getForgotPasswordPage);
+
+// POST /auth/password/forgot - Xử lý quên mật khẩu
+router.post('/password/forgot', authController.handleForgotPassword);
+
+// Legacy routes (giữ lại để tương thích)
 router.get('/change-password', authController.getChangePasswordPage);
-
-// POST /auth/change-password - Vẫn giữ lại để tránh lỗi
 router.post('/change-password', authController.getChangePasswordPage);
-
-// ĐÃ LOẠI BỎ: /forgot-password và /register
 
 module.exports = router;

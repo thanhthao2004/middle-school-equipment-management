@@ -153,4 +153,23 @@ router.get("/view/:id", (req, res) => {
     res.render("disposal/views/view", { disposal, deviceTypes, departments });
 });
 
+// =============================================
+// PRINCIPAL ROUTES (Hiệu trưởng - Duyệt thanh lý)
+// =============================================
+// GET /disposal/approve - Danh sách báo cáo thanh lý cần duyệt
+router.get("/approve", (req, res) => {
+    const pendingDisposals = dummyDisposal.filter(d => d.status === 'pending' || !d.status);
+    res.render("disposal/views/approve-list", { 
+        disposal: pendingDisposals, 
+        deviceTypes, 
+        departments 
+    });
+});
+
+// POST /disposal/approve/:id - Duyệt báo cáo thanh lý
+router.post("/approve/:id", (req, res) => {
+    // TODO: Implement approve logic
+    return res.redirect("/disposal/approve");
+});
+
 module.exports = router;

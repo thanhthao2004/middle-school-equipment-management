@@ -1,19 +1,36 @@
+// Profile Routes - Quản lý thông tin cá nhân (cho tất cả actors)
 const express = require('express');
 const router = express.Router();
+const profileController = require('../controllers/profile.controller');
+// const { authenticate } = require('../../../core/middlewares/auth.middleware');
+// const { validate } = require('../../../core/middlewares/validation.middleware');
+// const profileValidators = require('../validators/profile.validators');
 
-// Temporary/sample user data. In a full implementation the controller
-// would load the authenticated user's profile from a database.
-// Render profile page
-router.get('/', (req, res) => {
-    // Do not send sample user data to the view (inputs should be empty).
-    // Pass currentPage so header/sidebar partials that expect it won't error.
-    res.render('profile/views/profile', { title: 'Quản lý thông tin cá nhân', currentPage: 'profile' });
-});
+// Apply auth middleware to all routes (tạm thời bỏ qua để frontend chạy được)
+// router.use(authenticate);
 
-// Handle profile update (temporary: redirect back to profile)
-router.post('/', (req, res) => {
-    // TODO: persist updates using controller/service
-    return res.redirect('/profile');
-});
+// =============================================
+// PROFILE ROUTES
+// =============================================
+// GET /profile - Xem thông tin cá nhân
+router.get('/', profileController.getProfilePage);
+
+// POST /profile - Cập nhật thông tin cá nhân
+router.post('/', 
+    // validate(profileValidators.updateProfile), // Tạm thời bỏ qua validation
+    profileController.updateProfile
+);
+
+// =============================================
+// PASSWORD CHANGE ROUTES
+// =============================================
+// GET /profile/password/change - Form đổi mật khẩu cá nhân
+router.get('/password/change', profileController.getChangePasswordPage);
+
+// POST /profile/password/change - Xử lý đổi mật khẩu cá nhân
+router.post('/password/change',
+    // validate(profileValidators.changePassword), // Tạm thời bỏ qua validation
+    profileController.changePassword
+);
 
 module.exports = router;

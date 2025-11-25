@@ -1,146 +1,56 @@
+/**
+ * Main Application Entry Point
+ * Tổ chức code theo cấu trúc rõ ràng, dễ đọc và dễ quản lý
+ */
+
+require('dotenv').config();
+
 const express = require('express');
-const path = require('path');
-const compression = require('compression');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan'); // Giữ lại morgan logger
-require('dotenv').config(); // Đảm bảo biến môi trường được tải
-
-// Các modules chính và Middleware
 const config = require('./src/config/env');
-const appLogger = require('./src/config/logger'); // Đổi tên để tránh xung đột với morgan logger
+const logger = require('./src/config/logger');
+const { configureMiddleware } = require('./src/config/middleware');
+const { configureViewEngine } = require('./src/config/view-engine');
+const { initializeDatabase } = require('./src/config/database');
 const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware');
+const routes = require('./src/routes');
 
+// ==========================
+// Initialize Express App
+// ==========================
 const app = express();
 
 // ==========================
-// Cấu hình view engine
+// Configuration
 // ==========================
-// CHỌN: Sử dụng 'src/features' làm thư mục views chính. Nếu cần 'src/views', hãy thay đổi logic này.
-app.set('views', path.join(__dirname, 'src/features'));
-app.set('view engine', 'ejs');
+configureViewEngine(app);
+configureMiddleware(app);
 
 // ==========================
-// Middleware & Static
+// Database Connection
 // ==========================
-// Logger
-app.use(logger('dev'));
-// Compression
-app.use(compression({
-	filter: (req, res) => {
-		if (req.headers['x-no-compression']) {
-			return false;
-		}
-		return compression.filter(req, res);
-	},
-	level: 6,
-	threshold: 1024
-}));
-
-// Body Parsers
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(cookieParser());
-
-// Static files (Đã hợp nhất các định nghĩa)
-app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
-app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
-// CHỌN: Sử dụng prefix '/public' cho thư mục public để rõ ràng hơn
-app.use('/public', express.static(path.join(__dirname, 'public')));
+initializeDatabase();
 
 // ==========================
-// Kết nối MongoDB
+// Routes
 // ==========================
-// CHỌN: Chỉ giữ lại 1 logic kết nối, sử dụng async/await và appLogger
-setImmediate(async () => {
-	try {
-		const { connectMongo } = require('./src/config/db');
-		await connectMongo();
-		appLogger.info('MongoDB connection initiated');
-	} catch (e) {
-		appLogger.error('MongoDB init failed:', e.message);
-		appLogger.warn(' ** Server vẫn chạy nhưng chưa kết nối được MongoDB');
-		appLogger.warn(' ** Hướng dẫn: Chạy "npm run db:up" để khởi động MongoDB');
+app.use(routes);
+
+// ==========================
+// Error Handling
+// ==========================
+app.use(notFoundHandler); // 404 - Phải đặt sau tất cả routes
+app.use(errorHandler);    // 500 - Phải đặt cuối cùng
+
+// ==========================
+// Start Server
+// ==========================
+const PORT = config.port || 3000;
+app.listen(PORT, () => {
+	logger.info(`Server đang chạy tại: http://localhost:${PORT}`);
+	logger.info(`Environment: ${config.nodeEnv}`);
+	if (process.send) {
+		process.send('ready');
 	}
-});
-// ==========================
-// ROUTES
-// ==========================
-// Khai báo Routes
-const authRoutes = require('./src/features/auth/routes/auth.routes');
-const usersRoutes = require('./src/features/users/routes/users.routes');
-const profileRoutes = require('./src/features/profile/routes/profile.routes');
-const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
-const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
-const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
-const trainingRoutes = require('./src/features/training-plans/routes/training.routes');
-const periodicReportsRoutes = require('./src/features/periodic-reports/routes/periodic-report.routes');
-const acceptanceRoutes = require('./src/features/acceptance/routes/acceptance.routes');
-const disposalRoutes = require('./src/features/disposal/routes/disposal.routes');
-
-// Report feature (từ HEAD)
-const reportsRoutes = require('./src/features/reports/routes/reports.routes');
-
-// Áp dụng Routes
-app.use('/auth', authRoutes);
-app.use('/users', usersRoutes);
-app.use('/profile', profileRoutes);
-app.use('/borrow', borrowRoutes);
-app.use('/categories', categoriesRoutes);
-app.use('/purchasing-plans', purchasingRoutes);
-app.use('/training-plans', trainingRoutes);
-app.use('/periodic-reports', periodicReportsRoutes);
-app.use('/acceptance', acceptanceRoutes);
-app.use('/disposal', disposalRoutes);
-app.use('/reports', reportsRoutes);
-
-// Redirect trang chủ
-app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
-
-// Suppliers feature
-const suppliersRoutes = require('./src/features/suppliers/routes/suppliers.routes');
-app.use('/suppliers', suppliersRoutes);
-
-// ==========================
-// Error Handling (Handlers 404 & 500)
-// ==========================
-// Sử dụng các middleware từ lõi:
-app.use(notFoundHandler); // 404
-app.use(errorHandler); // 500
-
-// Nếu bạn muốn dùng logic 404 và 500 cũ, bạn cần thay thế notFoundHandler và errorHandler bằng các đoạn sau:
-/*
-// 404 Handler (Logic cũ)
-app.use((req, res, next) => {
-    res.status(404).render('error_page', {
-        title: '404 - Không tìm thấy trang',
-        message: 'Trang bạn yêu cầu không tồn tại.',
-        status: 404
-    });
-});
-
-// 500 Handler (Logic cũ)
-app.use((err, req, res, next) => {
-    console.error('SERVER ERROR:', err.stack);
-    const status = err.status || 500;
-
-    res.status(status).render('error_page', {
-        title: `${status} - Lỗi máy chủ`,
-        status: status,
-        errorDetail: app.get('env') === 'development' ? err.stack : undefined
-    });
-});
-*/
-
-// ==========================
-// Khởi động server
-// ==========================
-// CHỌN: Chỉ giữ lại 1 lần khởi động server, dùng config.port và appLogger
-app.listen(config.port, () => {
-    appLogger.info(`Server đang chạy tại: http://localhost:${config.port}`);
-    appLogger.info(`Environment: ${config.nodeEnv}`);
-    if (process.send) {
-        process.send('ready');
-    }
 });
 
 module.exports = app;

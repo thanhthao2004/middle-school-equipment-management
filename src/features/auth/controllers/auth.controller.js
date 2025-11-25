@@ -34,13 +34,36 @@ class AuthController {
         res.redirect('/auth/login?success=Đăng xuất thành công');
     }
 
-    // Tạm thời giữ lại hàm getChangePasswordPage để không gây lỗi 404 cho route đã có
+    // GET /auth/password/change - Hiển thị form đổi mật khẩu
     getChangePasswordPage(req, res) {
         res.render('auth/views/change-password', {
             title: 'Đổi mật khẩu',
             errors: [],
             success: null
         });
+    }
+
+    // POST /auth/password/change - Xử lý đổi mật khẩu
+    handleChangePassword(req, res) {
+        // TODO: Implement logic đổi mật khẩu
+        // Tạm thời redirect về trang đổi mật khẩu với thông báo thành công
+        res.redirect('/auth/password/change?success=Đổi mật khẩu thành công');
+    }
+
+    // GET /auth/password/forgot - Hiển thị form quên mật khẩu
+    getForgotPasswordPage(req, res) {
+        res.render('auth/views/forgot-password', {
+            title: 'Quên mật khẩu',
+            errors: [],
+            success: null
+        });
+    }
+
+    // POST /auth/password/forgot - Xử lý quên mật khẩu
+    handleForgotPassword(req, res) {
+        // TODO: Implement logic quên mật khẩu (gửi email reset password)
+        // Tạm thời redirect về trang login với thông báo thành công
+        res.redirect('/auth/login?success=Vui lòng kiểm tra email để đặt lại mật khẩu');
     }
 }
 

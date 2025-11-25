@@ -33,6 +33,17 @@ router.get('/', (req, res) => {
     res.render('training-plans/views/list', { title: 'Xem kế hoạch đào tạo', trainingPlans: filtered, years, queryYear });
 });
 
+// GET /training-plans/report - Xem báo cáo kế hoạch đào tạo (Tổ trưởng)
+router.get('/report', (req, res) => {
+    const trainingPlans = sampleTrainingPlans();
+    const years = sampleYears();
+    res.render('training-plans/views/report', { 
+        title: 'Báo cáo kế hoạch đào tạo', 
+        trainingPlans, 
+        years 
+    });
+});
+
 // View single plan
 router.get('/:id', (req, res) => {
     const plan = getPlanById(req.params.id);

@@ -70,7 +70,19 @@ router.delete('/:id', (req, res) => {
     return res.redirect('/purchasing-plans');
 });
 
-// Approve page
+// =============================================
+// PRINCIPAL ROUTES (Hiệu trưởng - Duyệt mua sắm)
+// =============================================
+// GET /purchasing-plans/approve - Danh sách kế hoạch cần duyệt
+router.get('/approve', (req, res) => {
+    const plans = samplePlans().filter(p => p.status === 'pending');
+    res.render('purchasing-plans/views/approve-list', { 
+        title: 'Duyệt kế hoạch mua sắm', 
+        plans 
+    });
+});
+
+// Approve page for specific plan
 router.get('/:id/approve', (req, res) => {
     const plan = getPlanById(req.params.id);
     if (!plan) return res.status(404).send('Kế hoạch không tồn tại');
