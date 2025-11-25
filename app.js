@@ -1,30 +1,73 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const connectDB = require('./config/db');
 const path = require('path');
-require('dotenv').config();
+const compression = require('compression');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan'); // Giữ lại morgan logger
+require('dotenv').config(); // Đảm bảo biến môi trường được tải
+
+// Các modules chính và Middleware
+const config = require('./src/config/env');
+const appLogger = require('./src/config/logger'); // Đổi tên để tránh xung đột với morgan logger
+const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware');
 
 const app = express();
 
 // ==========================
-// ⚙️ Cấu hình view engine
+// Cấu hình view engine
 // ==========================
-app.set('view engine', 'ejs');
+// CHỌN: Sử dụng 'src/features' làm thư mục views chính. Nếu cần 'src/views', hãy thay đổi logic này.
 app.set('views', path.join(__dirname, 'src/features'));
+app.set('view engine', 'ejs');
 
 // ==========================
-// ⚙️ Middleware & Static
+// Middleware & Static
 // ==========================
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// Logger
+app.use(logger('dev'));
+// Compression
+app.use(compression({
+	filter: (req, res) => {
+		if (req.headers['x-no-compression']) {
+			return false;
+		}
+		return compression.filter(req, res);
+	},
+	level: 6,
+	threshold: 1024
+}));
 
+// Body Parsers
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Static files (Đã hợp nhất các định nghĩa)
 app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
 app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
+// CHỌN: Sử dụng prefix '/public' cho thư mục public để rõ ràng hơn
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 
-// Use feature routes
-const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
-app.use('/purchasing-plans', purchasingRoutes);
+// ==========================
+// Kết nối MongoDB
+// ==========================
+// CHỌN: Chỉ giữ lại 1 logic kết nối, sử dụng async/await và appLogger
+setImmediate(async () => {
+	try {
+		const { connectMongo } = require('./src/config/db');
+		await connectMongo();
+		appLogger.info('MongoDB connection initiated');
+	} catch (e) {
+		appLogger.error('MongoDB init failed:', e.message);
+		appLogger.warn(' ** Server vẫn chạy nhưng chưa kết nối được MongoDB');
+		appLogger.warn(' ** Hướng dẫn: Chạy "npm run db:up" để khởi động MongoDB');
+	}
+});
+
 
 // Categories feature (từ develop)
 const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
@@ -33,44 +76,90 @@ app.use('/categories', categoriesRoutes);
 const usersRoutes = require('./src/features/users/routes/users.routes');
 app.use('/users', usersRoutes);
 // ==========================
-// ⚙️ ROUTES
+// ROUTES
 // ==========================
+// Khai báo Routes
+const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
+const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
+const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
+const trainingRoutes = require('./src/features/training-plans/routes/training.routes');
+const periodicReportsRoutes = require('./src/features/periodic-reports/routes/periodic-report.routes');
+const acceptanceRoutes = require('./src/features/acceptance/routes/acceptance.routes');
+const disposalRoutes = require('./src/features/disposal/routes/disposal.routes');
 
-// Borrow (mượn thiết bị)
-app.get('/', (req, res) => res.redirect('/teacher/home'));
+// Borrow feature (mượn thiết bị)
+const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
+app.use('/borrow', borrowRoutes);
 
-app.get('/teacher/home', (req, res) => {
-  res.render('borrow/views/teacher-home', { title: 'Trang chủ giáo viên', currentPage: 'teacher-home' });
+// Categories feature
+const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
+// Áp dụng Routes
+app.use('/borrow', borrowRoutes);
+app.use('/purchasing-plans', purchasingRoutes);
+app.use('/categories', categoriesRoutes);
+app.use('/training-plans', trainingRoutes);
+app.use('/periodic-reports', periodicReportsRoutes);
+app.use('/acceptance', acceptanceRoutes);
+app.use('/disposal', disposalRoutes);
+
+// CHỌN: Chỉ giữ lại một Redirect trang chủ
+app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
+
+
+// Auth feature routes (login, change-password, etc.)
+const authRoutes = require('./src/features/auth/routes/auth.routes');
+app.use('/auth', authRoutes);
+
+// ==========================
+// Error Handling (Handlers 404 & 500)
+// ==========================
+// Sử dụng các middleware từ lõi:
+app.use(notFoundHandler); // 404
+app.use(errorHandler); // 500
+
+// Nếu bạn muốn dùng logic 404 và 500 cũ, bạn cần thay thế notFoundHandler và errorHandler bằng các đoạn sau:
+/*
+// 404 Handler (Logic cũ)
+app.use((req, res, next) => {
+    res.status(404).render('error_page', {
+        title: '404 - Không tìm thấy trang',
+        message: 'Trang bạn yêu cầu không tồn tại.',
+        status: 404
+    });
 });
 
-app.get('/borrow/register', (req, res) => {
-  res.render('borrow/views/register', { title: 'Đăng ký mượn thiết bị', currentPage: 'register' });
-});
+// 500 Handler (Logic cũ)
+app.use((err, req, res, next) => {
+    console.error('SERVER ERROR:', err.stack);
+    const status = err.status || 500;
 
-app.get('/borrow/slip/:id', (req, res) => {
-  res.render('borrow/views/slip', { title: 'Phiếu mượn thiết bị', slipId: req.params.id, from: req.query.from || '' });
+    res.status(status).render('error_page', {
+        title: `${status} - Lỗi máy chủ`,
+        status: status,
+        errorDetail: app.get('env') === 'development' ? err.stack : undefined
+    });
 });
+*/
 
-app.get('/borrow/history', (req, res) => {
-  res.render('borrow/views/history', { title: 'Lịch sử mượn/trả', currentPage: 'history' });
-});
 
-app.get('/borrow/pending-approvals', (req, res) => {
-  res.render('borrow/views/pending-approvals', { title: 'Chờ duyệt', currentPage: 'status' });
-});
+// Purchasing-plans fearure 
+const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
+app.use('/purchasing-plans', purchasingRoutes);
 
-app.get('/borrow/detail/:id', (req, res) => {
-  res.render('borrow/views/detail', { title: 'Chi tiết phiếu', id: req.params.id });
-});
-
-app.get('/borrow/cancel', (req, res) => {
-  res.render('borrow/views/cancel', { title: 'Hủy phiếu' });
-});
-
-// Categories feature (từ develop)
+// Profile feature
+const profileRoutes = require('./src/features/profile/routes/profile.routes');
+app.use('/profile', profileRoutes);
 
 // ==========================
 // Khởi động server
 // ==========================
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server đang chạy tại: http://localhost:${PORT}`));
+// CHỌN: Chỉ giữ lại 1 lần khởi động server, dùng config.port và appLogger
+app.listen(config.port, () => {
+    appLogger.info(`Server đang chạy tại: http://localhost:${config.port}`);
+    appLogger.info(`Environment: ${config.nodeEnv}`);
+    if (process.send) {
+        process.send('ready');
+    }
+});
+
+module.exports = app;
