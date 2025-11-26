@@ -4,109 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chờ duyệt</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="/public/stylesheets/style.css" rel="stylesheet">
     <link href="/public/stylesheets/borrow.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
-    <%- include('../../../views/partials/header') %>
+    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'giao_vien' }; %>
+    <div class="app-shell">
+        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'status', user: userObj }) %>
 
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <!-- Sidebar -->
-            <%- include('../../../views/partials/borrow-sidebar') %>
+        <div class="main-content">
+        
+        <%- include('../../../views/partials/header', { currentPage: 'status', user: userObj }) %>
 
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 main-content">
-                <div class="container py-4">
+        <div class="container py-4">
 
-        <!-- Filters -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="row g-3 align-items-end">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+     
                     <div class="col-md-3">
-                        <label class="form-label small text-muted fw-bold">Mã phiếu</label>
-                        <input type="text" class="form-control" id="filterId" placeholder="Nhập mã phiếu (VD: PM2)">
-                    </div>
+                            <label class="form-label small text-muted fw-bold">Mã phiếu</label>
+                            <input type="text" class="form-control" id="filterId" placeholder="Nhập mã phiếu (VD: PM2)">
+                       
+  </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted fw-bold">Ngày tạo từ</label>
+                            <input type="date" class="form-control" id="filterFrom">
+                        </div>
+     
                     <div class="col-md-3">
-                        <label class="form-label small text-muted fw-bold">Ngày tạo từ</label>
-                        <input type="date" class="form-control" id="filterFrom">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label small text-muted fw-bold">Ngày tạo đến</label>
-                        <input type="date" class="form-control" id="filterTo">
-                    </div>
-                    <div class="col-md-3 d-flex gap-2">
-                        <button class="btn btn-outline-info" id="btnApply"><i class="fas fa-filter me-1"></i>Áp dụng</button>
-                        <button class="btn btn-outline-secondary" id="btnReset"><i class="fas fa-undo me-1"></i>Reset</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Table -->
-        <div class="card mt-2">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover equipment-table mb-0" id="pendingTable">
-                        <thead>
-                            <tr>
-                                <th style="width: 120px;">Mã phiếu</th>
-                                <th style="width: 180px;">Ngày tạo phiếu</th>
-                                <th style="width: 140px;">Chi tiết phiếu</th>
-                                <th style="width: 140px;">Lựa chọn</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pendingTbody">
-                            <!-- Mock row for manual UI testing; JS will replace this on load -->
-                            <tr>
-                                <td class="fw-semibold">PM2</td>
-                                <td>10/09/2025</td>
-                                <td>
-                                    <button class="btn btn-link p-0" onclick="viewSlip('PM2')">Xem</button>
-                                </td>
-                                <td>
-                                    <button class="btn btn-outline-danger btn-sm" onclick="openCancel('PM2')">Hủy mượn</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Confirm cancel modal -->
-        <div class="modal fade" id="confirmCancelModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">THÔNG BÁO</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <p class="mb-0">Bạn có chắc chắn muốn hủy mượn không?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Trở về</button>
-                        <button type="button" class="btn btn-primary" id="btnConfirmCancel">Xác nhận</button>
-                    </div>
-                </div>
-            </div>
+                            <label class="form-label small text-muted fw-bold">Ngày tạo đến</label>
+                            <input type="date" class="form-control" id="filterTo">
+                        </div>
+       
+                  <div class="col-md-3 d-flex gap-2">
+                            <button class="btn btn-outline-info" id="btnApply"><i class="fas fa-filter me-1"></i>Áp dụng</button>
+                            <button class="btn btn-outline-secondary" id="btnReset"><i class="fas fa-undo me-1"></i>Reset</button>
+                       
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="card mt-2">
+                <div class="card-body">
+                    <div class="table-responsive">
+                 
+        <table class="table table-hover equipment-table mb-0" id="pendingTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 120px;">Mã phiếu</th>
+     
+                                <th style="width: 180px;">Ngày tạo phiếu</th>
+                                <th style="width: 140px;">Chi tiết phiếu</th>
+                                <th style="width: 140px;">Lựa chọn</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingTbody">
+                                <tr>
+                                    <td class="fw-semibold">PM2</td>
+                                    <td>10/09/2025</td>
+     
+                                <td>
+                                        <button class="btn btn-link p-0" onclick="viewSlip('PM2')">Xem</button>
+                                </td>
+                                    <td>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="openCancel('PM2')">Hủy mượn</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+        
+         </div>
             </div>
+
+            <div class="modal fade" id="confirmCancelModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+             
+                <h5 class="modal-title">THÔNG BÁO</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                  
+           <p class="mb-0">Bạn có chắc chắn muốn hủy mượn không?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Trở về</button>
+                
+             <button type="button" class="btn btn-primary" id="btnConfirmCancel">Xác nhận</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <%- include('../../../views/partials/footer') %>
+        
         </div>
     </div>
 
-    <!-- Footer -->
-    <%- include('../../../views/partials/footer') %>
-
-    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/public/javascripts/pending-approvals.js"></script>
-    </body>
-    </html>
-
+</body>
+</html>

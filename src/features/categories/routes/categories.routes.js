@@ -15,11 +15,18 @@ router.get("/", (req, res) => {
     { id: "DM04", name: "ThietBiNguVan", location: "Phong VanHoc" },
   ];
 
-  res.render(path.join(viewPath, "list.ejs"), { categories });
+  res.render(path.join(viewPath, "list.ejs"), { 
+    categories,
+    currentPage: 'categories',
+    user: req.user || { role: 'ql_thiet_bi' }
+  });
 });
 
 router.get("/add", (req, res) => {
-  res.render(path.join(viewPath, "add.ejs"));
+  res.render(path.join(viewPath, "add.ejs"), {
+    currentPage: 'categories',
+    user: req.user || { role: 'ql_thiet_bi' }
+  });
 });
 
 router.get("/edit/:id", (req, res) => {
@@ -28,7 +35,30 @@ router.get("/edit/:id", (req, res) => {
     name: "ThietBiNguVan",
     location: "Phòng Văn học"
   };
-  res.render(path.join(viewPath, "edit.ejs"), { category });
+  res.render(path.join(viewPath, "edit.ejs"), { 
+    category,
+    currentPage: 'categories',
+    user: req.user || { role: 'ql_thiet_bi' }
+  });
+});
+
+// POST routes for CRUD operations
+router.post("/", (req, res) => {
+  // TODO: Implement create category logic
+  // For now, just redirect back to list
+  res.redirect("/manager/categories");
+});
+
+router.post("/:id", (req, res) => {
+  // TODO: Implement update category logic
+  // For now, just redirect back to list
+  res.redirect("/manager/categories");
+});
+
+router.post("/:id/delete", (req, res) => {
+  // TODO: Implement delete category logic
+  // For now, just redirect back to list
+  res.redirect("/manager/categories");
 });
 
 module.exports = router;

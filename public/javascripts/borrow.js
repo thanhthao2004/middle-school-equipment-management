@@ -2,15 +2,16 @@
 // Global variables
 let selectedDevices = [];
 let filteredDevices = [];
+let loadedDevices = [];
 
 // Initialize page
-document.addEventListener('DOMContentLoaded', function() {
-    initializePage();
+document.addEventListener('DOMContentLoaded', async function() {
+    await initializePage();
     setupEventListeners();
     updateSelectionCounter();
 });
 
-function initializePage() {
+async function initializePage() {
     // Set minimum date to today
     const today = new Date().toISOString().split('T')[0];
     const borrowDateFrom = document.getElementById('borrowDateFrom');
@@ -22,9 +23,137 @@ function initializePage() {
     if (borrowDateTo) {
         borrowDateTo.min = today;
     }
-    
-    // Initialize filtered devices
-    filteredDevices = Array.from(document.querySelectorAll('#equipmentTableBody tr'));
+
+    // Load devices from API for register page
+    const equipmentTableBody = document.getElementById('equipmentTableBody');
+    if (equipmentTableBody) {
+        await loadDevicesFromApi();
+    }
+}
+
+async function loadDevicesFromApi() {
+    const tbody = document.getElementById('equipmentTableBody');
+    if (!tbody) return;
+
+    // Show loading row
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="12" class="text-center py-4 text-muted">
+                <i class="fas fa-spinner fa-spin me-2"></i>Đang tải danh sách thiết bị...
+            </td>
+        </tr>
+    `;
+
+    try {
+        const params = new URLSearchParams();
+        const category = document.getElementById('categoryFilter')?.value;
+        const classFilter = document.getElementById('classFilter')?.value;
+        const status = document.getElementById('statusFilter')?.value;
+        const condition = document.getElementById('conditionFilter')?.value;
+        const location = document.getElementById('locationFilter')?.value;
+        const origin = document.getElementById('originFilter')?.value;
+        const search = document.getElementById('searchInput')?.value;
+
+        if (category) params.append('category', category);
+        if (classFilter) params.append('class', classFilter);
+        if (status) params.append('status', status);
+        if (condition) params.append('condition', condition);
+        if (location) params.append('location', location);
+        if (origin) params.append('origin', origin);
+        if (search) params.append('search', search);
+
+        const res = await fetch(`/teacher/borrow/api/devices?${params.toString()}`);
+        const json = await res.json();
+
+        if (!json.success) {
+            throw new Error(json.message || 'Không thể tải danh sách thiết bị');
+        }
+
+        loadedDevices = json.data || [];
+
+        if (loadedDevices.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="12" class="text-center py-4 text-muted">
+                        Không có thiết bị phù hợp với bộ lọc hiện tại.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        const categoryLabels = {
+            chemistry: 'Hóa học',
+            it: 'Tin học',
+            literature: 'Ngữ văn',
+            physics: 'Vật lý'
+        };
+
+        const statusLabels = {
+            available: 'Có sẵn',
+            borrowed: 'Đã mượn'
+        };
+
+        const conditionLabels = {
+            good: 'Tốt',
+            damaged: 'Hỏng'
+        };
+
+        tbody.innerHTML = '';
+
+        loadedDevices.forEach(device => {
+            const tr = document.createElement('tr');
+            tr.dataset.category = device.category || '';
+            tr.dataset.class = device.class || '';
+            tr.dataset.status = device.status || '';
+            tr.dataset.condition = device.condition || '';
+            tr.dataset.deviceId = device.id;
+
+            const categoryLabel = categoryLabels[device.category] || device.category || '';
+            const statusLabel = statusLabels[device.status] || device.status || '';
+            const conditionLabel = conditionLabels[device.condition] || device.condition || '';
+
+            tr.innerHTML = `
+                <td><span class="fw-bold text-primary">${device.id}</span></td>
+                <td>
+                    <div class="fw-bold">${device.name || ''}</div>
+                    ${device.description ? `<small class="text-muted">${device.description}</small>` : ''}
+                </td>
+                <td><span class="badge bg-info">${categoryLabel}</span></td>
+                <td>${device.unit || ''}</td>
+                <td>${device.class || ''}</td>
+                <td><span class="fw-bold text-success">${device.quantity ?? ''}</span></td>
+                <td><span class="${device.status === 'available' ? 'status-available' : 'status-borrowed'}">${statusLabel}</span></td>
+                <td><span class="${device.condition === 'good' ? 'condition-good' : 'condition-damaged'}">${conditionLabel}</span></td>
+                <td>${device.location || ''}</td>
+                <td>${device.origin || ''}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="viewDetails(${device.id})" title="Xem chi tiết">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input equipment-checkbox" data-device-id="${device.id}" data-max-quantity="${device.quantity ?? 1}">
+                    </div>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+        });
+
+        // Cập nhật danh sách hàng để filter
+        filteredDevices = Array.from(document.querySelectorAll('#equipmentTableBody tr'));
+    } catch (err) {
+        console.error('Error loading devices:', err);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="12" class="text-center py-4 text-danger">
+                    Không thể tải danh sách thiết bị. Vui lòng thử lại sau.
+                </td>
+            </tr>
+        `;
+    }
 }
 
 function setupEventListeners() {
@@ -39,7 +168,10 @@ function setupEventListeners() {
     filterIds.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
-            element.addEventListener('change', applyFilters);
+            element.addEventListener('change', async () => {
+                await loadDevicesFromApi();
+                applyFilters();
+            });
         }
     });
     
@@ -48,7 +180,10 @@ function setupEventListeners() {
     dateFilters.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
-            element.addEventListener('change', applyFilters);
+            element.addEventListener('change', async () => {
+                await loadDevicesFromApi();
+                applyFilters();
+            });
         }
     });
     
@@ -60,105 +195,46 @@ function setupEventListeners() {
     });
 }
 
+// Store current device ID for selectDevice function
+let currentViewingDeviceId = null;
+
 function viewDetails(deviceId) {
-    // Device data with more comprehensive information
-    const deviceData = {
-        101: {
-            name: "Bộ dụng cụ thí nghiệm H2SO4",
-            id: "101",
-            category: "Hóa học",
-            unit: "cái",
-            class: "8, 9",
-            quantity: "3",
-            status: "Có sẵn",
-            condition: "Tốt",
-            location: "Phòng thiết bị 2",
-            origin: "CC",
-            supplier: "Công ty TNHH Hóa Chất Việt"
-        },
-        102: {
-            name: "Bộ sách tuổi thơ lớp 8",
-            id: "102",
-            category: "Ngữ văn",
-            unit: "bộ",
-            class: "8",
-            quantity: "10",
-            status: "Đã mượn",
-            condition: "Tốt",
-            location: "Phòng thiết bị 3",
-            origin: "Bộ giáo dục",
-            supplier: "Nhà xuất bản Giáo dục Việt Nam"
-        },
-        103: {
-            name: "Bộ thí nghiệm Hoá học cơ bản",
-            id: "103",
-            category: "Hóa học",
-            unit: "bộ",
-            class: "8, 9",
-            quantity: "5",
-            status: "Có sẵn",
-            condition: "Tốt",
-            location: "Kho Hóa học",
-            origin: "GV Thanh Th",
-            supplier: "Công ty Thiết bị Giáo dục ABC"
-        },
-        104: {
-            name: "Laptop Dell Inspiron 3501",
-            id: "104",
-            category: "Tin học",
-            unit: "cái",
-            class: "6, 7, 8",
-            quantity: "10",
-            status: "Có sẵn",
-            condition: "Tốt",
-            location: "Phòng IT",
-            origin: "NCC",
-            supplier: "Công ty TNHH Công nghệ XYZ"
-        },
-        105: {
-            name: "Bảng tương tác thông minh",
-            id: "105",
-            category: "Tin học",
-            unit: "cái",
-            class: "6, 7, 8",
-            quantity: "1",
-            status: "Có sẵn",
-            condition: "Hỏng",
-            location: "Phòng 101",
-            origin: "NCC",
-            supplier: "Công ty TNHH Công nghệ XYZ"
-        },
-        106: {
-            name: "Phim tư liệu về tác phẩm Nam quốc sơn hà",
-            id: "106",
-            category: "Ngữ văn",
-            unit: "bộ",
-            class: "1",
-            quantity: "9",
-            status: "Đã mượn",
-            condition: "Tốt",
-            location: "Thư viện",
-            origin: "NCC",
-            supplier: "Công ty Sản xuất Phim Giáo dục"
-        }
-    };
-    
-    const device = deviceData[deviceId];
+    // Tìm thiết bị từ dữ liệu đã load
+    const device = loadedDevices.find(d => String(d.id) === String(deviceId));
     if (!device) return;
-    
-    // Update modal content
+
+    // Store device ID for selectDevice function
+    currentViewingDeviceId = device.id;
+
+    const categoryLabels = {
+        chemistry: 'Hóa học',
+        it: 'Tin học',
+        literature: 'Ngữ văn',
+        physics: 'Vật lý'
+    };
+
+    const statusLabels = {
+        available: 'Có sẵn',
+        borrowed: 'Đã mượn'
+    };
+
+    const conditionLabels = {
+        good: 'Tốt',
+        damaged: 'Hỏng'
+    };
+
     const modalElements = {
-        'deviceName': device.name,
+        'deviceName': device.name || '',
         'deviceId': device.id,
-        'deviceCategory': device.category,
-        'deviceUnit': device.unit,
-        'deviceClass': device.class,
-        'deviceQuantity': device.quantity,
-        'deviceStatus': device.status,
-        'deviceCondition': device.condition,
-        'deviceLocation': device.location,
-        'deviceOrigin': device.origin,
-        'deviceSupplier': device.supplier
+        'deviceCategory': categoryLabels[device.category] || device.category || '',
+        'deviceUnit': device.unit || '',
+        'deviceClass': device.class || '',
+        'deviceQuantity': device.quantity ?? '',
+        'deviceStatus': statusLabels[device.status] || device.status || '',
+        'deviceCondition': conditionLabels[device.condition] || device.condition || '',
+        'deviceLocation': device.location || '',
+        'deviceOrigin': device.origin || '',
+        'deviceSupplier': device.supplier || ''
     };
     
     Object.keys(modalElements).forEach(id => {
@@ -172,7 +248,7 @@ function viewDetails(deviceId) {
     modal.show();
 }
 
-// Filter functions
+// Filter functions - Tối ưu với early return và cache
 function applyFilters() {
     const categoryFilter = document.getElementById('categoryFilter')?.value || '';
     const classFilter = document.getElementById('classFilter')?.value || '';
@@ -183,64 +259,72 @@ function applyFilters() {
     const searchTerm = document.getElementById('searchInput')?.value?.toLowerCase() || '';
 
     const rows = document.querySelectorAll('#equipmentTableBody tr');
+    const searchLower = searchTerm.toLowerCase();
     
-    rows.forEach(row => {
-        let show = true;
-        
-        // Category filter
-        if (categoryFilter && row.dataset.category !== categoryFilter) {
-            show = false;
-        }
-        
-        // Class filter
-        if (classFilter && !row.dataset.class.includes(classFilter)) {
-            show = false;
-        }
-        
-        // Status filter
-        if (statusFilter && row.dataset.status !== statusFilter) {
-            show = false;
-        }
-        
-        // Condition filter
-        if (conditionFilter && row.dataset.condition !== conditionFilter) {
-            show = false;
-        }
-        
-        // Location filter
-        if (locationFilter) {
-            const locationCell = row.cells[8]?.textContent?.trim();
-            if (locationCell !== locationFilter) {
-                show = false;
+    // Tối ưu: Dùng requestAnimationFrame cho batch DOM updates
+    requestAnimationFrame(() => {
+        rows.forEach(row => {
+            // Early return pattern - kiểm tra điều kiện nhanh nhất trước
+            if (categoryFilter && row.dataset.category !== categoryFilter) {
+                row.style.display = 'none';
+                return;
             }
-        }
-        
-        // Origin filter
-        if (originFilter) {
-            const originCell = row.cells[9]?.textContent?.trim();
-            if (originCell !== originFilter) {
-                show = false;
+            
+            if (statusFilter && row.dataset.status !== statusFilter) {
+                row.style.display = 'none';
+                return;
             }
-        }
-        
-        // Search filter
-        if (searchTerm) {
-            const deviceName = row.cells[1]?.textContent?.toLowerCase() || '';
-            const deviceId = row.cells[0]?.textContent?.toLowerCase() || '';
-            if (!deviceName.includes(searchTerm) && !deviceId.includes(searchTerm)) {
-                show = false;
+            
+            if (conditionFilter && row.dataset.condition !== conditionFilter) {
+                row.style.display = 'none';
+                return;
             }
-        }
-        
-        row.style.display = show ? '' : 'none';
-        
-        if (show) {
+            
+            // Class filter - tối ưu với Set nếu có nhiều classes
+            if (classFilter) {
+                const classes = row.dataset.class?.split(',') || [];
+                if (!classes.includes(classFilter)) {
+                    row.style.display = 'none';
+                    return;
+                }
+            }
+            
+            // Location filter
+            if (locationFilter) {
+                const locationCell = row.cells[8]?.textContent?.trim();
+                if (locationCell !== locationFilter) {
+                    row.style.display = 'none';
+                    return;
+                }
+            }
+            
+            // Origin filter
+            if (originFilter) {
+                const originCell = row.cells[9]?.textContent?.trim();
+                if (originCell !== originFilter) {
+                    row.style.display = 'none';
+                    return;
+                }
+            }
+            
+            // Search filter - tối ưu với includes() thay vì regex
+            if (searchLower) {
+                const deviceName = (row.cells[1]?.textContent || '').toLowerCase();
+                const deviceId = (row.cells[0]?.textContent || '').toLowerCase();
+                if (!deviceName.includes(searchLower) && !deviceId.includes(searchLower)) {
+                    row.style.display = 'none';
+                    return;
+                }
+            }
+            
+            // Hiển thị row nếu pass tất cả filters
+            row.style.display = '';
             row.classList.add('table-row-enter');
             setTimeout(() => row.classList.remove('table-row-enter'), 300);
-        }
+        });
+        
+        updateSelectionCounter();
     });
-    
-    updateSelectionCounter();
 }
 
 function resetFilters() {
@@ -258,17 +342,20 @@ function resetFilters() {
 
 function toggleAdvancedFilters() {
     const advancedFilters = document.getElementById('advancedFilters');
+    const advancedButtons = document.getElementById('advancedFilterButtons'); // Thêm dòng này
     const toggleBtn = document.getElementById('toggleAdvancedBtn');
     
-    if (advancedFilters && toggleBtn) {
+    if (advancedFilters && toggleBtn && advancedButtons) { // Thêm advancedButtons vào
         const icon = toggleBtn.querySelector('i');
         
         if (advancedFilters.style.display === 'none') {
             advancedFilters.style.display = 'block';
+            advancedButtons.style.display = 'block'; 
             icon.className = 'fas fa-chevron-up me-1';
             toggleBtn.innerHTML = '<i class="fas fa-chevron-up me-1"></i>Ẩn bộ lọc nâng cao';
         } else {
             advancedFilters.style.display = 'none';
+            advancedButtons.style.display = 'none'; 
             icon.className = 'fas fa-chevron-down me-1';
             toggleBtn.innerHTML = '<i class="fas fa-chevron-down me-1"></i>Bộ lọc nâng cao';
         }
@@ -330,39 +417,62 @@ function selectDevice() {
         detailsModal.hide();
     }
     
-    // Get device ID from modal and find corresponding checkbox
-    const deviceId = document.getElementById('deviceId')?.textContent;
-    if (deviceId) {
-        // Find the checkbox for this device
-        const checkbox = document.querySelector(`input[data-device-id="${deviceId}"]`);
-        if (checkbox && !checkbox.disabled) {
-            // Check the checkbox
-            checkbox.checked = true;
-            
-            // Update selection counter
-            updateSelectionCounter();
-            
-            // Scroll to the table to show the selected item
-            const tableContainer = document.querySelector('.table-responsive');
-            if (tableContainer) {
-                tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Use stored device ID or get from modal
+    const deviceId = currentViewingDeviceId || document.getElementById('deviceId')?.textContent?.trim();
+    
+    if (!deviceId) {
+        showErrorModal('Không tìm thấy thông tin thiết bị.');
+        return;
+    }
+    
+    // Find the checkbox for this device - try both string and number comparison
+    let checkbox = document.querySelector(`input[data-device-id="${deviceId}"]`);
+    
+    // If not found, try finding by iterating through all checkboxes
+    if (!checkbox) {
+        const allCheckboxes = document.querySelectorAll('input.equipment-checkbox');
+        for (let cb of allCheckboxes) {
+            if (String(cb.dataset.deviceId) === String(deviceId)) {
+                checkbox = cb;
+                break;
             }
-            
-            // Highlight the selected row briefly
-            const row = checkbox.closest('tr');
-            if (row) {
-                row.classList.add('row-highlight');
-                setTimeout(() => {
-                    row.classList.remove('row-highlight');
-                }, 2000);
-            }
-            
-            // Show success message
-            showSuccessMessage(`Đã chọn thiết bị "${document.getElementById('deviceName')?.textContent}" để mượn!`);
-        } else {
-            showErrorModal('Không thể chọn thiết bị này. Vui lòng kiểm tra trạng thái thiết bị.');
         }
     }
+    
+    if (checkbox && !checkbox.disabled) {
+        // Check the checkbox
+        checkbox.checked = true;
+        
+        // Trigger change event to update selection
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Update selection counter
+        updateSelectionCounter();
+        
+        // Scroll to the table to show the selected item
+        const tableContainer = document.querySelector('.table-responsive');
+        if (tableContainer) {
+            tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Highlight the selected row briefly
+        const row = checkbox.closest('tr');
+        if (row) {
+            row.classList.add('row-highlight');
+            setTimeout(() => {
+                row.classList.remove('row-highlight');
+            }, 2000);
+        }
+        
+        // Show success message
+        const deviceName = document.getElementById('deviceName')?.textContent || 'thiết bị';
+        showSuccessMessage(`Đã chọn thiết bị "${deviceName}" để mượn!`);
+    } else {
+        showErrorModal('Không thể chọn thiết bị này. Vui lòng kiểm tra trạng thái thiết bị hoặc tải lại trang.');
+    }
+    
+    // Clear stored device ID
+    currentViewingDeviceId = null;
 }
 
 // Utility function for debouncing
@@ -418,19 +528,20 @@ function openBorrowForm() {
     
     selectedDevices.forEach(device => {
         const row = document.createElement('tr');
+        row.dataset.deviceId = device.deviceId; // Store deviceId in row data attribute
         row.innerHTML = `
             <td class="text-center fw-bold">${device.st}</td>
             <td>
-                <div class="fw-bold">${device.name}</div>
-                <small class="text-muted">Mã: ${device.deviceId}</small>
+                <div class="device-name">${device.name}</div>
+                <div class="device-code">Mã: ${device.deviceId}</div>
             </td>
-            <td><span class="badge bg-info">${device.category}</span></td>
-            <td>${device.unit}</td>
+            <td class="text-center"><span class="badge bg-info">${device.category}</span></td>
+            <td class="text-center">${device.unit}</td>
             <td class="text-center">
                 <span class="fw-bold text-success">${device.quantity}</span>
             </td>
             <td>${device.location}</td>
-            <td>${device.origin}</td>
+            <td class="text-center">${device.origin}</td>
             <td>
                 <input type="date" class="form-control form-control-sm borrow-date" 
                        value="${today.toISOString().split('T')[0]}" 
@@ -445,11 +556,11 @@ function openBorrowForm() {
                 <input type="number" class="form-control form-control-sm borrow-quantity" 
                        value="1" min="1" max="${device.maxQuantity}" 
                        data-max="${device.maxQuantity}" required>
-                <small class="text-muted">Tối đa: ${device.maxQuantity}</small>
+                <small class="text-muted d-block mt-1">Tối đa: ${device.maxQuantity}</small>
             </td>
             <td>
-                <select class="form-select form-select-sm session-time" required>
-                    <option value="">Chọn ca</option>
+                <select class="form-select form-select-sm session-time" required style="min-width: 120px;">
+                    <option value="">-- Chọn ca --</option>
                     <option value="sang">Sáng (7:00-11:30)</option>
                     <option value="chieu">Chiều (13:00-17:30)</option>
                 </select>
@@ -528,22 +639,30 @@ function submitBorrowForm() {
         return;
     }
     
-    // Validate dates
+    // Validate dates - Reset time về 00:00:00 để chỉ so sánh ngày
     const borrowDates = document.querySelectorAll('.borrow-date');
     const returnDates = document.querySelectorAll('.return-date');
+    
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     
     for (let i = 0; i < borrowDates.length; i++) {
         const borrowDate = new Date(borrowDates[i].value);
+        borrowDate.setHours(0, 0, 0, 0);
+        
         const returnDate = new Date(returnDates[i].value);
+        returnDate.setHours(0, 0, 0, 0);
         
         if (returnDate < borrowDate) {
             showErrorModal('Ngày trả phải sau hoặc bằng ngày mượn!');
             return;
         }
         
+        // Phải đăng ký ít nhất 1 ngày trước (tức là >= tomorrow)
+        // Ví dụ: Hôm nay 20/11, chọn 21/11 là OK (21/11 >= 21/11)
         if (borrowDate < tomorrow) {
             showErrorModal('Cần đăng ký sớm hơn (≥1 ngày) trước buổi dạy!');
             return;
@@ -563,33 +682,133 @@ function submitBorrowForm() {
     });
     
     if (!isValid) return;
-    
+
+    // Build payload for backend
+    const rows = document.querySelectorAll('#borrowFormTable tr');
+    const devices = [];
+
+    rows.forEach((row) => {
+        // Get deviceId from row data attribute (set when creating the row)
+        let deviceId = row.dataset.deviceId;
+        
+        // Fallback: try to get from device-code text (format: "Mã: 123")
+        if (!deviceId) {
+            const deviceCodeText = row.querySelector('.device-code')?.textContent || '';
+            const match = deviceCodeText.match(/Mã:\s*(\d+)/i);
+            if (match) {
+                deviceId = match[1];
+            }
+        }
+        
+        // Last fallback: try to get from any number in device-code
+        if (!deviceId) {
+            const deviceCodeText = row.querySelector('.device-code')?.textContent || '';
+            const match = deviceCodeText.match(/(\d+)/);
+            if (match) {
+                deviceId = match[1];
+            }
+        }
+
+        const quantityInput = row.querySelector('.borrow-quantity');
+
+        if (deviceId && quantityInput) {
+            // Ensure deviceId is a number for validation
+            const deviceIdNum = typeof deviceId === 'string' ? parseInt(deviceId, 10) : deviceId;
+            if (!isNaN(deviceIdNum) && deviceIdNum > 0) {
+                devices.push({
+                    deviceId: deviceIdNum,
+                    quantity: parseInt(quantityInput.value, 10) || 1
+                });
+            }
+        }
+    });
+
+    const borrowDateInput = document.querySelector('.borrow-date');
+    const returnDateInput = document.querySelector('.return-date');
+    const sessionInput = document.querySelector('.session-time');
+    const contentInput = document.querySelector('.content-note');
+
+    const payload = {
+        devices,
+        borrowDate: borrowDateInput?.value,
+        returnDate: returnDateInput?.value,
+        sessionTime: sessionInput?.value,
+        content: contentInput?.value?.trim() || ''
+    };
+
     // Show loading state
     const submitBtn = document.querySelector('#borrowFormModal .btn-primary');
-    if (submitBtn) {
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
-        submitBtn.disabled = true;
-        
-        // Simulate API call
-        setTimeout(() => {
-            // Reset button state
+    if (!submitBtn) return;
+
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+    submitBtn.disabled = true;
+
+    fetch('/teacher/borrow/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(async res => {
+        let data;
+        try {
+            data = await res.json();
+        } catch (e) {
+            // If response is not JSON, show generic error
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
+            showErrorModal('Lỗi không xác định từ server. Vui lòng thử lại.');
+            return;
+        }
+        
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+
+        if (!res.ok || !data.success) {
+            // Handle validation errors
+            let errorMessage = data.message || 'Đăng ký mượn thất bại. Vui lòng thử lại.';
             
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('borrowFormModal'));
-            if (modal) {
-                modal.hide();
+            // If there are validation errors, show them
+            if (data.errors) {
+                if (Array.isArray(data.errors)) {
+                    errorMessage = data.errors.map(e => {
+                        if (typeof e === 'string') return e;
+                        if (e.msg) return e.msg;
+                        if (e.message) return e.message;
+                        return JSON.stringify(e);
+                    }).join('\n');
+                } else if (typeof data.errors === 'string') {
+                    errorMessage = data.errors;
+                }
+            } else if (data.error) {
+                errorMessage = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
             }
             
-            // Show success notification
-            showSuccessModal();
-        }, 2000);
-    }
+            showErrorModal(errorMessage);
+            return;
+        }
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('borrowFormModal'));
+        if (modal) {
+            modal.hide();
+        }
+
+        // Get maPhieu from response
+        const maPhieu = data.data?.maPhieu || data.data?.ticket?.maPhieu || null;
+        showSuccessModal(maPhieu);
+    })
+    .catch(err => {
+        console.error('Error submitting borrow request:', err);
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        showErrorModal('Có lỗi khi gửi yêu cầu mượn. Vui lòng thử lại.');
+    });
 }
 
-function showSuccessModal() {
+function showSuccessModal(maPhieu) {
+    const slipId = maPhieu || 'PM0001';
     const modalHtml = `
         <div class="modal fade" id="successModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
@@ -602,7 +821,7 @@ function showSuccessModal() {
                         <h5 class="text-success mb-4">ĐĂNG KÝ MƯỢN THÀNH CÔNG!</h5>
                         <p class="text-muted mb-4">Phiếu mượn đã được tạo và gửi đến email của bạn.</p>
                         <div class="d-flex gap-3 justify-content-center">
-                            <button class="btn btn-primary btn-lg" onclick="viewBorrowSlip()">
+                            <button class="btn btn-primary btn-lg" onclick="viewBorrowSlip('${slipId}')">
                                 <i class="fas fa-file-alt me-2"></i>Xem phiếu mượn
                             </button>
                             <button class="btn btn-outline-secondary btn-lg" data-bs-dismiss="modal">
@@ -621,93 +840,4 @@ function showSuccessModal() {
     
     // Auto remove modal after 10 seconds
     setTimeout(() => {
-        const modalElement = document.getElementById('successModal');
-        if (modalElement) {
-            modalElement.remove();
-        }
-    }, 10000);
-}
-
-function showErrorModal(message) {
-    const modalHtml = `
-        <div class="modal fade" id="errorModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-body text-center py-4">
-                        <div class="mb-3">
-                            <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
-                        </div>
-                        <h4 class="text-danger mb-3 fw-bold">THÔNG BÁO LỖI</h4>
-                        <p class="mb-4 text-muted">${message}</p>
-                        <button class="btn btn-primary" data-bs-dismiss="modal">
-                            <i class="fas fa-check me-2"></i>Đã hiểu
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    const modal = new bootstrap.Modal(document.getElementById('errorModal'));
-    modal.show();
-    
-    // Auto remove modal after 5 seconds
-    setTimeout(() => {
-        const modalElement = document.getElementById('errorModal');
-        if (modalElement) {
-            modalElement.remove();
-        }
-    }, 5000);
-}
-
-function showSuccessMessage(message) {
-    // Create toast notification
-    const toastHtml = `
-        <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" id="successToast">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas fa-check-circle me-2"></i>${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-    `;
-    
-    // Add toast container if it doesn't exist
-    let toastContainer = document.getElementById('toastContainer');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.id = 'toastContainer';
-        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-        toastContainer.style.zIndex = '9999';
-        document.body.appendChild(toastContainer);
-    }
-    
-    // Add toast to container
-    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-    
-    // Show toast
-    const toastElement = document.getElementById('successToast');
-    const toast = new bootstrap.Toast(toastElement, {
-        autohide: true,
-        delay: 3000
-    });
-    toast.show();
-    
-    // Remove toast element after it's hidden
-    toastElement.addEventListener('hidden.bs.toast', () => {
-        toastElement.remove();
-    });
-}
-
-function viewBorrowSlip() {
-    // Close success modal
-    const successModal = bootstrap.Modal.getInstance(document.getElementById('successModal'));
-    if (successModal) {
-        successModal.hide();
-    }
-    
-    // Show borrow slip
-    window.location.href = '/borrow/slip/PM01';
-}
+        const modalE

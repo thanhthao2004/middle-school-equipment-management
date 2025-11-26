@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa chi tiết Nghiệm thu</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .acceptance-form-box { border: 1px solid #ddd; padding: 30px; border-radius: 8px; background-color: #fff; max-width: 1100px; margin: 20px auto; }
+        .table-form th, .table-form td { font-size: 0.85rem; padding: 8px; }
+        .table-form th { background-color: #e9ecef; }
+        .table-form .form-control-sm { height: 30px; padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <%- include('../../../views/partials/header', { currentPage: 'acceptance', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar QLTB -->
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'acceptance', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="container py-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 mb-0">SỬA CHI TIẾT NGHIỆM THU</h1>
+                        <span class="text-muted small">Quản lý thiết bị</span>
+                    </div>
+
+                    <div class="acceptance-form-box">
+                        <h4 class="mb-4">Mã: NT007</h4>
+                        
+                        <form onsubmit="return handleSave(event)">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-form">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">STT</th>
+                                            <th colspan="2" class="text-center">Thông tin Thiết bị</th>
+                                            <th colspan="2" class="text-center">Số lượng</th>
+                                            <th rowspan="2">Chất lượng</th>
+                                            <th rowspan="2">Lý do</th>
+                                            <th rowspan="2">Thỏa mãn</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Tên Danh mục</th>
+                                            <th>Tên TB</th>
+                                            <th>Số lượng đặt</th>
+                                            <th>Số lượng thực tế khi nhận</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Mock data có thể chỉnh sửa -->
+                                        <% 
+                                            const items = [
+                                                { id: 1, category: 'Thiết bị dạy môn', name: 'Bộ thiết bị vẽ trên bảng trơ', ordered: 5, received: 5, quality: 'Tốt', reason: '', satisfied: true },
+                                                { id: 2, category: 'Thiết bị dạy môn', name: 'Bộ thí nghiệm cơ học', ordered: 3, received: 3, quality: 'Khá', reason: 'Bị gãy 1 bộ -> yêu cầu đổi', satisfied: false },
+                                                { id: 3, category: 'Thiết bị dạy Hóa', name: 'Bộ dụng cụ thí nghiệm hóa chất', ordered: 4, received: 2, quality: 'Trung bình', reason: 'Thiếu 2 bộ', satisfied: false },
+                                                { id: 4, category: 'Thiết bị dạy Sinh', name: 'Bộ kính hiển vi', ordered: 2, received: 2, quality: 'Trung bình', reason: '1 kính bị mờ -> đề xuất bảo trì', satisfied: false },
+                                                { id: 5, category: 'Thiết bị dạy Tin', name: 'Máy chiếu', ordered: 1, received: 1, quality: 'Tốt', reason: '', satisfied: true }
+                                            ];
+                                            items.forEach(item => {
+                                        %>
+                                            <tr>
+                                                <td><%= item.id %></td>
+                                                <td><%= item.category %></td>
+                                                <td><%= item.name %></td>
+                                                <td><%= item.ordered %></td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm" value="<%= item.received %>" data-ordered="<%= item.ordered %>">
+                                                </td>
+                                                <td>
+                                                    <select class="form-select form-select-sm">
+                                                        <option <%= item.quality === 'Tốt' ? 'selected' : '' %>>Tốt</option>
+                                                        <option <%= item.quality === 'Khá' ? 'selected' : '' %>>Khá</option>
+                                                        <option <%= item.quality === 'Trung bình' ? 'selected' : '' %>>Trung bình</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" value="<%= item.reason %>" placeholder="Nhập lý do nếu có">
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" <%= item.satisfied ? 'checked' : '' %> style="width: 18px; height: 18px;">
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="text-end mt-4">
+                                <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-1"></i> Lưu kết quả</button>
+                                <button type="button" class="btn btn-secondary px-4 ms-2" onclick="window.history.back()">Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../../../views/partials/footer') %>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function handleSave(event) {
+            event.preventDefault();
+            alert('Lưu kết quả nghiệm thu thành công! (MOCK)');
+            window.location.href = '/manager/acceptance';
+            return false;
+        }
+    </script>
+</body>
+</html>

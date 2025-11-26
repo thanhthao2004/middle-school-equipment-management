@@ -3,61 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <title>Quản lý thiết bị</title>
+    
+    <!-- Bootstrap 5.3.0 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6.4.0 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/stylesheets/devices.css">
+    <link rel="stylesheet" href="/public/stylesheets/style.css">
 </head>
 <body>
-    <div class="container mt-4">
-        <h1 class="mb-4"><%= title %></h1>
-        
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Danh sách thiết bị</h5>
+    <!-- Header -->
+    <%- include('../../../views/partials/header', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar QLTB -->
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="container py-4">
+                    <!-- Page Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 mb-0">QUẢN LÝ THIẾT BỊ</h1>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="text-muted small">Quản lý thiết bị</span>
+                            <a href="/manager/devices/create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Thêm thiết bị mới
+                            </a>
+                        </div>
                     </div>
+
+                    <!-- Flash Messages -->
+                    <% if (typeof messages !== 'undefined' && messages.success) { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <%= messages.success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <% } %>
+                    <% if (typeof messages !== 'undefined' && messages.error) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <%= messages.error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <% } %>
+
+                    <!-- Filter Section -->
+                    <div class="card mb-4">
                     <div class="card-body">
-                        <% if (devices && devices.length > 0) { %>
+                            <form method="GET" action="/manager/devices" id="filterForm" class="row g-3">
+                                <!-- Tìm kiếm -->
+                                <div class="col-md-3">
+                                    <label for="search" class="form-label">Tìm kiếm</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="search" 
+                                           name="search" 
+                                           placeholder="Mã hoặc tên thiết bị..."
+                                           value="<%= filters.search || '' %>">
+                                </div>
+
+                                <!-- Danh mục -->
+                                <div class="col-md-2">
+                                    <label for="category" class="form-label">Danh mục</label>
+                                    <select class="form-select" id="category" name="category">
+                                        <option value="">Tất cả</option>
+                                        <% if (categories && categories.length > 0) { %>
+                                            <% categories.forEach(cat => { %>
+                                                <option value="<%= cat._id %>" 
+                                                        <%= filters.categoryId === cat._id.toString() ? 'selected' : '' %>>
+                                                    <%= cat.tenDM || cat.name || '' %>
+                                                </option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                </div>
+
+                                <!-- Trạng thái thiết bị -->
+                                <div class="col-md-2">
+                                    <label for="status" class="form-label">Trạng thái</label>
+                                    <select class="form-select" id="status" name="status">
+                                        <option value="">Tất cả</option>
+                                        <% if (filterOptions && filterOptions.statuses && filterOptions.statuses.length > 0) { %>
+                                            <% filterOptions.statuses.forEach(status => { %>
+                                                <option value="<%= status %>" 
+                                                        <%= filters.tinhTrangThietBi === status ? 'selected' : '' %>>
+                                                    <%= status %>
+                                                </option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                </div>
+
+                                <!-- Vị trí lưu trữ -->
+                                <div class="col-md-2">
+                                    <label for="location" class="form-label">Vị trí lưu trữ</label>
+                                    <select class="form-select" id="location" name="location">
+                                        <option value="">Tất cả</option>
+                                        <% if (filterOptions && filterOptions.locations && filterOptions.locations.length > 0) { %>
+                                            <% filterOptions.locations.forEach(loc => { %>
+                                                <option value="<%= loc %>" 
+                                                        <%= filters.viTriLuuTru === loc ? 'selected' : '' %>>
+                                                    <%= loc %>
+                                                </option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                </div>
+
+                                <!-- Nguồn gốc -->
+                                <div class="col-md-2">
+                                    <label for="origin" class="form-label">Nguồn gốc</label>
+                                    <select class="form-select" id="origin" name="origin">
+                                        <option value="">Tất cả</option>
+                                        <% if (filterOptions && filterOptions.origins && filterOptions.origins.length > 0) { %>
+                                            <% filterOptions.origins.forEach(orig => { %>
+                                                <option value="<%= orig %>" 
+                                                        <%= filters.nguonGoc === orig ? 'selected' : '' %>>
+                                                    <%= orig %>
+                                                </option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search"></i> Lọc
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Devices Table -->
+                    <div class="card">
+                        <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-striped">
+                                <table class="table table-hover mb-0">
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
+                                            <th>Mã TB</th>
                                             <th>Tên thiết bị</th>
                                             <th>Danh mục</th>
+                                            <th>Số lượng</th>
                                             <th>Trạng thái</th>
-                                            <th>Hành động</th>
+                                            <th>Vị trí lưu trữ</th>
+                                            <th>Nguồn gốc</th>
+                                            <th>Ngày nhập</th>
+                                            <th>Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <% if (devices && devices.length > 0) { %>
                                         <% devices.forEach(device => { %>
                                             <tr>
-                                                <td><%= device.id %></td>
-                                                <td><%= device.name %></td>
-                                                <td><%= device.category %></td>
-                                                <td><%= device.status %></td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-primary">Sửa</button>
-                                                    <button class="btn btn-sm btn-danger">Xóa</button>
+                                                    <td>
+                                                        <span class="code-box"><%= device.maTB || '' %></span>
+                                                    </td>
+                                                    <td><%= device.tenTB || '' %></td>
+                                                    <td>
+                                                        <% if (device.category && device.category.tenDM) { %>
+                                                            <%= device.category.tenDM %>
+                                                        <% } else if (device.maDM) { %>
+                                                            <%= device.maDM %>
+                                                        <% } else { %>
+                                                            <span class="text-muted">-</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td><%= device.soLuong || 0 %></td>
+                                                    <td>
+                                                        <% if (device.tinhTrangThietBi) { %>
+                                                            <span class="status-badge status-available">
+                                                                <%= device.tinhTrangThietBi %>
+                                                            </span>
+                                                        <% } else { %>
+                                                            <span class="text-muted">-</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td><%= device.viTriLuuTru || '-' %></td>
+                                                    <td><%= device.nguonGoc || '-' %></td>
+                                                    <td>
+                                                        <% if (device.ngayNhap) { %>
+                                                            <%= new Date(device.ngayNhap).toLocaleDateString('vi-VN') %>
+                                                        <% } else { %>
+                                                            <span class="text-muted">-</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group btn-group-sm" role="group">
+                                                            <a href="/manager/devices/detail/<%= device._id %>" 
+                                                               class="btn btn-outline-primary" 
+                                                               title="Xem chi tiết">
+                                                                <i class="fas fa-eye"></i>
+                                                            </a>
+                                                            <a href="/manager/devices/edit/<%= device._id %>" 
+                                                               class="btn btn-outline-warning" 
+                                                               title="Sửa">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                            <a href="/manager/devices/delete/<%= device._id %>" 
+                                                               class="btn btn-outline-danger btn-delete" 
+                                                               data-id="<%= device._id %>" 
+                                                               data-name="<%= device.tenTB %>"
+                                                               title="Xóa">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% }); %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="9" class="text-center py-4">
+                                                    <div class="text-muted">
+                                                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                                                        <p class="mb-0">Không tìm thấy thiết bị nào</p>
+                                                    </div>
                                                 </td>
                                             </tr>
-                                        <% }); %>
+                                        <% } %>
                                     </tbody>
                                 </table>
                             </div>
-                        <% } else { %>
-                            <div class="alert alert-info">
-                                <h5>Chưa có thiết bị nào</h5>
-                                <p>Bắt đầu bằng cách thêm thiết bị mới.</p>
-                                <button class="btn btn-primary">Thêm thiết bị</button>
                             </div>
-                        <% } %>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <script src="/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <%- include('../../../views/partials/footer') %>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3><i class="fas fa-triangle-exclamation text-danger"></i> Xác nhận xóa</h3>
+            <p id="deleteText"></p>
+            <form id="deleteForm" method="POST">
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> Xác nhận
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">
+                        <i class="fas fa-times"></i> Hủy
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/javascripts/devices.js"></script>
 </body>
 </html>

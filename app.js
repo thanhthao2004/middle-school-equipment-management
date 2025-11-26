@@ -1,70 +1,56 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
-const config = require('./src/config/env'); 
-const logger = require('./src/config/logger');
-const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware'); 
+/**
+ * Main Application Entry Point
+ * Tổ chức code theo cấu trúc rõ ràng, dễ đọc và dễ quản lý
+ */
 
+require('dotenv').config();
+
+const express = require('express');
+const config = require('./src/config/env');
+const logger = require('./src/config/logger');
+const { configureMiddleware } = require('./src/config/middleware');
+const { configureViewEngine } = require('./src/config/view-engine');
+const { initializeDatabase } = require('./src/config/database');
+const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware');
+const routes = require('./src/routes');
+
+// ==========================
+// Initialize Express App
+// ==========================
 const app = express();
 
 // ==========================
-// ⚙️ Cấu hình view engine
+// Configuration
 // ==========================
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'src/features'));
+configureViewEngine(app);
+configureMiddleware(app);
 
 // ==========================
-// ⚙️ Middleware & Static
+// Database Connection
 // ==========================
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
-app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
-app.use('/public', express.static(path.join(__dirname, 'public')));
+initializeDatabase();
 
 // ==========================
-//  Kết nối MongoDB
+// Routes
 // ==========================
-(async () => {
-	try {
-		const { connectMongo } = require('./src/config/db');
-		await connectMongo();
-		logger.info('MongoDB connection initiated');
-	} catch (e) {
-		logger.error('MongoDB init failed:', e.message);
-		logger.warn(' ** Server vẫn chạy nhưng chưa kết nối được MongoDB');
-		logger.warn(' ** Hướng dẫn: Chạy "npm run db:up" để khởi động MongoDB');
-	}
-})();
-
-// ==========================
-// ⚙️ ROUTES
-// ==========================
-
-// Use feature routes
-const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
-app.use('/purchasing-plans', purchasingRoutes);
-
-// Borrow (mượn thiết bị)
-const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
-app.use('/borrow', borrowRoutes);
-// app.get('/', (req, res) => res.redirect('/teacher/home'));
-
-// Categories feature
-const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
-app.use('/categories', categoriesRoutes);
+app.use(routes);
 
 // ==========================
 // Error Handling
 // ==========================
-app.use(notFoundHandler); 
-app.use(errorHandler);
+app.use(notFoundHandler); // 404 - Phải đặt sau tất cả routes
+app.use(errorHandler);    // 500 - Phải đặt cuối cùng
 
 // ==========================
-// Khởi động server
+// Start Server
 // ==========================
-app.listen(config.port, () => {
-  logger.info(`Server đang chạy tại: http://localhost:${config.port}`);
-  logger.info(`Environment: ${config.nodeEnv}`);
+const PORT = config.port || 3000;
+app.listen(PORT, () => {
+	logger.info(`Server đang chạy tại: http://localhost:${PORT}`);
+	logger.info(`Environment: ${config.nodeEnv}`);
+	if (process.send) {
+		process.send('ready');
+	}
 });
+
+module.exports = app;
