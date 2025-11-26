@@ -26,10 +26,10 @@
                 <h3><i class="fas fa-triangle-exclamation"></i> Xác nhận xóa</h3>
                 <p>Bạn có chắc chắn muốn xóa nhà cung cấp "<%= supplier.name %>" không?</p>
 
-                <form action="/suppliers/delete/<%= supplier.id %>" method="POST" style="display:inline;">
+                <form action="/manager/suppliers/<%= supplier.id %>/delete" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-confirm"><i class="fas fa-trash-alt"></i> Xác nhận</button>
                 </form>
-                <a href="/suppliers" class="btn btn-cancel"><i class="fas fa-times"></i> Hủy</a>
+                <a href="/manager/suppliers" class="btn btn-cancel"><i class="fas fa-times"></i> Hủy</a>
             </div>
         </div>
         <script src="/public/javascripts/suppliers.js"></script>

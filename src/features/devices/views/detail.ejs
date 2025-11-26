@@ -14,12 +14,12 @@
 </head>
 <body>
     <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'devices' }) %>
+    <%- include('../../../views/partials/header', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar QLTB -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices' }) %>
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
@@ -28,13 +28,13 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h1 class="h3 mb-0">CHI TIẾT THIẾT BỊ</h1>
                         <div class="d-flex gap-2">
-                            <a href="/devices" class="btn btn-secondary">
+                            <a href="/manager/devices" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Quay lại
                             </a>
-                            <a href="/devices/edit/<%= device._id %>" class="btn btn-warning">
+                            <a href="/manager/devices/edit/<%= device._id %>" class="btn btn-warning">
                                 <i class="fas fa-edit"></i> Sửa
                             </a>
-                            <a href="/devices/delete/<%= device._id %>" class="btn btn-danger">
+                            <a href="/manager/devices/delete/<%= device._id %>" class="btn btn-danger">
                                 <i class="fas fa-trash-alt"></i> Xóa
                             </a>
                         </div>

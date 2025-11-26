@@ -15,7 +15,8 @@
 
 <body>
     <div class="app-shell">
-        <%- include('../../../views/partials/sidebar_ToTruongChuyenMon', { active: 'trainingPlans' }) %>
+        <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
+        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'trainingPlans', user: userObj }) %>
 
 
             <main class="main-content">
@@ -68,7 +69,7 @@
                                                         Date(plan.createdAt)).toLocaleDateString('en-GB') : '' %>
                                                 </td>
                                                 <td class="float-right">
-                                                    <a href="/training-plans/<%= plan.id %>" class="action-btn btn-view"
+                                                    <a href="/teacher/training-plans/<%= plan.id %>" class="action-btn btn-view"
                                                         title="Xem">
                                                         <i class="fa-solid fa-eye"></i>
                                                     </a>

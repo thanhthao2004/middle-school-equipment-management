@@ -14,7 +14,8 @@ class PeriodicReportController {
                 title: 'Quản lý báo cáo định kỳ',
                 reports, 
                 periods, // Đảm bảo periods được truyền vào
-                active: 'periodic-reports', // Dùng cho sidebar
+                currentPage: 'periodic-reports',
+                user: req.user || { role: 'ql_thiet_bi' }
             });
         } catch (error) {
             console.error('Error rendering report list page:', error);
@@ -30,9 +31,8 @@ class PeriodicReportController {
             
             res.render('periodic-reports/views/create', { 
                 title: 'Lập báo cáo định kỳ',
-                // mockCode,
-                active: 'periodic-reports',
-                // Dùng cho sidebar
+                currentPage: 'periodic-reports',
+                user: req.user || { role: 'ql_thiet_bi' }
             });
         } catch (error) {
             console.error('Error rendering create report page:', error);
@@ -52,7 +52,8 @@ class PeriodicReportController {
                 title: `Chi tiết báo cáo ${report.code}`,
                 report,
                 readOnly: true, // Chỉ xem
-                active: 'periodic-reports',
+                currentPage: 'periodic-reports',
+                user: req.user || { role: 'ql_thiet_bi' }
             });
         } catch (error) {
             console.error('Error rendering report detail page:', error);

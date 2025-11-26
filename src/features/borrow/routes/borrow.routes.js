@@ -33,24 +33,27 @@ router.get('/pending-approvals', borrowController.getPendingApprovalsPage); // L
 // GET /borrow/history - Lịch sử mượn/trả
 router.get('/history', borrowController.getHistoryPage);
 
-// GET /borrow/:id - Xem chi tiết phiếu mượn
+// GET /borrow/teacher-home - Trang chủ giáo viên (PHẢI ĐẶT TRƯỚC /:id)
+router.get('/teacher-home', borrowController.getTeacherHomePage);
+
+// GET /borrow/return/:id - Xem chi tiết phiếu trả (cho giáo viên)
+router.get('/return/:id', borrowController.getReturnSlipForTeacher);
+
+// GET /borrow/:id - Xem chi tiết phiếu mượn (PHẢI ĐẶT SAU các route cụ thể)
 router.get('/:id', borrowController.getBorrowSlip);
 router.get('/slip/:id', borrowController.getBorrowSlip); // Legacy
 
-// POST /borrow/:id/cancel - Hủy phiếu mượn
+// POST /borrow/:id/cancel - Hủy phiếu phiếu mượn
 router.post('/:id/cancel', borrowController.cancelBorrow);
-
-// GET /borrow/teacher-home - Trang chủ giáo viên
-router.get('/teacher-home', borrowController.getTeacherHomePage);
 
 // =============================================
 // QLTB ROUTES (Duyệt mượn/trả)
 // =============================================
 // POST /borrow/approve/:id - Duyệt phiếu mượn
-router.post('/approve/:id', borrowController.approveBorrowSlip);
+//router.post('/approve/:id', borrowController.approveBorrowSlip);
 
 // POST /borrow/return/:id - Duyệt trả thiết bị
-router.post('/return/:id', borrowController.approveReturnSlip);
+//router.post('/return/:id', borrowController.approveReturnSlip);
 
 // =============================================
 // API ROUTES

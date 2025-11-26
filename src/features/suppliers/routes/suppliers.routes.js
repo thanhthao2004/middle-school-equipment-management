@@ -43,14 +43,21 @@ router.get("/", (req, res) => {
     }
   ];
 
-  res.render(path.join(viewPath, "list.ejs"), { suppliers });
+  res.render(path.join(viewPath, "list.ejs"), { 
+    suppliers,
+    currentPage: 'suppliers',
+    user: req.user || { role: 'ql_thiet_bi' }
+  });
 });
 
 // ==========================
 // Route thêm nhà cung cấp
 // ==========================
 router.get("/add", (req, res) => {
-  res.render(path.join(viewPath, "add.ejs"));
+  res.render(path.join(viewPath, "add.ejs"), {
+    currentPage: 'suppliers',
+    user: req.user || { role: 'ql_thiet_bi' }
+  });
 });
 
 // ==========================
@@ -69,7 +76,11 @@ router.get("/edit/:id", (req, res) => {
     status: "Đang hợp tác"
   };
 
-  res.render(path.join(viewPath, "edit.ejs"), { supplier });
+  res.render(path.join(viewPath, "edit.ejs"), { 
+    supplier,
+    currentPage: 'suppliers',
+    user: req.user || { role: 'ql_thiet_bi' }
+  });
 });
 
 // ==========================

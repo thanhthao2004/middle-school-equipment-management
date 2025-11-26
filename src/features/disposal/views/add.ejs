@@ -52,7 +52,7 @@
 
             <!-- BUTTON ADD DEVICE -->
             <div style="margin-bottom:20px;">
-                <a href="/disposal/add-devices?code=<%= code %>&year=<%= year %>&created_at=<%= created_at %>"
+                <a href="/manager/disposal/add-devices?code=<%= code %>&year=<%= year %>&created_at=<%= created_at %>"
                     class="btn btn-primary">
                     <i class="fas fa-plus"></i> Thêm thiết bị
                 </a>
@@ -109,9 +109,9 @@
 
             <!-- Nút tạo báo cáo / hủy -->
             <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-                <a href="/disposal/create?code=<%= code %>&year=<%= year %>&created_at=<%= created_at %>"
+                <a href="/manager/disposal/create?code=<%= code %>&year=<%= year %>&created_at=<%= created_at %>"
                     class="btn btn-primary">Tạo báo cáo</a>
-                <a href="/disposal" class="btn btn-secondary">Hủy</a>
+                <a href="/manager/disposal" class="btn btn-secondary">Hủy</a>
             </div>
 
         </div>

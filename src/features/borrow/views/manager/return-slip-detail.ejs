@@ -18,12 +18,12 @@
 </head>
 <body>
     <!-- Header -->
-    <%- include('../../../../views/partials/header') %>
+    <%- include('../../../../views/partials/header', { currentPage: 'return-slips', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar QLTB -->
-            <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'return-slips' }) %>
+            <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'return-slips', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
@@ -114,7 +114,7 @@
             if (confirm(`Bạn có chắc chắn muốn thực hiện hành động: ${actionText} không?`)) {
                 // Trong thực tế, gọi API POST /borrow/api/return/approve/:id hoặc API khác
                 alert(`Đã thực hiện: ${actionText}. (MOCK)`);
-                window.location.href = '/return/slips'; // Chuyển hướng về danh sách phiếu trả
+                window.location.href = '/manager/return-slips'; // Chuyển hướng về danh sách phiếu trả
             }
         }
     </script>

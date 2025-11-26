@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const openDeleteModal = (id, name) => {
         deleteText.textContent = `Bạn có chắc chắn muốn xóa nhà cung cấp "${name}" không?`;
-        deleteForm.action = `/suppliers/delete/${id}`;
+        deleteForm.action = `/manager/suppliers/${id}/delete`;
         deleteModal.style.display = "flex";
         setTimeout(() => deleteModal.classList.add("active"), 10);
     };
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     /* -----------------------------
        Form Add/Edit Supplier
     ----------------------------- */
-    const supplierForm = document.querySelector('form[action^="/suppliers"]');
+    const supplierForm = document.querySelector('form[action^="/manager/suppliers"]');
     if (supplierForm) {
         const nameInput = supplierForm.querySelector('#name');
         const phoneInput = supplierForm.querySelector('#phone');

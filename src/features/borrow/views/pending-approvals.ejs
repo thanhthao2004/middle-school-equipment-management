@@ -10,11 +10,12 @@
     <link href="/public/stylesheets/borrow.css" rel="stylesheet">
 </head>
 <body>
-    <%- include('../../../views/partials/borrow-sidebar', { currentPage: 'status' }) %>
+    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'giao_vien' }; %>
+    <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'status', user: userObj }) %>
 
     <div class="main-content">
         
-        <%- include('../../../views/partials/header', { currentPage: 'borrow' }) %>
+        <%- include('../../../views/partials/header', { currentPage: 'status', user: userObj }) %>
 
         <div class="container py-4">
 

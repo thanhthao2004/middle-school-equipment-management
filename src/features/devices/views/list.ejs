@@ -14,12 +14,12 @@
 </head>
 <body>
     <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'devices' }) %>
+    <%- include('../../../views/partials/header', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar QLTB -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices' }) %>
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
@@ -29,7 +29,7 @@
                         <h1 class="h3 mb-0">QUẢN LÝ THIẾT BỊ</h1>
                         <div class="d-flex align-items-center gap-3">
                             <span class="text-muted small">Quản lý thiết bị</span>
-                            <a href="/devices/create" class="btn btn-primary">
+                            <a href="/manager/devices/create" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> Thêm thiết bị mới
                             </a>
                         </div>
@@ -52,7 +52,7 @@
                     <!-- Filter Section -->
                     <div class="card mb-4">
                     <div class="card-body">
-                            <form method="GET" action="/devices" id="filterForm" class="row g-3">
+                            <form method="GET" action="/manager/devices" id="filterForm" class="row g-3">
                                 <!-- Tìm kiếm -->
                                 <div class="col-md-3">
                                     <label for="search" class="form-label">Tìm kiếm</label>
@@ -194,17 +194,17 @@
                                                     </td>
                                                     <td>
                                                         <div class="btn-group btn-group-sm" role="group">
-                                                            <a href="/devices/detail/<%= device._id %>" 
+                                                            <a href="/manager/devices/detail/<%= device._id %>" 
                                                                class="btn btn-outline-primary" 
                                                                title="Xem chi tiết">
                                                                 <i class="fas fa-eye"></i>
                                                             </a>
-                                                            <a href="/devices/edit/<%= device._id %>" 
+                                                            <a href="/manager/devices/edit/<%= device._id %>" 
                                                                class="btn btn-outline-warning" 
                                                                title="Sửa">
                                                                 <i class="fas fa-edit"></i>
                                                             </a>
-                                                            <a href="/devices/delete/<%= device._id %>" 
+                                                            <a href="/manager/devices/delete/<%= device._id %>" 
                                                                class="btn btn-outline-danger btn-delete" 
                                                                data-id="<%= device._id %>" 
                                                                data-name="<%= device.tenTB %>"

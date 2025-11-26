@@ -17,11 +17,19 @@
 </head>
 
 <body>
-    <!-- Sidebar -->
-    <%- include('../../../views/partials/qltb-sidebar') %>
+    <!-- Header -->
+    <%- include('../../../views/partials/header', { currentPage: 'disposal', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
-        <!-- MAIN -->
-        <div class="main">
+    <div class="container-fluid p-0">
+      <div class="row g-0">
+        <!-- Sidebar -->
+        <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'disposal', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 main-content">
+          <div class="container py-4">
+            <!-- MAIN -->
+            <div class="main">
             <!-- HEADER -->
             <div class="main-header">
                 <div style="display:flex; align-items:center;">
@@ -69,8 +77,8 @@
                                 </td>
 
                                 <td>
-                                    <a href="/disposal/view/<%= r.id %>"><i class="fas fa-eye"></i> Xem</a> |
-                                    <a href="/disposal/edit/<%= r.id %>"><i class="fas fa-edit"></i> Sửa</a> |
+                                    <a href="/manager/disposal/view/<%= r.id %>"><i class="fas fa-eye"></i> Xem</a> |
+                                    <a href="/manager/disposal/edit/<%= r.id %>"><i class="fas fa-edit"></i> Sửa</a> |
                                     <a href="#" class="btn-delete" data-id="<%= r.id %>" data-code="<%= r.code %>"><i
                                             class="fas fa-trash-alt"></i> Xóa</a>
                                 </td>
@@ -81,8 +89,12 @@
             </div>
 
             <!-- ADD BUTTON -->
-            <a href="/disposal/add" class="btn-add"><i class="fas fa-plus"></i> Thêm báo cáo mới</a>
+            <a href="/manager/disposal/add" class="btn-add"><i class="fas fa-plus"></i> Thêm báo cáo mới</a>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
 
         <!-- DELETE MODAL -->
         <div id="deleteModal">

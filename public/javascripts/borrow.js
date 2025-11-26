@@ -62,7 +62,7 @@ async function loadDevicesFromApi() {
         if (origin) params.append('origin', origin);
         if (search) params.append('search', search);
 
-        const res = await fetch(`/borrow/api/devices?${params.toString()}`);
+        const res = await fetch(`/teacher/borrow/api/devices?${params.toString()}`);
         const json = await res.json();
 
         if (!json.success) {
@@ -693,7 +693,7 @@ function submitBorrowForm() {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
     submitBtn.disabled = true;
 
-    fetch('/borrow/register', {
+    fetch('/teacher/borrow/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -845,5 +845,5 @@ function viewBorrowSlip() {
     }
     
     // Show borrow slip
-    window.location.href = '/borrow/slip/PM01';
+    window.location.href = '/teacher/borrow/PM01';
 }

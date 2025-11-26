@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!deleteModal || !deleteText || !deleteForm) return;
         
         deleteText.textContent = `Bạn có chắc chắn muốn xóa thiết bị "${name}" không? Hành động này không thể hoàn tác!`;
-        deleteForm.action = `/devices/delete/${id}`;
+        deleteForm.action = `/manager/devices/delete/${id}`;
         deleteModal.style.display = "flex";
         setTimeout(() => deleteModal.classList.add("active"), 10);
     };
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         clearFiltersBtn.className = "btn btn-outline-secondary";
         clearFiltersBtn.innerHTML = '<i class="fas fa-times"></i> Xóa bộ lọc';
         clearFiltersBtn.addEventListener("click", () => {
-            window.location.href = "/devices";
+            window.location.href = "/manager/devices";
         });
 
         const submitBtn = filterForm.querySelector('button[type="submit"]');

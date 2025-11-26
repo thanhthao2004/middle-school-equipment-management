@@ -80,7 +80,7 @@
                     <button id="period-filter-btn" class="btn btn-outline-primary">Lọc</button>
                 </div>
 
-                <a href="/periodic-reports/create" class="btn-register">+ Lập báo cáo mới</a>
+                <a href="/manager/periodic-reports/create" class="btn-register">+ Lập báo cáo mới</a>
             </div>
 
 
@@ -123,11 +123,11 @@
                                             <td><%= report.fileName || 'Không có file' %></td>
 
                                             <td class="text-end">
-                                                <a href="/periodic-reports/<%= report.id %>" class="btn btn-sm btn-outline-primary">Xem</a>
-                                                <a href="/periodic-reports/<%= report.id %>/download" class="btn btn-sm btn-outline-success">Tải</a>
+                                                <a href="/manager/periodic-reports/<%= report.id %>" class="btn btn-sm btn-outline-primary">Xem</a>
+                                                <a href="/manager/periodic-reports/<%= report.id %>/download" class="btn btn-sm btn-outline-success">Tải</a>
 
                                                 <% if (report.status === 'pending') { %>
-                                                    <form action="/periodic-reports/<%= report.id %>/delete"
+                                                    <form action="/manager/periodic-reports/<%= report.id %>/delete"
                                                         method="post"
                                                         style="display:inline-block;">
                                                         <button type="submit" class="btn btn-sm btn-outline-danger"

@@ -10,7 +10,7 @@ class BorrowController {
                 currentPage: 'register',
                 sidebarType: 'borrow-sidebar',
                 bodyClass: '',
-                user: req.user || { name: 'Nguyễn Văn A', role: 'Giáo viên bộ môn' }
+                user: req.user || { name: 'Nguyễn Văn A', role: 'giao_vien' }
             });
         } catch (error) {
             console.error('Error rendering register page:', error);
@@ -23,12 +23,13 @@ class BorrowController {
         try {
             const userId = req.user?.id || null; // Không dùng giá trị mặc định số
             const slips = await borrowService.getPendingApprovals(userId, {});
-            res.render('borrow/views/pending-approvals', { // <-- ĐÃ SỬA
+            res.render('borrow/views/pending-approvals', {
                 title: 'Phiếu mượn chờ duyệt',
                 currentPage: 'status',
                 sidebarType: 'borrow-sidebar',
                 bodyClass: '',
-                slips
+                slips,
+                user: req.user || { name: 'Nguyễn Văn A', role: 'giao_vien' }
             });
         } catch (error) {
             console.error('Error rendering pending approvals page:', error);
@@ -69,7 +70,7 @@ class BorrowController {
                 currentPage: 'history',
                 sidebarType: 'borrow-sidebar',
                 bodyClass: '',
-                user: req.user || { name: 'Nguyễn Văn A', role: 'Giáo viên bộ môn' }
+                user: req.user || { name: 'Nguyễn Văn A', role: 'giao_vien' }
             });
         } catch (error) {
             console.error('Error rendering history page:', error);
@@ -87,7 +88,7 @@ class BorrowController {
                 currentPage: 'status',
                 sidebarType: 'borrow-sidebar',
                 bodyClass: '',
-                user: req.user || { name: 'Nguyễn Văn A', role: 'Giáo viên bộ môn' }
+                user: req.user || { name: 'Nguyễn Văn A', role: 'giao_vien' }
             });
         } catch (error) {
             console.error('Error rendering status page:', error);
@@ -103,7 +104,7 @@ class BorrowController {
                 currentPage: 'teacher-home',
                 sidebarType: 'borrow-sidebar',
                 bodyClass: '',
-                user: req.user || { name: 'Nguyễn Văn A', role: 'Giáo viên bộ môn' }
+                user: req.user || { name: 'Nguyễn Văn A', role: 'giao_vien' }
             });
         } catch (error) {
             console.error('Error rendering teacher home page:', error);
@@ -146,7 +147,7 @@ class BorrowController {
                 sidebarType: 'borrow-sidebar',
                 bodyClass: '',
                 slip: slip,
-                user: req.user || { name: 'Nguyễn Văn A', role: 'Giáo viên bộ môn' }
+                user: req.user || { name: 'Nguyễn Văn A', role: 'giao_vien' }
             });
         } catch (error) {
             console.error('Error rendering borrow slip:', error);
@@ -154,12 +155,37 @@ class BorrowController {
         }
     }
 
+    // GET /borrow/return/:id - Xem chi tiết phiếu trả (cho giáo viên)
+    async getReturnSlipForTeacher(req, res) {
+        try {
+            const slipId = req.params.id;
+            const slip = await borrowService.getReturnSlip(slipId);
+            
+            res.render('borrow/views/return-slip', {
+                title: `Phiếu trả ${slipId}`,
+                currentPage: 'history',
+                slip: slip,
+                user: req.user || { name: 'Nguyễn Văn A', role: 'giao_vien' },
+                readOnly: true // Chỉ xem, không có nút duyệt
+            });
+        } catch (error) {
+            console.error('Error rendering return slip:', error);
+            res.status(500).send(error.message);
+        }
+    }
+
     // API: GET /borrow/api/history
     async getHistoryApi(req, res) {
         try {
             const userId = req.user?.id || null; // Không dùng giá trị mặc định số
-            const { status, createdFrom, createdTo, search } = req.query;
-            const items = await borrowService.getBorrowHistory(userId, { status, createdFrom, createdTo, search });
+            const { status, createdFrom, createdTo, search, type } = req.query;
+            const items = await borrowService.getBorrowHistory(userId, { 
+                status, 
+                createdFrom, 
+                createdTo, 
+                search,
+                type 
+            });
             res.json({ success: true, data: items });
         } catch (error) {
             console.error('Error fetching history:', error);
@@ -301,7 +327,7 @@ class BorrowController {
         res.render("borrow/views/manager/manager-home", {
             title: "Trang chủ QLTB",
             currentPage: "manager-home",
-            user: req.user || { name: "QLTB (mock)" },
+            user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
         });
     }
 
@@ -309,8 +335,8 @@ class BorrowController {
     async getApprovalsPage(req, res) {
         res.render("borrow/views/manager/borrow-approvals", {
             title: "Danh sách phiếu mượn",
-            currentPage: "approvals",
-            user: req.user || { name: "QLTB (mock)" },
+            currentPage: "borrow-approvals",
+            user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
         });
     }
 
@@ -320,7 +346,8 @@ class BorrowController {
         res.render("borrow/views/manager/borrow-detail", {
             title: `Phiếu mượn ${slipId}`,
             id: slipId,
-            currentPage: "approvals",
+            currentPage: "borrow-approvals",
+            user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
         });
     }
 
@@ -330,6 +357,7 @@ class BorrowController {
             title: "Danh sách phiếu trả",
             slips: [],
             currentPage: "return-slips",
+            user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
         });
     }
 
@@ -340,6 +368,7 @@ class BorrowController {
             title: `Phiếu trả ${slipId}`,
             id: slipId,
             currentPage: "return-slips",
+            user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
         });
     }
 }

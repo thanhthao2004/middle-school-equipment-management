@@ -13,11 +13,18 @@
 </head>
 
 <body>
-    <!-- Sidebar -->
-    <%- include('../../../views/partials/qltb-sidebar') %>
+    <!-- Header -->
+    <%- include('../../../views/partials/header', { currentPage: 'suppliers', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+    <div class="container-fluid p-0">
+      <div class="row g-0">
+        <!-- Sidebar -->
+        <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'suppliers', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
         <!-- Main Content -->
-        <div class="main">
+        <div class="col-md-9 col-lg-10 main-content">
+          <div class="container py-4">
+            <div class="main">
             <div class="main-header">
                 <div style="display:flex; align-items:center;">
                     <!-- <button class="btn-menu" id="toggleSidebar"></button> -->
@@ -76,7 +83,7 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="/suppliers/edit/<%= s.id %>"><i class="fas fa-edit"></i> Sửa</a> |
+                                <a href="/manager/suppliers/edit/<%= s.id %>"><i class="fas fa-edit"></i> Sửa</a> |
                                 <a href="#" class="btn-delete" data-id="<%= s.id %>" data-name="<%= s.name %>"><i
                                         class="fas fa-trash-alt"></i> Xóa</a>
                             </td>
@@ -84,8 +91,12 @@
                         <% }) %>
                 </tbody>
             </table>
-            <a href="/suppliers/add" class="btn-add"><i class="fas fa-plus"></i> Thêm nhà cung cấp mới</a>
+            <a href="/manager/suppliers/add" class="btn-add"><i class="fas fa-plus"></i> Thêm nhà cung cấp mới</a>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
         <!-- Modal Xóa -->
         <div id="deleteModal">
             <div class="modal-box">

@@ -19,7 +19,8 @@
 
 <body>
     <div class="app-shell">
-        <%- include('../../../views/partials/sidebar_ToTruongChuyenMon', { active: 'reports' }) %>
+        <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
+        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'reports', user: userObj }) %>
 
             <main class="main-content">
                 <div class="page-header">
@@ -88,7 +89,7 @@
                 </div>
 
                 <div class="d-flex justify-content-end mt-4">
-                    <a href="/reports/damaged-summary/export" class="btn btn-primary btn-lg export-btn">
+                    <a href="/teacher/reports/damaged-summary/export" class="btn btn-primary btn-lg export-btn">
                         <i class="fas fa-file-export me-2"></i> Xuất báo cáo
                     </a>
                 </div>

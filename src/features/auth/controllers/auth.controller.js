@@ -20,7 +20,7 @@ class AuthController {
         // Cho phép đăng nhập nếu là 'admin' / '123456'
         if (username === 'admin' && password === '123456') {
             // Xác thực thành công: Chuyển hướng đến trang chủ
-            return res.redirect('/borrow/teacher-home'); 
+            return res.redirect('/teacher/borrow/teacher-home'); 
         } else {
             // Xác thực thất bại: Chuyển hướng lại trang login với thông báo lỗi
             const errorMessage = 'Tên đăng nhập hoặc mật khẩu không đúng.';

@@ -1,7 +1,8 @@
 // Borrow Repository
-const { BorrowTicket, BorrowDetail } = require('../models/borrow-ticket.model');
+const { BorrowTicket, BorrowDetail, ReturnSlip, ReturnDetail } = require('../models/borrow-ticket.model');
 const Device = require('../../devices/models/device.model');
 const Category = require('../../categories/models/category.model');
+const User = require('../../users/models/user.model');
 
 class BorrowRepository {
     // Tạo yêu cầu mượn mới
@@ -49,7 +50,7 @@ class BorrowRepository {
     async getBorrowSlipById(slipId) {
         try {
             const ticket = await BorrowTicket.findOne({ maPhieu: slipId })
-                .populate('nguoiLapPhieuId', 'name email role'); // Populate user info
+                .populate('nguoiLapPhieuId', 'hoTen email role'); // Populate user info
 
             if (!ticket) return null;
 
@@ -74,38 +75,101 @@ class BorrowRepository {
         }
     }
 
-    // Lấy lịch sử mượn của user
+    // Lấy lịch sử mượn và trả của user (cả phiếu mượn và phiếu trả)
     async getBorrowHistoryByUserId(userId, filters = {}) {
         try {
-            const query = {};
-            
-            // Chỉ thêm userId vào query nếu nó là ObjectId hợp lệ
-            if (userId) {
-                const mongoose = require('mongoose');
-                if (mongoose.Types.ObjectId.isValid(userId)) {
-                    query.nguoiLapPhieuId = new mongoose.Types.ObjectId(userId);
-                } else {
-                    console.warn(`Invalid userId format: ${userId}, skipping user filter`);
-                }
+            const mongoose = require('mongoose');
+            const history = [];
+
+            // 1. Lấy danh sách phiếu mượn của user
+            const borrowQuery = {};
+            if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+                borrowQuery.nguoiLapPhieuId = new mongoose.Types.ObjectId(userId);
             }
 
             if (filters.status) {
-                query.trangThai = filters.status;
+                borrowQuery.trangThai = filters.status;
             }
 
-            if (filters.dateFrom) {
-                query.ngayMuon = { $gte: new Date(filters.dateFrom) };
+            if (filters.createdFrom) {
+                borrowQuery.createdAt = { $gte: new Date(filters.createdFrom) };
             }
 
-            if (filters.dateTo) {
-                query.ngayMuon = { ...query.ngayMuon, $lte: new Date(filters.dateTo) };
+            if (filters.createdTo) {
+                borrowQuery.createdAt = { ...borrowQuery.createdAt, $lte: new Date(filters.createdTo) };
             }
 
-            const tickets = await BorrowTicket.find(query)
+            if (filters.search) {
+                borrowQuery.maPhieu = { $regex: filters.search, $options: 'i' };
+            }
+
+            const borrowTickets = await BorrowTicket.find(borrowQuery)
+                .populate('nguoiLapPhieuId', 'hoTen email role')
                 .sort({ createdAt: -1 })
-                .limit(filters.limit || 20);
+                .limit(filters.limit || 50);
 
-            return tickets;
+            // Map phiếu mượn với type = 'borrow'
+            borrowTickets.forEach(ticket => {
+                history.push({
+                    type: 'borrow',
+                    id: ticket.maPhieu,
+                    maPhieu: ticket.maPhieu,
+                    ngayTao: ticket.createdAt || ticket.ngayMuon,
+                    ngayMuon: ticket.ngayMuon,
+                    ngayDuKienTra: ticket.ngayDuKienTra,
+                    trangThai: ticket.trangThai,
+                    lyDo: ticket.lyDo,
+                    ghiChu: ticket.ghiChu,
+                    nguoiLapPhieu: ticket.nguoiLapPhieuId
+                });
+            });
+
+            // 2. Lấy danh sách phiếu trả liên quan đến các phiếu mượn của user
+            if (borrowTickets.length > 0) {
+                const maPhieuMuonList = borrowTickets.map(t => t.maPhieu);
+                
+                const returnQuery = { maPhieuMuon: { $in: maPhieuMuonList } };
+                
+                if (filters.createdFrom) {
+                    returnQuery.createdAt = { $gte: new Date(filters.createdFrom) };
+                }
+
+                if (filters.createdTo) {
+                    returnQuery.createdAt = { ...returnQuery.createdAt, $lte: new Date(filters.createdTo) };
+                }
+
+                if (filters.search) {
+                    returnQuery.maPhieuTra = { $regex: filters.search, $options: 'i' };
+                }
+
+                const returnSlips = await ReturnSlip.find(returnQuery)
+                    .populate('nguoiTraId', 'hoTen email role')
+                    .sort({ createdAt: -1 })
+                    .limit(filters.limit || 50);
+
+                // Map phiếu trả với type = 'return'
+                returnSlips.forEach(slip => {
+                    history.push({
+                        type: 'return',
+                        id: slip.maPhieuTra,
+                        maPhieuTra: slip.maPhieuTra,
+                        maPhieuMuon: slip.maPhieuMuon,
+                        ngayTao: slip.createdAt || slip.ngayTra,
+                        ngayTra: slip.ngayTra,
+                        ghiChu: slip.ghiChu,
+                        nguoiTra: slip.nguoiTraId
+                    });
+                });
+            }
+
+            // Sắp xếp theo ngày tạo (mới nhất trước)
+            history.sort((a, b) => {
+                const dateA = new Date(a.ngayTao || 0);
+                const dateB = new Date(b.ngayTao || 0);
+                return dateB - dateA;
+            });
+
+            return history;
         } catch (error) {
             console.error('Error getting borrow history:', error);
             throw error;
@@ -174,6 +238,40 @@ class BorrowRepository {
             return result;
         } catch (error) {
             console.error('Error deleting borrow request:', error);
+            throw error;
+        }
+    }
+
+    // Lấy chi tiết phiếu trả theo maPhieuTra
+    async getReturnSlipById(slipId) {
+        try {
+            const slip = await ReturnSlip.findOne({ maPhieuTra: slipId })
+                .populate('nguoiTraId', 'hoTen email role');
+
+            if (!slip) return null;
+
+            const details = await ReturnDetail.find({ maPhieuTra: slipId });
+
+            // Fetch device info for each detail
+            const detailsWithDevice = await Promise.all(details.map(async (detail) => {
+                const device = await Device.findOne({ maTB: detail.maTB });
+                return {
+                    ...detail.toObject(),
+                    device: device
+                };
+            }));
+
+            // Lấy thông tin phiếu mượn liên quan
+            const borrowTicket = await BorrowTicket.findOne({ maPhieu: slip.maPhieuMuon })
+                .populate('nguoiLapPhieuId', 'hoTen email role');
+
+            return {
+                ...slip.toObject(),
+                details: detailsWithDevice,
+                borrowTicket: borrowTicket
+            };
+        } catch (error) {
+            console.error('Error getting return slip:', error);
             throw error;
         }
     }

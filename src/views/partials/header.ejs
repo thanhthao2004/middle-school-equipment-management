@@ -1,18 +1,19 @@
 <%
-// Xác định header type dựa trên userRole
-const headerType = typeof userRole !== 'undefined' ? userRole : 'giao_vien';
-const headerTypes = {
-    'admin': 'admin-header',
-    'ql_thiet_bi': 'qltb-header',
-    'giao_vien': 'teacher-header',
-    'to_truong': 'department-head-header',
-    'hieu_truong': 'principal-header'
-};
-const headerFile = headerTypes[headerType] || 'teacher-header';
+// Xác định header type dựa trên user.role
+const userRole = (typeof user !== 'undefined' && user && user.role) ? user.role : 'giao_vien';
+const userObj = typeof user !== 'undefined' ? user : {};
+const currentPageObj = typeof currentPage !== 'undefined' ? currentPage : '';
 %>
 
 <!-- Include header theo actor -->
-<%- include('./headers/' + headerFile, {
-    user: typeof user !== 'undefined' ? user : {},
-    currentPage: typeof currentPage !== 'undefined' ? currentPage : ''
-}) %>
+<% if (userRole === 'admin') { %>
+    <%- include('./headers/admin-header', { user: userObj, currentPage: currentPageObj }) %>
+<% } else if (userRole === 'ql_thiet_bi') { %>
+    <%- include('./headers/qltb-header', { user: userObj, currentPage: currentPageObj }) %>
+<% } else if (userRole === 'to_truong') { %>
+    <%- include('./headers/department-head-header', { user: userObj, currentPage: currentPageObj }) %>
+<% } else if (userRole === 'hieu_truong') { %>
+    <%- include('./headers/principal-header', { user: userObj, currentPage: currentPageObj }) %>
+<% } else { %>
+    <%- include('./headers/teacher-header', { user: userObj, currentPage: currentPageObj }) %>
+<% } %>

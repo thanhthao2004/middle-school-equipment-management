@@ -14,12 +14,12 @@
 </head>
 <body>
     <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'devices' }) %>
+    <%- include('../../../views/partials/header', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar QLTB -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices' }) %>
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
@@ -98,7 +98,7 @@
                             <!-- Delete Form -->
                             <form action="/devices/delete/<%= device._id %>" method="POST" id="deleteForm">
                                 <div class="d-flex justify-content-end gap-2">
-                                    <a href="/devices/detail/<%= device._id %>" class="btn btn-secondary">
+                                    <a href="/manager/devices/detail/<%= device._id %>" class="btn btn-secondary">
                                         <i class="fas fa-times"></i> Hủy
                                     </a>
                                     <button type="submit" class="btn btn-danger">

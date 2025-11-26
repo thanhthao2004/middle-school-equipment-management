@@ -14,12 +14,12 @@
 </head>
 <body>
     <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'devices' }) %>
+    <%- include('../../../views/partials/header', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar QLTB -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices' }) %>
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
@@ -27,7 +27,7 @@
                     <!-- Page Header -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h1 class="h3 mb-0">THÊM THIẾT BỊ MỚI</h1>
-                        <a href="/devices" class="btn btn-secondary">
+                        <a href="/manager/devices" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </a>
                     </div>
@@ -43,7 +43,7 @@
                     <!-- Form -->
                     <div class="card">
                         <div class="card-body">
-                            <form action="/devices/create" method="POST" id="deviceForm">
+                            <form action="/manager/devices/create" method="POST" id="deviceForm">
                                 <div class="row">
                                     <!-- Mã thiết bị -->
                                     <div class="col-md-6 mb-3">
@@ -162,7 +162,7 @@
 
                                 <!-- Form Actions -->
                                 <div class="d-flex justify-content-end gap-2 mt-4">
-                                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/devices'">
+                                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/manager/devices'">
                                         <i class="fas fa-times"></i> Hủy
                                     </button>
                                     <button type="submit" class="btn btn-primary">

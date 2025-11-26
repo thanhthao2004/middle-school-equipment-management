@@ -10,11 +10,12 @@
     <link href="/public/stylesheets/borrow.css" rel="stylesheet">
 </head>
 <body>
-    <%- include('../../../views/partials/borrow-sidebar', { currentPage: 'slip' }) %>
+    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'giao_vien' }; %>
+    <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'slip', user: userObj }) %>
 
     <div class="main-content">
         
-        <%- include('../../../views/partials/header', { currentPage: 'borrow' }) %>
+        <%- include('../../../views/partials/header', { currentPage: 'slip', user: userObj }) %>
 
         <div class="container py-4">
 
@@ -138,11 +139,11 @@
          const params = new URLSearchParams(window.location.search);
         const from = params.get('from');
             if (from === 'pending') {
-                            window.location.href = '/borrow/pending-approvals';
+                            window.location.href = '/teacher/borrow/pending';
             } else if (from === 'history') {
-                            window.location.href = '/borrow/history';
+                            window.location.href = '/teacher/borrow/history';
             } else {
-                            window.location.href = '/borrow/register';
+                            window.location.href = '/teacher/borrow/register';
             }
                     }
     </script>

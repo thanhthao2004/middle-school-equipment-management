@@ -18,7 +18,11 @@ const departments = ["CNTT", "Vật lý", "Hóa học", "Sinh học", "Toán"];
 
 // --- DANH SÁCH BÁO CÁO ---
 router.get("/", (req, res) => {
-    res.render("disposal/views/list", { disposal: dummyDisposal });
+    res.render("disposal/views/list", { 
+        disposal: dummyDisposal,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
 // --- THÊM BÁO CÁO ---
@@ -38,7 +42,14 @@ router.get("/add", (req, res) => {
     // Mảng thiết bị ban đầu trống
     const devices = [];
 
-    res.render("disposal/views/add", { code: newCode, year, created_at, devices });
+    res.render("disposal/views/add", { 
+        code: newCode, 
+        year, 
+        created_at, 
+        devices,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
 // --- TRANG TẠO BÁO CÁO ---
@@ -50,7 +61,14 @@ router.get("/add", (req, res) => {
     const created_at = new Date().toLocaleDateString("vi-VN");
     const devices = [];
 
-    res.render("disposal/views/add", { code: newCode, year, created_at, devices });
+    res.render("disposal/views/add", { 
+        code: newCode, 
+        year, 
+        created_at, 
+        devices,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
 // --- TRANG ADD DEVICES --- //
@@ -68,7 +86,10 @@ router.get("/add-devices", (req, res) => {
         created_at, 
         devices, 
         deviceTypes, 
-        departments });
+        departments,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
 // ------------------------
@@ -85,7 +106,13 @@ router.get("/edit/:id", (req, res) => {
     ];
 
     // Truyền thêm deviceTypes và departments
-    res.render("disposal/views/edit", { disposal, deviceTypes, departments });
+    res.render("disposal/views/edit", { 
+        disposal, 
+        deviceTypes, 
+        departments,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
 
@@ -150,7 +177,13 @@ router.get("/view/:id", (req, res) => {
         ]
     };
 
-    res.render("disposal/views/view", { disposal, deviceTypes, departments });
+    res.render("disposal/views/view", { 
+        disposal, 
+        deviceTypes, 
+        departments,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
 // =============================================
@@ -159,10 +192,12 @@ router.get("/view/:id", (req, res) => {
 // GET /disposal/approve - Danh sách báo cáo thanh lý cần duyệt
 router.get("/approve", (req, res) => {
     const pendingDisposals = dummyDisposal.filter(d => d.status === 'pending' || !d.status);
-    res.render("disposal/views/approve-list", { 
+    res.render("disposal/views/list", { 
         disposal: pendingDisposals, 
         deviceTypes, 
-        departments 
+        departments,
+        currentPage: 'disposal-approve',
+        user: req.user || { role: 'hieu_truong' }
     });
 });
 

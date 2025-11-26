@@ -23,7 +23,8 @@ router.get('/device-stats', (req, res) => {
     res.render('reports/views/damaged-summary', {
         title: 'Báo cáo thiết bị hỏng',
         items,
-        active: 'reports'
+        currentPage: 'reports',
+        user: req.user || { role: 'to_truong' }
     });
 });
 
@@ -33,7 +34,8 @@ router.get('/damaged-summary', (req, res) => {
     res.render('reports/views/damaged-summary', {
         title: 'Báo cáo thiết bị hỏng',
         items,
-        active: 'reports'
+        currentPage: 'reports',
+        user: req.user || { role: 'to_truong' }
     });
 });
 

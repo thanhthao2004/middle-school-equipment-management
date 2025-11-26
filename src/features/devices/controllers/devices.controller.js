@@ -28,17 +28,15 @@ class DevicesController {
                 categories,
                 filterOptions,
                 filters,
+                user: req.user || { role: 'ql_thiet_bi' },
                 messages: {
-                    success: req.flash('success')[0],
-                    error: req.flash('error')[0]
+                    success: req.session?.flash?.success || null,
+                    error: req.session?.flash?.error || null
                 }
             });
         } catch (error) {
             console.error('Error rendering devices list page:', error);
-            res.status(500).render('error', {
-                title: 'Lỗi',
-                message: error.message
-            });
+            res.status(500).send(`<h1>Lỗi</h1><p>${error.message}</p>`);
         }
     }
 
@@ -51,17 +49,15 @@ class DevicesController {
                 currentPage: 'devices',
                 sidebarType: 'qltb-sidebar',
                 categories,
+                user: req.user || { role: 'ql_thiet_bi' },
                 messages: {
-                    success: req.flash('success')[0],
-                    error: req.flash('error')[0]
+                    success: req.session?.flash?.success || null,
+                    error: req.session?.flash?.error || null
                 }
             });
         } catch (error) {
             console.error('Error rendering create device page:', error);
-            res.status(500).render('error', {
-                title: 'Lỗi',
-                message: error.message
-            });
+            res.status(500).send(`<h1>Lỗi</h1><p>${error.message}</p>`);
         }
     }
 
@@ -77,12 +73,14 @@ class DevicesController {
             else deviceData.soLuong = parseInt(deviceData.soLuong) || 0;
 
             const device = await devicesService.createDevice(deviceData);
-            req.flash('success', 'Thêm thiết bị thành công');
-            res.redirect(`/devices`);
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.success = 'Thêm thiết bị thành công';
+            res.redirect(`/manager/devices`);
         } catch (error) {
             console.error('Error creating device:', error);
-            req.flash('error', error.message);
-            res.redirect('/devices/create');
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.error = error.message;
+            res.redirect('/manager/devices/create');
         }
     }
 
@@ -97,15 +95,17 @@ class DevicesController {
                 currentPage: 'devices',
                 sidebarType: 'qltb-sidebar',
                 device,
+                user: req.user || { role: 'ql_thiet_bi' },
                 messages: {
-                    success: req.flash('success')[0],
-                    error: req.flash('error')[0]
+                    success: req.session?.flash?.success || null,
+                    error: req.session?.flash?.error || null
                 }
             });
         } catch (error) {
             console.error('Error rendering device detail page:', error);
-            req.flash('error', error.message);
-            res.redirect('/devices');
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.error = error.message;
+            res.redirect('/manager/devices');
         }
     }
 
@@ -124,15 +124,17 @@ class DevicesController {
                 sidebarType: 'qltb-sidebar',
                 device,
                 categories,
+                user: req.user || { role: 'ql_thiet_bi' },
                 messages: {
-                    success: req.flash('success')[0],
-                    error: req.flash('error')[0]
+                    success: req.session?.flash?.success || null,
+                    error: req.session?.flash?.error || null
                 }
             });
         } catch (error) {
             console.error('Error rendering edit device page:', error);
-            req.flash('error', error.message);
-            res.redirect('/devices');
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.error = error.message;
+            res.redirect('/manager/devices');
         }
     }
 
@@ -149,12 +151,14 @@ class DevicesController {
             else deviceData.soLuong = parseInt(deviceData.soLuong) || 0;
 
             await devicesService.updateDevice(deviceId, deviceData);
-            req.flash('success', 'Cập nhật thiết bị thành công');
-            res.redirect(`/devices/detail/${deviceId}`);
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.success = 'Cập nhật thiết bị thành công';
+            res.redirect(`/manager/devices/detail/${deviceId}`);
         } catch (error) {
             console.error('Error updating device:', error);
-            req.flash('error', error.message);
-            res.redirect(`/devices/edit/${req.params.id}`);
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.error = error.message;
+            res.redirect(`/manager/devices/edit/${req.params.id}`);
         }
     }
 
@@ -169,15 +173,17 @@ class DevicesController {
                 currentPage: 'devices',
                 sidebarType: 'qltb-sidebar',
                 device,
+                user: req.user || { role: 'ql_thiet_bi' },
                 messages: {
-                    success: req.flash('success')[0],
-                    error: req.flash('error')[0]
+                    success: req.session?.flash?.success || null,
+                    error: req.session?.flash?.error || null
                 }
             });
         } catch (error) {
             console.error('Error rendering delete device page:', error);
-            req.flash('error', error.message);
-            res.redirect('/devices');
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.error = error.message;
+            res.redirect('/manager/devices');
         }
     }
 
@@ -186,12 +192,14 @@ class DevicesController {
         try {
             const deviceId = req.params.id;
             await devicesService.deleteDevice(deviceId);
-            req.flash('success', 'Xóa thiết bị thành công');
-            res.redirect('/devices');
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.success = 'Xóa thiết bị thành công';
+            res.redirect('/manager/devices');
         } catch (error) {
             console.error('Error deleting device:', error);
-            req.flash('error', error.message);
-            res.redirect(`/devices/delete/${req.params.id}`);
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.error = error.message;
+            res.redirect(`/manager/devices/delete/${req.params.id}`);
         }
     }
 }

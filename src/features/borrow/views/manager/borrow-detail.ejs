@@ -19,12 +19,12 @@
 </head>
 <body>
     <!-- Header -->
-    <%- include('../../../../views/partials/header') %>
+    <%- include('../../../../views/partials/header', { currentPage: 'borrow-approvals', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar QLTB -->
-            <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'borrow-approvals' }) %>
+            <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'borrow-approvals', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
@@ -138,7 +138,7 @@
             if (confirm(`Bạn có chắc chắn muốn ${actionText} phiếu mượn ${slipId} này không?`)) {
                 // Trong thực tế, gọi API POST /borrow/api/borrow/{actionType}/{slipId}
                 alert(`Đã gửi yêu cầu ${actionText} phiếu ${slipId}. (MOCK)`);
-                window.location.href = '/borrow/approvals'; // Quay lại trang danh sách
+                window.location.href = '/manager/approvals'; // Quay lại trang danh sách
             }
         }
     </script>

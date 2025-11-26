@@ -25,10 +25,10 @@
             <h3><i class="fas fa-triangle-exclamation"></i> Xác nhận xóa</h3>
             <p>Bạn có chắc chắn muốn xóa danh mục "<%= disposal.name %>" không?</p>
 
-            <form action="/disposal/delete/<%= disposal.id %>" method="POST" style="display:inline;">
+            <form action="/manager/disposal/<%= disposal.id %>/delete" method="POST" style="display:inline;">
                 <button type="submit" class="btn btn-confirm"><i class="fas fa-trash-alt"></i> Xác nhận</button>
             </form>
-            <a href="/disposal" class="btn btn-cancel"><i class="fas fa-times"></i> Hủy</a>
+            <a href="/manager/disposal" class="btn btn-cancel"><i class="fas fa-times"></i> Hủy</a>
         </div>
     </div>
     <script src="/public/javascripts/disposal.js"></script>

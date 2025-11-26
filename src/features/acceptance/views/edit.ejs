@@ -16,12 +16,12 @@
 </head>
 <body>
     <!-- Header -->
-    <%- include('../../../views/partials/header') %>
+    <%- include('../../../views/partials/header', { currentPage: 'acceptance', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar QLTB -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'acceptance' }) %>
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'acceptance', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
@@ -111,7 +111,7 @@
         function handleSave(event) {
             event.preventDefault();
             alert('Lưu kết quả nghiệm thu thành công! (MOCK)');
-            window.location.href = '/acceptance/list';
+            window.location.href = '/manager/acceptance';
             return false;
         }
     </script>

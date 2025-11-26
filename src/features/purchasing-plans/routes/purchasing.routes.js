@@ -28,12 +28,21 @@ function getPlanById(id) {
 router.get('/', (req, res) => {
     const plans = samplePlans();
     const years = sampleYears();
-    res.render('purchasing-plans/views/list', { title: 'Quản lý kế hoạch mua sắm', plans, years });
+    res.render('purchasing-plans/views/list', { 
+        title: 'Quản lý kế hoạch mua sắm', 
+        plans, 
+        years,
+        user: req.user || { role: 'to_truong' }
+    });
 });
 
 // Render create form
 router.get('/create', (req, res) => {
-    res.render('purchasing-plans/views/create', { title: 'Lập kế hoạch mua sắm', plan: {} });
+    res.render('purchasing-plans/views/create', { 
+        title: 'Lập kế hoạch mua sắm', 
+        plan: {},
+        user: req.user || { role: 'to_truong' }
+    });
 });
 
 // Create action (temporary: redirect back to list)
@@ -76,9 +85,12 @@ router.delete('/:id', (req, res) => {
 // GET /purchasing-plans/approve - Danh sách kế hoạch cần duyệt
 router.get('/approve', (req, res) => {
     const plans = samplePlans().filter(p => p.status === 'pending');
-    res.render('purchasing-plans/views/approve-list', { 
+    res.render('purchasing-plans/views/list', { 
         title: 'Duyệt kế hoạch mua sắm', 
-        plans 
+        plans,
+        years: sampleYears(),
+        currentPage: 'purchasing-approve',
+        user: req.user || { role: 'hieu_truong' }
     });
 });
 
@@ -86,7 +98,12 @@ router.get('/approve', (req, res) => {
 router.get('/:id/approve', (req, res) => {
     const plan = getPlanById(req.params.id);
     if (!plan) return res.status(404).send('Kế hoạch không tồn tại');
-    res.render('purchasing-plans/views/approve', { title: 'Duyệt kế hoạch', plan });
+    res.render('purchasing-plans/views/edit', { 
+        title: 'Duyệt kế hoạch', 
+        plan,
+        currentPage: 'purchasing-approve',
+        user: req.user || { role: 'hieu_truong' }
+    });
 });
 
 // Approve action (temporary)

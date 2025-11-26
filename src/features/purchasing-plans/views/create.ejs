@@ -16,7 +16,8 @@
 
 <body>
     <div class="app-shell">
-        <%- include('../../../views/partials/sidebar_ToTruongChuyenMon', { active: 'purchasing' }) %>
+        <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
+        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing', user: userObj }) %>
 
             <main class="main-content">
                 <div class="page-header">
@@ -24,7 +25,7 @@
                     <div class="page-subtitle">Lập kế hoạch mua sắm mới</div>
                 </div>
 
-                <form action="/purchasing-plans" method="post">
+                <form action="/teacher/purchasing-plans" method="post">
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <label class="form-label">Mã kế hoạch</label>
@@ -91,7 +92,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-3">
-                        <a href="/purchasing-plans" class="btn btn-secondary">Đóng</a>
+                        <a href="/teacher/purchasing-plans" class="btn btn-secondary">Đóng</a>
                         <button type="submit" class="btn btn-danger">Lưu và gửi Phê duyệt</button>
                     </div>
                 </form>

@@ -8,7 +8,8 @@ const { authenticate, requireRole } = require('../../../core/middlewares/auth.mi
 router.use(authenticate);
 router.use(requireRole('ql_thiet_bi'));
 
-// Trang chủ QLTB
+// Trang chủ QLTB - root route
+router.get('/', borrowController.getManagerHomePage);
 router.get('/manager-home', borrowController.getManagerHomePage);
 
 // Danh sách phiếu mượn chờ duyệt

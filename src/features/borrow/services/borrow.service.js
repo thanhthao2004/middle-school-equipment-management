@@ -132,10 +132,31 @@ class BorrowService {
         }
     }
 
-    // Lấy lịch sử mượn của user
+    // Lấy chi tiết phiếu trả theo ID
+    async getReturnSlip(slipId) {
+        try {
+            const slip = await borrowRepo.getReturnSlipById(slipId);
+            if (!slip) {
+                throw new Error('Phiếu trả không tồn tại');
+            }
+            return slip;
+        } catch (error) {
+            console.error('Error in getReturnSlip service:', error);
+            throw error;
+        }
+    }
+
+    // Lấy lịch sử mượn và trả của user (cả phiếu mượn và phiếu trả)
     async getBorrowHistory(userId, filters = {}) {
         try {
+            // Nếu có filter type, chỉ lấy loại đó
             const history = await borrowRepo.getBorrowHistoryByUserId(userId, filters);
+            
+            // Filter theo type nếu có
+            if (filters.type) {
+                return history.filter(item => item.type === filters.type);
+            }
+            
             return history;
         } catch (error) {
             console.error('Error in getBorrowHistory service:', error);

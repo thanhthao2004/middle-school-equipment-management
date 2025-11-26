@@ -26,7 +26,7 @@
         <div class="user"><i class="fas fa-user"></i> QLTB</div>
       </div>
 
-      <form action="/suppliers/edit/<%= supplier.id %>" method="POST">
+      <form action="/manager/suppliers/<%= supplier.id %>" method="POST">
         <div class="form-group">
           <label for="id">Mã Nhà Cung Cấp</label>
           <input type="text" id="id" name="id" value="<%= supplier.id %>" readonly>
@@ -73,7 +73,7 @@
 
         <div class="btn-group">
           <button type="submit" class="btn-save"><i class="fas fa-save"></i> LƯU</button>
-          <button type="button" class="btn-cancel" onclick="window.location.href='/suppliers'"><i
+          <button type="button" class="btn-cancel" onclick="window.location.href='/manager/suppliers'"><i
               class="fas fa-times"></i> HỦY</button>
         </div>
       </form>

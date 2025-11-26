@@ -15,7 +15,8 @@
 
 <body>
     <div class="app-shell">
-        <%- include('../../../views/partials/sidebar_ToTruongChuyenMon', { active: 'purchasing' }) %>
+        <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
+        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing', user: userObj }) %>
 
             <main class="main-content">
                 <div class="page-header">
@@ -40,7 +41,7 @@
                     </div>
 
                     <div>
-                        <a href="/purchasing-plans/create" class="btn-register">
+                        <a href="/teacher/purchasing-plans/create" class="btn-register">
                             <i class="fa-solid fa-plus"></i> Lập kế hoạch mua sắm mới
                         </a>
                     </div>
@@ -84,12 +85,12 @@
                                                                     <% } %>
                                                 </td>
                                                 <td class="float-right">
-                                                    <a href="/purchasing-plans/<%= plan.id %>"
+                                                    <a href="/teacher/purchasing-plans/<%= plan.id %>"
                                                         class="action-btn btn-view" title="Xem">
                                                         <i class="fa-solid fa-eye"></i>
                                                     </a>
                                                     <% if (plan.status==='pending' ) { %>
-                                                        <a href="/purchasing-plans/<%= plan.id %>/edit"
+                                                        <a href="/teacher/purchasing-plans/<%= plan.id %>/edit"
                                                             class="action-btn btn-edit" title="Sửa">
                                                             <i class="fa-solid fa-pen"></i>
                                                         </a>

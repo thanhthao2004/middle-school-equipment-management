@@ -7,7 +7,7 @@
     <nav class="nav flex-column mt-3">
         <!-- TRANG CHỦ -->
         <a class="nav-link <%= currentPage === 'principal-home' ? 'active' : '' %>" 
-           href="/training-plans">
+           href="/principal">
             <i class="fas fa-home me-2"></i>
             Trang chủ
         </a>
@@ -16,19 +16,19 @@
         <h6 class="sidebar-heading text-muted mt-3 mb-1 px-3">Duyệt và Phê duyệt</h6>
         
         <a class="nav-link <%= currentPage === 'trainingPlans' ? 'active' : '' %>" 
-           href="/training-plans">
+           href="/principal/training-plans">
             <i class="fas fa-calendar-days me-2"></i>
             Kế hoạch đào tạo
         </a>
 
         <a class="nav-link <%= currentPage === 'purchasing-approve' ? 'active' : '' %>" 
-           href="/purchasing-plans/approve">
+           href="/principal/purchasing-plans/approve">
             <i class="fas fa-check-circle me-2"></i>
             Duyệt kế hoạch mua sắm
         </a>
 
         <a class="nav-link <%= currentPage === 'disposal-approve' ? 'active' : '' %>" 
-           href="/disposal/approve">
+           href="/principal/disposal/approve">
             <i class="fas fa-trash-alt me-2"></i>
             Duyệt báo cáo thanh lý
         </a>

@@ -1,7 +1,7 @@
 <!-- Department Head Header -->
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-blue);">
     <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="/reports">
+        <a class="navbar-brand fw-bold" href="/teacher">
             <i class="fas fa-graduation-cap me-2"></i>
             HỆ THỐNG QUẢN LÝ THIẾT BỊ TRƯỜNG THCS
         </a>
@@ -13,17 +13,22 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link <%= (currentPage === 'reports') ? 'active' : '' %>" href="/reports">
+                    <a class="nav-link <%= (currentPage === 'teacher-home' || currentPage === 'borrow') ? 'active' : '' %>" href="/teacher/borrow/teacher-home">
+                        <i class="fas fa-home me-1"></i>Trang chủ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= (currentPage === 'reports') ? 'active' : '' %>" href="/teacher/reports">
                         <i class="fas fa-chart-bar me-1"></i>Báo cáo
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= (currentPage === 'trainingPlans') ? 'active' : '' %>" href="/training-plans">
+                    <a class="nav-link <%= (currentPage === 'trainingPlans') ? 'active' : '' %>" href="/teacher/training-plans">
                         <i class="fas fa-calendar-days me-1"></i>Kế hoạch đào tạo
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= (currentPage === 'purchasing') ? 'active' : '' %>" href="/purchasing-plans">
+                    <a class="nav-link <%= (currentPage === 'purchasing') ? 'active' : '' %>" href="/teacher/purchasing-plans">
                         <i class="fas fa-shopping-cart me-1"></i>Kế hoạch mua sắm
                     </a>
                 </li>

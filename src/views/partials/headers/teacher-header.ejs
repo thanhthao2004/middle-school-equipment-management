@@ -1,7 +1,7 @@
 <!-- Teacher Header -->
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-blue);">
     <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="/borrow/teacher-home">
+        <a class="navbar-brand fw-bold" href="/teacher/borrow/teacher-home">
             <i class="fas fa-graduation-cap me-2"></i>
             HỆ THỐNG QUẢN LÝ THIẾT BỊ TRƯỜNG THCS
         </a>
@@ -13,7 +13,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link <%= (currentPage === 'teacher-home') ? 'active' : '' %>" href="/borrow/teacher-home">
+                    <a class="nav-link <%= (currentPage === 'teacher-home') ? 'active' : '' %>" href="/teacher/borrow/teacher-home">
                         <i class="fas fa-home me-1"></i>Trang chủ
                     </a>
                 </li>
@@ -23,13 +23,13 @@
                         <i class="fas fa-clipboard-list me-1"></i>Mượn/Trả
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/borrow/register">
+                        <li><a class="dropdown-item" href="/teacher/borrow/register">
                             <i class="fas fa-plus-circle me-2"></i>Đăng ký mượn
                         </a></li>
-                        <li><a class="dropdown-item" href="/borrow/history">
+                        <li><a class="dropdown-item" href="/teacher/borrow/history">
                             <i class="fas fa-history me-2"></i>Lịch sử mượn
                         </a></li>
-                        <li><a class="dropdown-item" href="/borrow/pending">
+                        <li><a class="dropdown-item" href="/teacher/borrow/pending">
                             <i class="fas fa-star me-2"></i>Chờ duyệt
                         </a></li>
                     </ul>

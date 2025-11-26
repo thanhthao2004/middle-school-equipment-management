@@ -7,7 +7,7 @@
     <nav class="nav flex-column mt-3">
         <!-- TRANG CHỦ QLTB -->
         <a class="nav-link <%= currentPage === 'manager-home' ? 'active' : '' %>" 
-           href="/manager/manager-home">
+           href="/manager/">
             <i class="fas fa-home me-2"></i>
             Trang chủ QLTB
         </a>
@@ -16,25 +16,25 @@
         <h6 class="sidebar-heading text-muted mt-3 mb-1 px-3">Quản lý thiết bị</h6>
         
         <a class="nav-link <%= currentPage === 'devices' ? 'active' : '' %>" 
-           href="/devices">
+           href="/manager/devices">
             <i class="fas fa-laptop me-2"></i>
             Quản lý thiết bị
         </a>
 
         <a class="nav-link <%= currentPage === 'categories' ? 'active' : '' %>" 
-           href="/categories">
+           href="/manager/categories">
             <i class="fas fa-folder me-2"></i>
             Danh mục thiết bị
         </a>
 
         <a class="nav-link <%= currentPage === 'suppliers' ? 'active' : '' %>" 
-           href="/suppliers">
+           href="/manager/suppliers">
             <i class="fas fa-building me-2"></i>
             Nhà cung cấp
         </a>
 
         <a class="nav-link <%= currentPage === 'device-stats' ? 'active' : '' %>" 
-           href="/device-stats">
+           href="/manager/device-stats">
             <i class="fas fa-chart-bar me-2"></i>
             Thống kê thiết bị
         </a>
@@ -43,19 +43,19 @@
         <h6 class="sidebar-heading text-muted mt-3 mb-1 px-3">Biên bản & Báo cáo</h6>
 
         <a class="nav-link <%= currentPage === 'acceptance' ? 'active' : '' %>" 
-           href="/acceptance">
+           href="/manager/acceptance">
             <i class="fas fa-file-alt me-2"></i>
             Biên bản nghiệm thu
         </a>
 
         <a class="nav-link <%= currentPage === 'periodic-reports' ? 'active' : '' %>" 
-           href="/periodic-reports">
+           href="/manager/periodic-reports">
             <i class="fas fa-chart-line me-2"></i>
             Báo cáo định kỳ
         </a>
 
         <a class="nav-link <%= currentPage === 'disposal' ? 'active' : '' %>" 
-           href="/disposal">
+           href="/manager/disposal">
             <i class="fas fa-trash-alt me-2"></i>
             Báo cáo thanh lý
         </a>

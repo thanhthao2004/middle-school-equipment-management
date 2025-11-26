@@ -67,7 +67,7 @@
 
 
             <!-- FORM ẨN -->
-            <form id="editDisposalForm" action="/disposal/edit/<%= disposal.id %>" method="POST" style="display:none;">
+            <form id="editDisposalForm" action="/manager/disposal/<%= disposal.id %>" method="POST" style="display:none;">
                 <input type="hidden" name="code" value="<%= disposal.code %>">
                 <input type="hidden" name="year" value="<%= disposal.year %>">
                 <input type="hidden" name="created_at" value="<%= disposal.created_at %>">
@@ -130,7 +130,7 @@
                 <button class="btn btn-primary" onclick="document.getElementById('editDisposalForm').submit();">
                     <i class="fas fa-save"></i> Lưu thay đổi
                 </button>
-                <a href="/disposal" class="btn btn-secondary"><i class="fas fa-times"></i> Hủy</a>
+                <a href="/manager/disposal" class="btn btn-secondary"><i class="fas fa-times"></i> Hủy</a>
             </div>
 
         </div>

@@ -30,7 +30,19 @@ router.get('/', (req, res) => {
     const queryYear = req.query.year || '';
     // Simple filter by year if provided
     const filtered = queryYear ? trainingPlans.filter(p => p.schoolYear === queryYear) : trainingPlans;
-    res.render('training-plans/views/list', { title: 'Xem kế hoạch đào tạo', trainingPlans: filtered, years, queryYear });
+    
+    // Xác định role từ URL path để hiển thị sidebar đúng
+    const isPrincipal = req.path.includes('/principal/');
+    const userRole = isPrincipal ? 'hieu_truong' : 'to_truong';
+    
+    res.render('training-plans/views/list', { 
+        title: 'Xem kế hoạch đào tạo', 
+        trainingPlans: filtered, 
+        years, 
+        queryYear,
+        currentPage: 'trainingPlans',
+        user: req.user || { role: userRole }
+    });
 });
 
 // GET /training-plans/report - Xem báo cáo kế hoạch đào tạo (Tổ trưởng)
@@ -40,7 +52,8 @@ router.get('/report', (req, res) => {
     res.render('training-plans/views/report', { 
         title: 'Báo cáo kế hoạch đào tạo', 
         trainingPlans, 
-        years 
+        years,
+        user: req.user || { role: 'to_truong' }
     });
 });
 

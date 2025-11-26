@@ -29,10 +29,11 @@ class AcceptanceController {
 
         res.render("acceptance/views/list", {
             title: "Nghiệm thu thiết bị",
-            currentPage: "acceptance",   // FIX
+            currentPage: "acceptance",
             years,
             selectedYear,
-            data
+            data,
+            user: req.user || { role: 'ql_thiet_bi' }
         });
     }
 
@@ -53,9 +54,10 @@ class AcceptanceController {
 
         res.render("acceptance/views/edit", {
             title: `Chi tiết nghiệm thu ${id}`,
-            currentPage: "acceptance",   // FIX
+            currentPage: "acceptance",
             id,
-            items
+            items,
+            user: req.user || { role: 'ql_thiet_bi' }
         });
     }
 
@@ -68,8 +70,9 @@ class AcceptanceController {
 
         res.render("acceptance/views/delete-item", {
             title: "Xóa mục nghiệm thu",
-            currentPage: "acceptance",   // FIX
-            id
+            currentPage: "acceptance",
+            id,
+            user: req.user || { role: 'ql_thiet_bi' }
         });
     }
 }

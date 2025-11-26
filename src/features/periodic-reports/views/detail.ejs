@@ -46,7 +46,7 @@
                 <h5 class="card-title mb-4">Thông tin báo cáo</h5>
                 
                 <!-- Sử dụng POST action mock để giữ cấu trúc -->
-                <form action="/periodic-reports/update/<%= report.code %>" method="post">
+                <form action="/manager/periodic-reports/<%= report.id || report.code %>" method="post">
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <label class="form-label">Mã báo cáo</label>
@@ -69,14 +69,14 @@
                         <div class="col-12">
                             <label class="form-label">File đính kèm</label>
                             <p class="form-control-static"><%= report.fileName %></p>
-                            <a href="/periodic-reports/<%= report.id %>/download" class="btn btn-sm btn-outline-primary">
+                            <a href="/manager/periodic-reports/<%= report.id %>/download" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-file-download me-1"></i>Tải xuống/Xem file
                             </a>
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-end gap-3">
-                        <a href="/periodic-reports" class="btn btn-secondary">Quay lại</a>
+                        <a href="/manager/periodic-reports" class="btn btn-secondary">Quay lại</a>
                         <!-- Không có nút cập nhật vì đây là trang chi tiết (readOnly) -->
                     </div>
                 </form>
