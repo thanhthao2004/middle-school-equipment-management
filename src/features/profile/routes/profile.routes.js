@@ -13,4 +13,24 @@ const profileController = require('../controllers/profile.controller');
 // PROFILE ROUTES
 // =============================================
 // GET /profile - Xem thông tin cá nhân
-route
+router.get('/', profileController.getProfilePage);
+
+// POST /profile - Cập nhật thông tin cá nhân
+router.post('/', 
+    // validate(profileValidators.updateProfile), // Tạm thời bỏ qua validation
+    profileController.updateProfile
+);
+
+// =============================================
+// PASSWORD CHANGE ROUTES
+// =============================================
+// GET /profile/password/change - Form đổi mật khẩu cá nhân
+router.get('/password/change', profileController.getChangePasswordPage);
+
+// POST /profile/password/change - Xử lý đổi mật khẩu cá nhân
+router.post('/password/change',
+    // validate(profileValidators.changePassword), // Tạm thời bỏ qua validation
+    profileController.changePassword
+);
+
+module.exports = router;
