@@ -42,4 +42,23 @@ router.get("/edit/:id", (req, res) => {
   });
 });
 
+// POST routes for CRUD operations
+router.post("/", (req, res) => {
+  // TODO: Implement create category logic
+  // For now, just redirect back to list
+  res.redirect("/manager/categories");
+});
+
+router.post("/:id", (req, res) => {
+  // TODO: Implement update category logic
+  // For now, just redirect back to list
+  res.redirect("/manager/categories");
+});
+
+router.post("/:id/delete", (req, res) => {
+  // TODO: Implement delete category logic
+  // For now, just redirect back to list
+  res.redirect("/manager/categories");
+});
+
 module.exports = router;

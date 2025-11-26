@@ -52,19 +52,21 @@ router.get("/add", (req, res) => {
     });
 });
 
-// --- TRANG TẠO BÁO CÁO ---
-router.get("/add", (req, res) => {
-    const lastCodeNumber = 7; // giả lập TL007
-    const newCode = "TL" + String(lastCodeNumber).padStart(3, "0");
+// --- TRANG TẠO BÁO CÁO (alias for /add) ---
+router.get("/create", (req, res) => {
+    // Redirect to /add or render same view
+    const lastDisposal = dummyDisposal[dummyDisposal.length - 1];
+    let lastCodeNumber = parseInt(lastDisposal.code.slice(2));
+    const newCode = "TL" + String(lastCodeNumber + 1).padStart(3, "0");
     const currentYear = new Date().getFullYear();
     const year = `${currentYear}-${currentYear + 1}`;
     const created_at = new Date().toLocaleDateString("vi-VN");
-    const devices = [];
+    const devices = req.query.devices ? JSON.parse(req.query.devices) : [];
 
     res.render("disposal/views/add", { 
-        code: newCode, 
-        year, 
-        created_at, 
+        code: req.query.code || newCode, 
+        year: req.query.year || year, 
+        created_at: req.query.created_at || created_at, 
         devices,
         currentPage: 'disposal',
         user: req.user || { role: 'ql_thiet_bi' }
@@ -204,7 +206,33 @@ router.get("/approve", (req, res) => {
 // POST /disposal/approve/:id - Duyệt báo cáo thanh lý
 router.post("/approve/:id", (req, res) => {
     // TODO: Implement approve logic
-    return res.redirect("/disposal/approve");
+    // Check if user is principal, redirect to principal route, else manager route
+    const userRole = req.user?.role || 'ql_thiet_bi';
+    if (userRole === 'hieu_truong') {
+        return res.redirect("/principal/disposal/approve");
+    }
+    return res.redirect("/manager/disposal");
+});
+
+// ==========================
+// POST Routes for CRUD operations
+// ==========================
+router.post("/", (req, res) => {
+    // TODO: Implement create disposal logic
+    // For now, just redirect back to list
+    res.redirect("/manager/disposal");
+});
+
+router.post("/:id", (req, res) => {
+    // TODO: Implement update disposal logic
+    // For now, just redirect back to list
+    res.redirect("/manager/disposal");
+});
+
+router.post("/:id/delete", (req, res) => {
+    // TODO: Implement delete disposal logic
+    // For now, just redirect back to list
+    res.redirect("/manager/disposal");
 });
 
 module.exports = router;

@@ -75,6 +75,14 @@ class AcceptanceController {
             user: req.user || { role: 'ql_thiet_bi' }
         });
     }
+
+    // ========================
+    // DETAIL PAGE (alias for edit page)
+    // ========================
+    async getDetailPage(req, res) {
+        // Use edit page for detail view
+        return this.getEditPage(req, res);
+    }
 }
 
 module.exports = new AcceptanceController();

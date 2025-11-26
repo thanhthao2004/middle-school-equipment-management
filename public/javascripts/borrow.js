@@ -195,10 +195,16 @@ function setupEventListeners() {
     });
 }
 
+// Store current device ID for selectDevice function
+let currentViewingDeviceId = null;
+
 function viewDetails(deviceId) {
     // Tìm thiết bị từ dữ liệu đã load
     const device = loadedDevices.find(d => String(d.id) === String(deviceId));
     if (!device) return;
+
+    // Store device ID for selectDevice function
+    currentViewingDeviceId = device.id;
 
     const categoryLabels = {
         chemistry: 'Hóa học',
@@ -411,39 +417,62 @@ function selectDevice() {
         detailsModal.hide();
     }
     
-    // Get device ID from modal and find corresponding checkbox
-    const deviceId = document.getElementById('deviceId')?.textContent;
-    if (deviceId) {
-        // Find the checkbox for this device
-        const checkbox = document.querySelector(`input[data-device-id="${deviceId}"]`);
-        if (checkbox && !checkbox.disabled) {
-            // Check the checkbox
-            checkbox.checked = true;
-            
-            // Update selection counter
-            updateSelectionCounter();
-            
-            // Scroll to the table to show the selected item
-            const tableContainer = document.querySelector('.table-responsive');
-            if (tableContainer) {
-                tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Use stored device ID or get from modal
+    const deviceId = currentViewingDeviceId || document.getElementById('deviceId')?.textContent?.trim();
+    
+    if (!deviceId) {
+        showErrorModal('Không tìm thấy thông tin thiết bị.');
+        return;
+    }
+    
+    // Find the checkbox for this device - try both string and number comparison
+    let checkbox = document.querySelector(`input[data-device-id="${deviceId}"]`);
+    
+    // If not found, try finding by iterating through all checkboxes
+    if (!checkbox) {
+        const allCheckboxes = document.querySelectorAll('input.equipment-checkbox');
+        for (let cb of allCheckboxes) {
+            if (String(cb.dataset.deviceId) === String(deviceId)) {
+                checkbox = cb;
+                break;
             }
-            
-            // Highlight the selected row briefly
-            const row = checkbox.closest('tr');
-            if (row) {
-                row.classList.add('row-highlight');
-                setTimeout(() => {
-                    row.classList.remove('row-highlight');
-                }, 2000);
-            }
-            
-            // Show success message
-            showSuccessMessage(`Đã chọn thiết bị "${document.getElementById('deviceName')?.textContent}" để mượn!`);
-        } else {
-            showErrorModal('Không thể chọn thiết bị này. Vui lòng kiểm tra trạng thái thiết bị.');
         }
     }
+    
+    if (checkbox && !checkbox.disabled) {
+        // Check the checkbox
+        checkbox.checked = true;
+        
+        // Trigger change event to update selection
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Update selection counter
+        updateSelectionCounter();
+        
+        // Scroll to the table to show the selected item
+        const tableContainer = document.querySelector('.table-responsive');
+        if (tableContainer) {
+            tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Highlight the selected row briefly
+        const row = checkbox.closest('tr');
+        if (row) {
+            row.classList.add('row-highlight');
+            setTimeout(() => {
+                row.classList.remove('row-highlight');
+            }, 2000);
+        }
+        
+        // Show success message
+        const deviceName = document.getElementById('deviceName')?.textContent || 'thiết bị';
+        showSuccessMessage(`Đã chọn thiết bị "${deviceName}" để mượn!`);
+    } else {
+        showErrorModal('Không thể chọn thiết bị này. Vui lòng kiểm tra trạng thái thiết bị hoặc tải lại trang.');
+    }
+    
+    // Clear stored device ID
+    currentViewingDeviceId = null;
 }
 
 // Utility function for debouncing
@@ -499,6 +528,7 @@ function openBorrowForm() {
     
     selectedDevices.forEach(device => {
         const row = document.createElement('tr');
+        row.dataset.deviceId = device.deviceId; // Store deviceId in row data attribute
         row.innerHTML = `
             <td class="text-center fw-bold">${device.st}</td>
             <td>
@@ -658,17 +688,38 @@ function submitBorrowForm() {
     const devices = [];
 
     rows.forEach((row) => {
-        const deviceCodeText = row.querySelector('.device-code')?.textContent || '';
-        const match = deviceCodeText.match(/(\d+)/);
-        const deviceId = match ? parseInt(match[1], 10) : null;
+        // Get deviceId from row data attribute (set when creating the row)
+        let deviceId = row.dataset.deviceId;
+        
+        // Fallback: try to get from device-code text (format: "Mã: 123")
+        if (!deviceId) {
+            const deviceCodeText = row.querySelector('.device-code')?.textContent || '';
+            const match = deviceCodeText.match(/Mã:\s*(\d+)/i);
+            if (match) {
+                deviceId = match[1];
+            }
+        }
+        
+        // Last fallback: try to get from any number in device-code
+        if (!deviceId) {
+            const deviceCodeText = row.querySelector('.device-code')?.textContent || '';
+            const match = deviceCodeText.match(/(\d+)/);
+            if (match) {
+                deviceId = match[1];
+            }
+        }
 
         const quantityInput = row.querySelector('.borrow-quantity');
 
         if (deviceId && quantityInput) {
-            devices.push({
-                deviceId: deviceId,
-                quantity: parseInt(quantityInput.value, 10) || 1
-            });
+            // Ensure deviceId is a number for validation
+            const deviceIdNum = typeof deviceId === 'string' ? parseInt(deviceId, 10) : deviceId;
+            if (!isNaN(deviceIdNum) && deviceIdNum > 0) {
+                devices.push({
+                    deviceId: deviceIdNum,
+                    quantity: parseInt(quantityInput.value, 10) || 1
+                });
+            }
         }
     });
 
@@ -700,13 +751,42 @@ function submitBorrowForm() {
         },
         body: JSON.stringify(payload)
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(async res => {
+        let data;
+        try {
+            data = await res.json();
+        } catch (e) {
+            // If response is not JSON, show generic error
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            showErrorModal('Lỗi không xác định từ server. Vui lòng thử lại.');
+            return;
+        }
+        
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
 
-        if (!data.success) {
-            showErrorModal(data.message || 'Đăng ký mượn thất bại. Vui lòng thử lại.');
+        if (!res.ok || !data.success) {
+            // Handle validation errors
+            let errorMessage = data.message || 'Đăng ký mượn thất bại. Vui lòng thử lại.';
+            
+            // If there are validation errors, show them
+            if (data.errors) {
+                if (Array.isArray(data.errors)) {
+                    errorMessage = data.errors.map(e => {
+                        if (typeof e === 'string') return e;
+                        if (e.msg) return e.msg;
+                        if (e.message) return e.message;
+                        return JSON.stringify(e);
+                    }).join('\n');
+                } else if (typeof data.errors === 'string') {
+                    errorMessage = data.errors;
+                }
+            } else if (data.error) {
+                errorMessage = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+            }
+            
+            showErrorModal(errorMessage);
             return;
         }
 
@@ -715,7 +795,9 @@ function submitBorrowForm() {
             modal.hide();
         }
 
-        showSuccessModal();
+        // Get maPhieu from response
+        const maPhieu = data.data?.maPhieu || data.data?.ticket?.maPhieu || null;
+        showSuccessModal(maPhieu);
     })
     .catch(err => {
         console.error('Error submitting borrow request:', err);
@@ -725,7 +807,8 @@ function submitBorrowForm() {
     });
 }
 
-function showSuccessModal() {
+function showSuccessModal(maPhieu) {
+    const slipId = maPhieu || 'PM0001';
     const modalHtml = `
         <div class="modal fade" id="successModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
@@ -738,7 +821,7 @@ function showSuccessModal() {
                         <h5 class="text-success mb-4">ĐĂNG KÝ MƯỢN THÀNH CÔNG!</h5>
                         <p class="text-muted mb-4">Phiếu mượn đã được tạo và gửi đến email của bạn.</p>
                         <div class="d-flex gap-3 justify-content-center">
-                            <button class="btn btn-primary btn-lg" onclick="viewBorrowSlip()">
+                            <button class="btn btn-primary btn-lg" onclick="viewBorrowSlip('${slipId}')">
                                 <i class="fas fa-file-alt me-2"></i>Xem phiếu mượn
                             </button>
                             <button class="btn btn-outline-secondary btn-lg" data-bs-dismiss="modal">
@@ -837,13 +920,14 @@ function showSuccessMessage(message) {
     });
 }
 
-function viewBorrowSlip() {
+function viewBorrowSlip(maPhieu) {
     // Close success modal
     const successModal = bootstrap.Modal.getInstance(document.getElementById('successModal'));
     if (successModal) {
         successModal.hide();
     }
     
-    // Show borrow slip
-    window.location.href = '/teacher/borrow/PM01';
+    // Show borrow slip with dynamic maPhieu
+    const slipId = maPhieu || 'PM0001';
+    window.location.href = `/teacher/borrow/${slipId}?from=register`;
 }

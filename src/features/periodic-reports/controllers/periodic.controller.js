@@ -67,7 +67,7 @@ class PeriodicReportController {
             // Mock: Giả định đã có middleware xử lý upload file (req.file)
             const result = await periodicReportService.createReport(req.body, req.file);
             // Sau khi tạo thành công, chuyển hướng về trang danh sách
-            res.redirect('/periodic-reports');
+            res.redirect('/manager/periodic-reports');
         } catch (error) {
             console.error('Error creating report:', error);
             res.status(500).send(error.message);
@@ -78,14 +78,14 @@ class PeriodicReportController {
     async updateReport(req, res) {
         // Chỉ là placeholder
         await periodicReportService.updateReport(req.params.id, req.body);
-        res.redirect(`/periodic-reports/${req.params.id}`);
+        res.redirect(`/manager/periodic-reports/${req.params.id}`);
     }
     
     // POST /periodic-reports/:id/delete
     async deleteReport(req, res) {
         // Chỉ là placeholder
         await periodicReportService.deleteReport(req.params.id);
-        res.redirect('/periodic-reports');
+        res.redirect('/manager/periodic-reports');
     }
     
     // GET /periodic-reports/:id/download

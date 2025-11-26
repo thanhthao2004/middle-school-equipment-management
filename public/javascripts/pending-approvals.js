@@ -7,7 +7,7 @@ function loadPending() {
   const id = document.getElementById('filterId').value.trim();
   const from = document.getElementById('filterFrom').value;
   const to = document.getElementById('filterTo').value;
-  if (id) params.append('id', id);
+  if (id) params.append('search', id); // Use 'search' instead of 'id' to match API
   if (from) params.append('createdFrom', from);
   if (to) params.append('createdTo', to);
 

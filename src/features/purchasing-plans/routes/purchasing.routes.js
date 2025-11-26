@@ -48,7 +48,12 @@ router.get('/create', (req, res) => {
 // Create action (temporary: redirect back to list)
 router.post('/', (req, res) => {
     // TODO: persist new plan using controller/repository
-    return res.redirect('/purchasing-plans');
+    // Check if user is principal, redirect to principal route, else teacher route
+    const userRole = req.user?.role || 'to_truong';
+    if (userRole === 'hieu_truong') {
+        return res.redirect('/principal/purchasing-plans');
+    }
+    return res.redirect('/teacher/purchasing-plans');
 });
 
 // View a single plan (render edit view in read-only mode)
@@ -70,13 +75,21 @@ router.get('/:id/edit', (req, res) => {
 // Update action (temporary)
 router.put('/:id', (req, res) => {
     // TODO: update plan
-    return res.redirect('/purchasing-plans');
+    const userRole = req.user?.role || 'to_truong';
+    if (userRole === 'hieu_truong') {
+        return res.redirect('/principal/purchasing-plans');
+    }
+    return res.redirect('/teacher/purchasing-plans');
 });
 
 // Delete action (temporary)
 router.delete('/:id', (req, res) => {
     // TODO: delete plan
-    return res.redirect('/purchasing-plans');
+    const userRole = req.user?.role || 'to_truong';
+    if (userRole === 'hieu_truong') {
+        return res.redirect('/principal/purchasing-plans');
+    }
+    return res.redirect('/teacher/purchasing-plans');
 });
 
 // =============================================
@@ -109,7 +122,11 @@ router.get('/:id/approve', (req, res) => {
 // Approve action (temporary)
 router.post('/:id/approve', (req, res) => {
     // TODO: perform approve
-    return res.redirect('/purchasing-plans');
+    const userRole = req.user?.role || 'hieu_truong';
+    if (userRole === 'hieu_truong') {
+        return res.redirect('/principal/purchasing-plans/approve');
+    }
+    return res.redirect('/teacher/purchasing-plans');
 });
 
 module.exports = router;

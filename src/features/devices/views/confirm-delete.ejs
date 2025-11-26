@@ -27,7 +27,7 @@
                     <!-- Page Header -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h1 class="h3 mb-0">XÁC NHẬN XÓA THIẾT BỊ</h1>
-                        <a href="/devices/detail/<%= device._id %>" class="btn btn-secondary">
+                        <a href="/manager/devices/detail/<%= device._id %>" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </a>
                     </div>
@@ -96,7 +96,7 @@
                             </div>
 
                             <!-- Delete Form -->
-                            <form action="/devices/delete/<%= device._id %>" method="POST" id="deleteForm">
+                            <form action="/manager/devices/delete/<%= device._id %>" method="POST" id="deleteForm">
                                 <div class="d-flex justify-content-end gap-2">
                                     <a href="/manager/devices/detail/<%= device._id %>" class="btn btn-secondary">
                                         <i class="fas fa-times"></i> Hủy

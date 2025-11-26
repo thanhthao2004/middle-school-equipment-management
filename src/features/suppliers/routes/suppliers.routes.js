@@ -84,6 +84,27 @@ router.get("/edit/:id", (req, res) => {
 });
 
 // ==========================
+// POST Routes for CRUD operations
+// ==========================
+router.post("/", (req, res) => {
+  // TODO: Implement create supplier logic
+  // For now, just redirect back to list
+  res.redirect("/manager/suppliers");
+});
+
+router.post("/:id", (req, res) => {
+  // TODO: Implement update supplier logic
+  // For now, just redirect back to list
+  res.redirect("/manager/suppliers");
+});
+
+router.post("/:id/delete", (req, res) => {
+  // TODO: Implement delete supplier logic
+  // For now, just redirect back to list
+  res.redirect("/manager/suppliers");
+});
+
+// ==========================
 // Export router
 // ==========================
 module.exports = router;

@@ -14,11 +14,18 @@
 </head>
 
 <body>
-    <div class="app-shell">
-        <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
-        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing', user: userObj }) %>
+    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
+    <!-- Header -->
+    <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans', user: userObj }) %>
 
-            <main class="main-content">
+    <div class="container-fluid p-0">
+      <div class="row g-0">
+        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans', user: userObj }) %>
+
+        <div class="col-md-9 col-lg-10 main-content">
+          <div class="container py-4">
+            <div class="app-shell">
+                <main class="main-content">
                 <div class="page-header">
                     <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
                 </div>
@@ -114,8 +121,14 @@
                                 <% } %>
                     </div>
                 </div>
-            </main>
+                </main>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <%- include('../../../views/partials/footer') %>
 
     <!-- Delete confirmation modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -184,7 +197,10 @@
                     const planId = btn.dataset.planId;
                     const planCode = btn.dataset.planCode;
                     modalPlanCode.textContent = planCode;
-                    deleteForm.action = '/purchasing-plans/' + planId + '?_method=DELETE';
+                    // Check if user is principal, use principal route, else teacher route
+                    const userRole = '<%= userObj.role || "to_truong" %>';
+                    const basePath = userRole === 'hieu_truong' ? '/principal/purchasing-plans' : '/teacher/purchasing-plans';
+                    deleteForm.action = basePath + '/' + planId + '?_method=DELETE';
                     deleteModal.show();
                 });
             });

@@ -139,19 +139,21 @@ class BorrowController {
     async getBorrowSlip(req, res) {
         try {
             const slipId = req.params.id;
+            const from = req.query.from || ''; // Get 'from' query parameter
             const slip = await borrowService.getBorrowSlip(slipId);
             
-            res.render('borrow/views/slip', { //
+            res.render('borrow/views/slip', {
                 title: `Phiếu mượn ${slipId}`,
                 currentPage: 'slip',
                 sidebarType: 'borrow-sidebar',
                 bodyClass: '',
                 slip: slip,
+                from: from, // Pass 'from' to view
                 user: req.user || { name: 'Nguyễn Văn A', role: 'giao_vien' }
             });
         } catch (error) {
             console.error('Error rendering borrow slip:', error);
-            res.status(500).send(error.message); // Sửa lỗi render
+            res.status(500).send(error.message);
         }
     }
 

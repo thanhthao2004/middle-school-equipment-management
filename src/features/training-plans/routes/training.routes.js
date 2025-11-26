@@ -57,11 +57,22 @@ router.get('/report', (req, res) => {
     });
 });
 
-// View single plan
+// View single plan (use edit view in read-only mode)
 router.get('/:id', (req, res) => {
     const plan = getPlanById(req.params.id);
     if (!plan) return res.status(404).send('Kế hoạch không tồn tại');
-    res.render('training-plans/views/view', { title: 'Xem kế hoạch', plan });
+    
+    // Xác định role từ URL path
+    const isPrincipal = req.path.includes('/principal/');
+    const userRole = isPrincipal ? 'hieu_truong' : 'to_truong';
+    
+    res.render('training-plans/views/edit', { 
+        title: 'Xem kế hoạch', 
+        plan,
+        readOnly: true,
+        currentPage: 'trainingPlans',
+        user: req.user || { role: userRole }
+    });
 });
 
 module.exports = router;

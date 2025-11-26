@@ -9,19 +9,23 @@ const isTeacher = userRole === 'giao_vien' || isDepartmentHead; // Tổ trưởn
     <nav class="nav flex-column mt-3">
         <% if (isTeacher) { %>
             <!-- PHẦN CHỨC NĂNG GIÁO VIÊN -->
-            <a class="nav-link <%= (typeof currentPage !== 'undefined' && currentPage === 'teacher-home') ? 'active' : '' %>" href="/teacher/borrow/teacher-home">
+            <% const isTeacherHome = (typeof currentPage !== 'undefined' && currentPage === 'teacher-home'); %>
+            <% const isRegister = (typeof currentPage !== 'undefined' && currentPage === 'register'); %>
+            <% const isHistory = (typeof currentPage !== 'undefined' && currentPage === 'history'); %>
+            <% const isStatus = (typeof currentPage !== 'undefined' && currentPage === 'status'); %>
+            <a class="nav-link <%= isTeacherHome ? 'active' : '' %>" href="/teacher/borrow/teacher-home">
             <i class="fas fa-home me-2"></i>
             Trang chủ giáo viên
         </a>
-            <a class="nav-link <%= (typeof currentPage !== 'undefined' && currentPage === 'register') ? 'active' : '' %>" href="/teacher/borrow/register">
+            <a class="nav-link <%= isRegister ? 'active' : '' %>" href="/teacher/borrow/register">
             <i class="fas fa-clipboard-list me-2"></i>
             Đăng ký mượn thiết bị
         </a>
-            <a class="nav-link <%= (typeof currentPage !== 'undefined' && currentPage === 'history') ? 'active' : '' %>" href="/teacher/borrow/history">
+            <a class="nav-link <%= isHistory ? 'active' : '' %>" href="/teacher/borrow/history">
             <i class="fas fa-history me-2"></i>
             Xem lịch sử mượn/trả
         </a>
-            <a class="nav-link <%= (typeof currentPage !== 'undefined' && currentPage === 'status') ? 'active' : '' %>" href="/teacher/borrow/pending">
+            <a class="nav-link <%= isStatus ? 'active' : '' %>" href="/teacher/borrow/pending">
             <i class="fas fa-star me-2"></i>
             Xem tình trạng phiếu mượn
         </a>
@@ -33,15 +37,18 @@ const isTeacher = userRole === 'giao_vien' || isDepartmentHead; // Tổ trưởn
             <div class="sidebar-section-title px-3 py-2 text-white-50" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05rem;">
                 <i class="fas fa-user-tie me-2"></i>Tổ trưởng chuyên môn
             </div>
-            <a class="nav-link <%= (typeof currentPage !== 'undefined' && currentPage === 'reports') ? 'active' : '' %>" href="/teacher/reports">
+            <% const isReports = (typeof currentPage !== 'undefined' && currentPage === 'reports'); %>
+            <% const isTrainingPlans = (typeof currentPage !== 'undefined' && (currentPage === 'trainingPlans' || currentPage === 'training-plans')); %>
+            <% const isPurchasingPlans = (typeof currentPage !== 'undefined' && (currentPage === 'purchasing' || currentPage === 'purchasing-plans')); %>
+            <a class="nav-link <%= isReports ? 'active' : '' %>" href="/teacher/reports">
                 <i class="fas fa-chart-bar me-2"></i>
                 Xem báo cáo
             </a>
-            <a class="nav-link <%= (typeof currentPage !== 'undefined' && (currentPage === 'trainingPlans' || currentPage === 'training-plans')) ? 'active' : '' %>" href="/teacher/training-plans">
+            <a class="nav-link <%= isTrainingPlans ? 'active' : '' %>" href="/teacher/training-plans">
                 <i class="fas fa-calendar-days me-2"></i>
                 Xem kế hoạch đào tạo
             </a>
-            <a class="nav-link <%= (typeof currentPage !== 'undefined' && (currentPage === 'purchasing' || currentPage === 'purchasing-plans')) ? 'active' : '' %>" href="/teacher/purchasing-plans">
+            <a class="nav-link <%= isPurchasingPlans ? 'active' : '' %>" href="/teacher/purchasing-plans">
                 <i class="fas fa-shopping-cart me-2"></i>
                 Quản lý kế hoạch mua sắm
             </a>

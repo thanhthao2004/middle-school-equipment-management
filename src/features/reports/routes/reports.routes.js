@@ -14,7 +14,7 @@ function sampleDamagedItems() {
 
 // Index - redirect đến báo cáo
 router.get('/', (req, res) => {
-    return res.redirect('/reports/damaged-summary');
+    return res.redirect('/teacher/reports/damaged-summary');
 });
 
 // Route hiển thị báo cáo (trang device-stats)
