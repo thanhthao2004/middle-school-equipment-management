@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chi Tiết Người Dùng</title>
+  <%
+    // Hàm format ngày theo định dạng Việt (dd/mm/yyyy)
+    const formatDate = (date) => {
+      if (!date) return '';
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+  %>
+  <link rel="stylesheet" href="/public/stylesheets/style.css">
+  <style>
+    .sidebar { width:270px; background:#2196f3; color:#fff; height:100vh; float:left; padding:0; box-sizing:border-box; border-right:1px solid #97c5f5; }
+    .sidebar h3 { padding:32px 0 14px 28px; margin:0; font-size:17px; font-weight:500; letter-spacing:.5px; }
+    .sidebar a { display:block; color:#fff; text-decoration:none; font-size:15px; padding:15px 0 15px 35px; margin:0 0 2px 0; border-left:4px solid transparent; }
+    .sidebar a.active, .sidebar a:focus { background:#156dc5; border-left:4px solid #fff; }
+    .sidebar a:hover { background:#1976d2 }
+    .main { margin-left:270px; padding:0; min-height:100vh; }
+    .page-title { font-size:22px; font-weight:700; color:#212529; margin:24px 0 12px 100px; }
+    .box { width:820px; margin:0 auto 60px; background:#fff; border:1px solid #dee2e6; border-radius:8px; padding:24px 28px; }
+    .row { display:flex; gap:18px; margin-bottom:12px; }
+    .label { width:220px; font-weight:600; color:#333; }
+    .value { flex:1; color:#212529; border-bottom:1px solid #e9ecef; padding-bottom:6px; }
+    .actions { display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
+    .btn-gray { background:#6c757d; color:#fff; border:none; padding:10px 16px; border-radius:6px; }
+    .btn-primary { background:#007bff; color:#fff; border:none; padding:10px 16px; border-radius:6px; transition: background-color .18s ease, box-shadow .18s ease; }
+    .btn-danger { background:#dc3545; color:#fff; border:none; padding:10px 16px; border-radius:6px; transition: background-color .18s ease, box-shadow .18s ease; }
+    a, .actions a { text-decoration: none; }
+    .btn-primary:hover { background:#0056b3; box-shadow: 0 4px 12px rgba(0,0,0,.12); color:#fff; }
+    .btn-danger:hover { background:#b02a37; box-shadow: 0 4px 12px rgba(0,0,0,.12); color:#fff; }
+    .btn-gray:hover { color:#fff; opacity:.95; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h3>Bảng chọn</h3>
+    <a href="/users/create">Tạo Tài Khoản</a>
+    <a class="active" href="/users">Quản Lí Tài Khoản</a>
+  </div>
+  <div class="main">
+    <div class="page-title">Thông Tin Người Dùng</div>
+    <div class="box">
+      <div class="row"><div class="label">Họ và tên:</div><div class="value"><%= user.fullname %></div></div>
+      <div class="row"><div class="label">Số điện thoại:</div><div class="value"><%= user.phone %></div></div>
+      <div class="row"><div class="label">Địa chỉ:</div><div class="value"><%= user.address %></div></div>
+      <div class="row"><div class="label">Tên Người Dùng:</div><div class="value"><%= user.username %></div></div>
+      <div class="row"><div class="label">Chức vụ:</div><div class="value"><%= user.role %></div></div>
+      <div class="row"><div class="label">Năm Kinh Nghiệm:</div><div class="value"><%= user.experience %></div></div>
+      <div class="row"><div class="label">Trình độ chuyên môn:</div><div class="value"><%= user.specialization %></div></div>
+      <div class="row"><div class="label">Giới tính:</div><div class="value"><%= user.gender %></div></div>
+      <div class="row"><div class="label">Bộ môn (nếu có):</div><div class="value"><%= user.subject %></div></div>
+      <div class="row"><div class="label">Ngày sinh:</div><div class="value"><%= formatDate(user.dob) %></div></div>
+      <div class="actions">
+        <a class="btn-gray" href="/users">Quay lại</a>
+        <form action="/users/<%= user.id %>/delete" method="POST" onsubmit="return confirm('Xóa tài khoản này?');" style="display:inline">
+          <button class="btn-danger" type="submit">Xóa TK</button>
+        </form>
+        <a class="btn-primary" href="/users/<%= user.id %>/edit">Chỉnh Sửa</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
