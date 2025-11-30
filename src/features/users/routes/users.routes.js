@@ -8,10 +8,4 @@ router.get('/', userController.renderUserList);
 router.get('/create', userController.renderCreateForm);
 router.post('/create', validateCreateUser, userController.createUser);
 
-// Detail, Edit và Delete routes - phải đặt trước /:id để tránh conflict
-router.get('/:id/edit', userController.renderEdit);
-router.post('/:id/edit', userController.updateUser);
-router.post('/:id/delete', userController.deleteUser);
-router.get('/:id', userController.renderDetail);
-
 module.exports = router;
