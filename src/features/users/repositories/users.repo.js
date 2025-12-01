@@ -1,18 +1,26 @@
-const users = [];
+const User = require('../models/user.model');
 
 const create = async (data) => {
-  users.push({ id: users.length + 1, ...data });
-  return data;
+  const user = new User(data);
+  await user.save();
+  return user;
+};
+
+const findByEmail = async (email) => {
+  return await User.findOne({ email });
 };
 
 const findByUsername = async (username) => {
-  return users.find(u => u.username === username);
+  return await User.findOne({ username });
 };
 
-const getAll = async () => users;
+const getAll = async () => {
+  return await User.find().sort({ createdAt: -1 });
+};
 
 module.exports = {
   create,
+  findByEmail,
   findByUsername,
   getAll
 };

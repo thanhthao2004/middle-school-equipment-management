@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,83 +11,131 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/public/stylesheets/style.css">
 </head>
+
 <body>
   <!-- Header -->
-  <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'admin' }; %>
-  <%- include('../../../views/partials/header', { currentPage: 'users', user: userObj }) %>
+  <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'admin' }; %>
+    <%- include('../../../views/partials/header', { currentPage: 'users' , user: userObj }) %>
 
-  <div class="container-fluid p-0">
-    <div class="row g-0">
-      <!-- Sidebar Admin -->
-      <%- include('../../../views/partials/admin-sidebar', { currentPage: 'users', user: userObj }) %>
+      <div class="container-fluid p-0">
+        <div class="row g-0">
+          <!-- Sidebar Admin -->
+          <%- include('../../../views/partials/admin-sidebar', { currentPage: 'users' , user: userObj }) %>
 
-      <!-- Main Content -->
-      <div class="col-md-9 col-lg-10 main-content">
-        <div class="container py-4">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">Danh Sách Người Dùng</h1>
-            <a class="btn btn-primary" href="/admin/create">
-              <i class="fas fa-user-plus me-2"></i>Tạo tài khoản mới
-            </a>
-          </div>
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+              <div class="container py-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h1 class="h3 mb-0">Danh Sách Người Dùng</h1>
+                  <a class="btn btn-primary" href="/admin/create">
+                    <i class="fas fa-user-plus me-2"></i>Tạo tài khoản mới
+                  </a>
+                </div>
 
-          <div class="card">
-            <div class="card-body">
-              <div style="overflow-x:auto;">
-                <table class="table table-hover">
-                  <thead class="table-light">
-                    <tr>
-                      <th>ID</th>
-                      <th>Họ và tên</th>
-                      <th>Tên đăng nhập</th>
-                      <th>Chức vụ</th>
-                      <th>Số điện thoại</th>
-                      <th>Năm KN</th>
-                      <th>Giới tính</th>
-                      <th>Bộ môn</th>
-                      <th>Thao tác</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% if (users && users.length > 0) { %>
-                      <% users.forEach(function(u) { %>
-                      <tr>
-                        <td><%= u.id %></td>
-                        <td><%= u.fullname %></td>
-                        <td><%= u.username %></td>
-                        <td><%= u.role %></td>
-                        <td><%= u.phone %></td>
-                        <td><%= u.experience %></td>
-                        <td><%= u.gender %></td>
-                        <td><%= u.subject %></td>
-                        <td>
-                          <a href="/admin/<%= u.id %>/edit" class="btn btn-sm btn-outline-primary me-1">
-                            <i class="fas fa-edit"></i>
-                          </a>
-                          <a href="/admin/<%= u.id %>/delete" class="btn btn-sm btn-outline-danger">
-                            <i class="fas fa-trash"></i>
-                          </a>
-                        </td>
-                      </tr>
-                      <% }); %>
-                    <% } else { %>
-                      <tr>
-                        <td colspan="9" class="text-center text-muted py-4">
-                          <i class="fas fa-inbox fa-2x mb-2"></i><br>
-                          Chưa có người dùng nào.
-                        </td>
-                      </tr>
-                    <% } %>
-                  </tbody>
-                </table>
+                <div class="card">
+                  <div class="card-body">
+                    <div style="overflow-x:auto;">
+                      <table class="table table-hover">
+                        <thead class="table-light">
+                          <tr>
+                            <th>Mã NV</th>
+                            <th>Họ và tên</th>
+                            <th>Tên đăng nhập</th>
+                            <th>Chức vụ</th>
+                            <th>Số điện thoại</th>
+                            <th>Địa chỉ</th>
+                            <th>Kinh nghiệm</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% if (users && users.length> 0) { %>
+                            <% users.forEach(function(u) { %>
+                              <tr>
+                                <td>
+                                  <strong>
+                                    <%= u.maNV %>
+                                  </strong>
+                                </td>
+                                <td>
+                                  <%= u.hoTen %>
+                                </td>
+                                <td>
+                                  <small class="text-muted">
+                                    <%= u.username %>
+                                  </small>
+                                </td>
+                                <td>
+                                  <% if (u.role==='admin' ) { %>
+                                    <span class="badge bg-danger">Quản trị viên</span>
+                                    <% } else if (u.role==='hieu_truong' ) { %>
+                                      <span class="badge bg-primary">Hiệu trưởng</span>
+                                      <% } else if (u.role==='to_truong' ) { %>
+                                        <span class="badge bg-info text-dark">Tổ trưởng</span>
+                                        <% } else if (u.role==='giao_vien' ) { %>
+                                          <span class="badge bg-success">Giáo viên</span>
+                                          <% } else if (u.role==='ql_thiet_bi' ) { %>
+                                            <span class="badge bg-warning text-dark">QL Thiết bị</span>
+                                            <% } else { %>
+                                              <span class="badge bg-secondary">
+                                                <%= u.role %>
+                                              </span>
+                                              <% } %>
+                                </td>
+                                <td>
+                                  <%= u.soDienThoai %>
+                                </td>
+                                <td>
+                                  <small>
+                                    <%= u.diaChi || '-' %>
+                                  </small>
+                                </td>
+                                <td>
+                                  <%= u.chucVu || '-' %>
+                                </td>
+                                <td>
+                                  <% if (u.trangThai==='active' ) { %>
+                                    <span class="badge bg-success">
+                                      <i class="fas fa-check-circle me-1"></i>Hoạt động
+                                    </span>
+                                    <% } else { %>
+                                      <span class="badge bg-secondary">
+                                        <i class="fas fa-times-circle me-1"></i>Không hoạt động
+                                      </span>
+                                      <% } %>
+                                </td>
+                                <td>
+                                  <a href="/admin/<%= u._id %>/edit" class="btn btn-sm btn-outline-primary me-1"
+                                    title="Chỉnh sửa">
+                                    <i class="fas fa-edit"></i>
+                                  </a>
+                                  <a href="/admin/<%= u._id %>/delete" class="btn btn-sm btn-outline-danger"
+                                    title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                  </a>
+                                </td>
+                              </tr>
+                              <% }); %>
+                                <% } else { %>
+                                  <tr>
+                                    <td colspan="9" class="text-center text-muted py-4">
+                                      <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                      Chưa có người dùng nào.
+                                    </td>
+                                  </tr>
+                                  <% } %>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
