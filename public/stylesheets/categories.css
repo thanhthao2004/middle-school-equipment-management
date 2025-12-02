@@ -144,48 +144,22 @@ body {
 
 
 
-/* --- Main --- */
-.main {
-    margin-left: 250px;
-    padding: 32px 40px;
-    min-height: 100vh;
-    transition: 0.3s;
-}
 
-.main-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    border-bottom: 2px solid rgba(226, 232, 240, 0.6);
-    padding-bottom: 12px;
-}
-
-.main-header h2 {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1e3a8a;
-    letter-spacing: 0.3px;
-}
-
-.user {
-    font-weight: 600;
-    color: #2563eb;
-    background: #e0e7ff;
-    padding: 6px 12px;
-    border-radius: 6px;
-}
-
-
-/* --- Main content --- */
-.main {
-    margin-left: 250px;
+/* --- Main Content --- */
+.main-content {
+    flex: 1;             
     padding: 32px 40px;
     background-color: #f8fafc;
-    min-height: 100vh;
     transition: 0.3s;
+    padding-bottom: 60px; 
 }
 
+/* --- Main --- */
+.main {
+    width: 100%; /* luôn đầy main-content */
+}
+
+/* --- Main Header --- */
 .main-header {
     display: flex;
     justify-content: space-between;
@@ -195,6 +169,13 @@ body {
     padding-bottom: 12px;
 }
 
+/* Header left (menu + title) */
+.main-header .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .main-header h2 {
     font-size: 26px;
     font-weight: 700;
@@ -202,13 +183,8 @@ body {
     letter-spacing: 0.3px;
 }
 
-.user {
-    font-weight: 600;
-    color: #2563eb;
-    background-color: #e0e7ff;
-    padding: 6px 12px;
-    border-radius: 6px;
-}
+
+
 
 /* --- Search box --- */
 /* --- Search Box đẹp hơn --- */
@@ -477,4 +453,23 @@ button {
     /* giảm font-size */
     letter-spacing: 0.5px;
     white-space: nowrap;
+}
+
+/* Fix navbar brand full text hiển thị */
+.navbar .container-fluid {
+    display: flex;
+    flex-wrap: wrap; /* cho phép wrap khi nhỏ màn hình */
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .navbar-brand {
+    flex: 1 1 auto; /* brand mở rộng hết không gian còn lại */
+    min-width: 0;   /* quan trọng để text wrap đúng */
+    white-space: normal; /* cho xuống dòng nếu cần */
+    word-break: break-word;
+}
+
+.navbar-nav {
+    flex: 0 0 auto; /* nav items không chiếm hết space */
 }
