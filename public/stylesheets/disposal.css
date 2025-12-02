@@ -168,18 +168,10 @@ body {
     letter-spacing: 0.3px;
 }
 
-.user {
-    font-weight: 600;
-    color: #2563eb;
-    background: #e0e7ff;
-    padding: 6px 12px;
-    border-radius: 6px;
-}
-
 
 /* --- Main content --- */
 .main {
-    margin-left: 250px;
+    margin-left: 0px;
     padding: 32px 40px;
     background-color: #f8fafc;
     min-height: 100vh;
@@ -852,3 +844,27 @@ button {
     outline: none;
     box-shadow: 0 0 5px rgba(59, 130, 246, 0.4);
 }
+
+
+/* --- Main Content fix layout --- */
+.main-content {
+    position: relative;
+    width: calc(100% - 250px); /* chiều rộng trừ sidebar */
+    margin-left: 250px; /* đúng với sidebar mặc định */
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    min-height: 100vh;
+    padding: 32px 40px;
+    background-color: #f8fafc;
+}
+
+/* Khi sidebar collapse */
+.sidebar-collapsed ~ .main-content {
+    margin-left: 0;
+    width: 100%;
+}
+
+/* Giữ padding cho .main bên trong */
+.main {
+    padding: 0; /* padding đã nằm trong .main-content */
+}
+
