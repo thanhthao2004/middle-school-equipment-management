@@ -167,20 +167,21 @@ body {
     margin-bottom: 24px;
     border-bottom: 2px solid #e2e8f0;
     padding-bottom: 12px;
+    flex-wrap: nowrap; /* quan trọng: giữ 1 dòng */
 }
 
-/* Header left (menu + title) */
-.main-header .header-left {
+.header-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px; /* khoảng cách giữa button + title */
+    flex-shrink: 0; /* không co lại */
 }
 
-.main-header h2 {
+.header-left h2 {
     font-size: 26px;
     font-weight: 700;
     color: #1e3a8a;
-    letter-spacing: 0.3px;
+    white-space: nowrap; /* không xuống dòng */
 }
 
 

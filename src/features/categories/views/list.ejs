@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,78 +13,98 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="/public/stylesheets/categories.css">
-    <link rel="stylesheet" href="/public/stylesheets/style.css">   
-</head>   
+    <link rel="stylesheet" href="/public/stylesheets/style.css">
 </head>
 
 <body>
-    <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'categories', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
-
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'categories', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'categories' , user: typeof user
+                !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 main-content">
-                <div class="container py-4">
-                    <!-- Main content -->
-                    <div class="main">
-        <div class="main-header">
-            <div style="display:flex; align-items:center;">
-                <button class="btn-menu" id="toggleSidebar"><i class="fas fa-bars"></i></button>
-                <h2>DANH MỤC THIẾT BỊ</h2>
+                <!-- Main Content -->
+                <div class="col-md-9 col-lg-10 main-content p-0">
+                    <!-- Header -->
+                    <%- include('../../../views/partials/header', { currentPage: 'categories' , user: typeof user
+                        !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+                        <div class="container py-4">
+                            <div class="main">
+                                <div class="main">
+                                    <div class="main-header">
+                                        <div class="header-left">
+                                            <button class="btn-menu" id="toggleSidebar"><i
+                                                    class="fas fa-bars"></i></button>
+                                            <h2>DANH MỤC THIẾT BỊ</h2>
+                                        </div>
+                                    </div>
+
+                                    <!-- Search Box nằm trên bảng -->
+                                    <div class="search-box" style="margin-bottom: 20px;">
+                                        <input type="text" placeholder="Tìm kiếm...">
+                                        <button><i class="fas fa-search"></i> Tìm kiếm</button>
+                                    </div>
+
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Mã Danh Mục</th>
+                                                <th>Tên Danh Mục</th>
+                                                <th>Vị Trí Lưu Trữ</th>
+                                                <th>Thao Tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% categories.forEach(c=> { %>
+                                                <tr>
+                                                    <td><span class="code-box">
+                                                            <%= c.id %>
+                                                        </span></td>
+                                                    <td>
+                                                        <%= c.name %>
+                                                    </td>
+                                                    <td>
+                                                        <%= c.location %>
+                                                    </td>
+                                                    <td>
+                                                        <a href="/manager/categories/edit/<%= c.id %>"><i
+                                                                class="fas fa-edit"></i> Sửa</a> |
+                                                        <a href="#" class="btn-delete" data-id="<%= c.id %>"
+                                                            data-name="<%= c.name %>">
+                                                            <i class="fas fa-trash-alt"></i> Xóa
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                <% }) %>
+                                        </tbody>
+                                    </table>
+
+                                    <a href="/manager/categories/add" class="btn-add"><i class="fas fa-plus"></i> Thêm
+                                        danh mục mới</a>
+                                </div>
+
+                            </div>
+
+                            <!-- Footer -->
+                            <%- include('../../../views/partials/footer') %>
+                        </div>
+                </div>
+        </div>
+
+        <!-- Modal Xóa -->
+        <div id="deleteModal">
+            <div class="modal-box">
+                <h3><i class="fas fa-triangle-exclamation"></i> Xác nhận xóa</h3>
+                <p id="deleteText"></p>
+                <form id="deleteForm" method="POST">
+                    <button type="submit" class="confirm">Xác nhận</button>
+                    <button type="button" class="cancel" id="cancelBtn">Hủy</button>
+                </form>
             </div>
         </div>
 
-        <div class="search-box">
-            <input type="text" placeholder="Tìm kiếm...">
-            <button><i class="fas fa-search"></i> Tìm kiếm</button>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Mã Danh Mục</th>
-                    <th>Tên Danh Mục</th>
-                    <th>Vị Trí Lưu Trữ</th>
-                    <th>Thao Tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% categories.forEach(c => { %>
-                    <tr>
-                        <!-- <td><%= c.id %></td> -->
-                        <td><span class="code-box"><%= c.id %></span></td>
-                        <td><%= c.name %></td>
-                        <td><%= c.location %></td>
-                        <td>
-                            <a href="/manager/categories/edit/<%= c.id %>"><i class="fas fa-edit"></i> Sửa</a> |
-                            <a href="#" class="btn-delete" data-id="<%= c.id %>" data-name="<%= c.name %>"><i class="fas fa-trash-alt"></i> Xóa</a>
-                        </td>
-                    </tr>
-                <% }) %>
-            </tbody>
-        </table>
-
-        <a href="/manager/categories/add" class="btn-add"><i class="fas fa-plus"></i> Thêm danh mục mới</a>
-    </div>
-
-    <!-- Modal Xóa -->
-    <div id="deleteModal">
-        <div class="modal-box">
-            <h3><i class="fas fa-triangle-exclamation"></i> Xác nhận xóa</h3>
-            <p id="deleteText"></p>
-            <form id="deleteForm" method="POST">
-                <button type="submit" class="confirm">Xác nhận</button>
-                <button type="button" class="cancel" id="cancelBtn">Hủy</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <%- include('../../../views/partials/footer') %>
-    <script src="/public/javascripts/categories.js"></script>
+        <script src="/public/javascripts/categories.js"></script>
 </body>
+
 </html>
