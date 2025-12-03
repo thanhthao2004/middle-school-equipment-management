@@ -194,29 +194,14 @@ body {
     letter-spacing: 0.3px;
 }
 
-.user {
-    font-weight: 600;
-    color: #2563eb;
-    background-color: #e0e7ff;
-    padding: 6px 12px;
-    border-radius: 6px;
-}
 
 /* --- Search box --- */
-/* --- Search Box đẹp hơn --- */
 .search-box {
+    width: 80%;          /* bằng đúng width của bảng */
+    margin: 20px;   /* căn giữa + nằm trên bảng */
     display: flex;
     justify-content: flex-end;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    max-width: 400px;
-    /* giới hạn chiều rộng */
-    margin-left: auto;
-    /* đẩy sang phải */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: #fff;
+    margin-left: 480px;
 }
 
 .search-box input {
@@ -246,6 +231,7 @@ body {
 .search-box button:hover {
     background-color: #2563eb;
 }
+
 
 
 /* --- Table modern --- */
@@ -333,13 +319,14 @@ tbody tr:hover {
 ============================== */
 
 .disposal-table {
-    width: 100%;
+    width: 80%;
     border-collapse: collapse;
     border-radius: 12px;
     overflow: hidden;
     background: white;
     box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
     margin-top: 10px;
+    margin: 0 auto;    /* căn giữa */
 }
 
 /* HEADER */
@@ -360,6 +347,8 @@ tbody tr:hover {
     border-bottom: 1px solid #e2e8f0;
     color: #334155;
     vertical-align: middle;
+    text-align: center;
+
 }
 
 /* Hover giống table chính */
@@ -657,7 +646,7 @@ button {
 .btn-add {
     display: inline-block;
     margin-top: 30px;
-    margin-left: auto;
+    margin-left: 100px;
     background: #1e3a8a;
     color: #fff !important;
     border: 2px solid #1e40af;
@@ -867,4 +856,5 @@ button {
 .main {
     padding: 0; /* padding đã nằm trong .main-content */
 }
+
 

@@ -18,65 +18,81 @@
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'disposal', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'disposal' , user: typeof user
+                !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 main-content">
-                <div class="main">
+                <!-- Main Content -->
+                <div class="col-md-9 col-lg-10 main-content p-0">
+                    <!-- Header -->
+                    <%- include('../../../views/partials/header', { currentPage: 'disposal' , user: typeof user
+                        !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
-                    <!-- HEADER -->
-                    <%- include('../../../views/partials/header', { currentPage: 'disposal', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+                        <div class="container py-4">
+                            <div class="main">
+                                <div class="main-header">
+                                    <div class="header-left">
+                                        <h2>DANH SÁCH BÁO CÁO THANH LÝ THIẾT BỊ HỎNG</h2>
+                                    </div>
+                                </div>
 
-                    <!-- PAGE TITLE -->
-                    <div class="main-header mt-3">
-                        <div style="display:flex; align-items:center;">
-                            <button class="btn-menu" id="toggleSidebar"><i class="fas fa-bars"></i></button>
-                            <h2>DANH SÁCH BÁO CÁO THANH LÝ THIẾT BỊ HỎNG</h2>
+                                <!-- Search Box -->
+                                <div class="search-box mb-3" style="max-width: 400px;">
+                                    <input type="text" placeholder="Tìm kiếm...">
+                                    <button><i class="fas fa-search"></i> Tìm kiếm</button>
+                                </div>
+
+                                <!-- Table -->
+                                <table class="disposal-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã biên bản</th>
+                                            <th>Năm học</th>
+                                            <th>Ngày lập</th>
+                                            <th>Lựa chọn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% disposal.forEach(r=> { %>
+                                            <tr>
+                                                <td>
+                                                    <div class="info-box info-code">
+                                                        <%= r.code %>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="info-box info-year">
+                                                        <%= r.year %>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="info-box info-date">
+                                                        <%= r.created_at %>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <a href="/manager/disposal/view/<%= r.id %>"><i
+                                                            class="fas fa-eye"></i> Xem</a> |
+                                                    <a href="/manager/disposal/edit/<%= r.id %>"><i
+                                                            class="fas fa-edit"></i> Sửa</a> |
+                                                    <a href="#" class="btn-delete" data-id="<%= r.id %>"
+                                                        data-code="<%= r.code %>"><i class="fas fa-trash-alt"></i>
+                                                        Xóa</a>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+
+                                <!-- Add Button -->
+                                <a href="/manager/disposal/add" class="btn-add mt-3"><i class="fas fa-plus"></i> Thêm
+                                    báo cáo mới</a>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- SEARCH BOX -->
-                    <div class="search-box mt-3 mb-3" style="max-width: 400px;">
-                        <input type="text" placeholder="Tìm kiếm...">
-                        <button><i class="fas fa-search"></i> Tìm kiếm</button>
-                    </div>
-
-                    <!-- TABLE -->
-                    <div class="table-responsive">
-                        <table class="disposal-table">
-                            <thead>
-                                <tr>
-                                    <th>Mã biên bản</th>
-                                    <th>Năm học</th>
-                                    <th>Ngày lập</th>
-                                    <th>Lựa chọn</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% disposal.forEach(r => { %>
-                                <tr>
-                                    <td><div class="info-box info-code"><%= r.code %></div></td>
-                                    <td><div class="info-box info-year"><%= r.year %></div></td>
-                                    <td><div class="info-box info-date"><%= r.created_at %></div></td>
-                                    <td>
-                                        <a href="/manager/disposal/view/<%= r.id %>"><i class="fas fa-eye"></i> Xem</a> |
-                                        <a href="/manager/disposal/edit/<%= r.id %>"><i class="fas fa-edit"></i> Sửa</a> |
-                                        <a href="#" class="btn-delete" data-id="<%= r.id %>" data-code="<%= r.code %>"><i class="fas fa-trash-alt"></i> Xóa</a>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- ADD BUTTON -->
-                    <a href="/manager/disposal/add" class="btn-add mt-3"><i class="fas fa-plus"></i> Thêm báo cáo mới</a>
-
-                    <!-- FOOTER -->
-                    <%- include('../../../views/partials/footer') %>
-
+                        <!-- Footer -->
+                        <%- include('../../../views/partials/footer') %>
                 </div>
-            </div>
+
         </div>
     </div>
 
