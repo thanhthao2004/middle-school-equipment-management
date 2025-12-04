@@ -1,3 +1,4 @@
+// src/features/auth/views/login.ejs
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -16,17 +17,24 @@
                     <h4><%= title %></h4>
                     </div>
                     <div class="card-body">
-                        <form>
+                        
+                        <% if (typeof error !== 'undefined' && error) { %>
+                            <div class="alert alert-danger" role="alert"><%= error %></div>
+                        <% } %>
+                        <% if (typeof success !== 'undefined' && success) { %>
+                            <div class="alert alert-success" role="alert"><%= success %></div>
+                        <% } %>
+
+                        <form method="POST" action="/auth/login">
              
                <div class="mb-3">
                                 <label for="username" class="form-label">Tên đăng nhập</label>
-                                <input type="text" class="form-control" id="username" required>
+                                <input type="text" class="form-control" id="username" name="username" required>
             
                 </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Mật khẩu</label>
-                    
-            <input type="password" class="form-control" id="password" required>
+            <input type="password" class="form-control" id="password" name="password" required>
                             </div>
                             <div class="d-grid">
                            
@@ -37,7 +45,7 @@
                    
  <div class="card-footer text-center">
                         <small class="text-muted">
-                            <a href="#" class="text-decoration-none">Quên mật khẩu?</a>
+                            <a href="/auth/password/forgot" class="text-decoration-none">Quên mật khẩu?</a>
                         </small>
                 
     </div>
