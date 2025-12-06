@@ -10,6 +10,7 @@
     font-size: 0.9rem;
     margin-bottom: 0;
 }
+
 .equipment-table th {
     background-color: var(--light-gray);
     color: var(--dark-gray);
@@ -18,14 +19,17 @@
     border: none;
     padding: 1rem 0.75rem;
 }
+
 .equipment-table td {
     padding: 0.75rem;
     vertical-align: middle;
     border-color: var(--border-gray);
 }
+
 .equipment-table tbody tr {
     transition: background-color 0.2s ease;
 }
+
 .equipment-table tbody tr:hover {
     background-color: var(--light-gray);
 }
@@ -39,6 +43,7 @@
     border-radius: 20px;
     font-size: 0.8rem;
 }
+
 .status-borrowed {
     color: var(--error-red);
     font-weight: 600;
@@ -47,10 +52,12 @@
     border-radius: 20px;
     font-size: 0.8rem;
 }
+
 .condition-good {
     color: var(--success-green);
     font-weight: 500;
 }
+
 .condition-damaged {
     color: var(--error-red);
     font-weight: 500;
@@ -60,6 +67,7 @@
 .search-container {
     position: relative;
 }
+
 .search-container .search-icon {
     position: absolute;
     right: 15px;
@@ -68,12 +76,16 @@
     color: var(--text-gray);
     pointer-events: none;
 }
-.form-control, .form-select {
+
+.form-control,
+.form-select {
     border-radius: 8px;
     border: 1px solid var(--border-gray);
     transition: all 0.3s ease;
 }
-.form-control:focus, .form-select:focus {
+
+.form-control:focus,
+.form-select:focus {
     border-color: var(--primary-blue-light);
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
@@ -87,14 +99,17 @@
     font-weight: 600;
     border-radius: 8px;
     transition: all 0.3s ease;
-    white-space: nowrap; /* Đảm bảo nút "Đăng ký" không bị dồn chữ */
+    white-space: nowrap;
+    /* Đảm bảo nút "Đăng ký" không bị dồn chữ */
 }
+
 .btn-register:hover {
     background-color: #0056b3;
     border-color: #0056b3;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
+
 .btn-cancel {
     background-color: var(--error-red);
     border-color: var(--error-red);
@@ -103,8 +118,10 @@
     font-weight: 600;
     border-radius: 8px;
     transition: all 0.3s ease;
-    white-space: nowrap; /* Đảm bảo nút "Hủy chọn" không bị dồn chữ */
+    white-space: nowrap;
+    /* Đảm bảo nút "Hủy chọn" không bị dồn chữ */
 }
+
 .btn-cancel:hover {
     background-color: #c82333;
     border-color: #bd2130;
@@ -134,7 +151,7 @@
 .modal-content {
     border: none;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 /* Borrow Form Modal - Full width on large screens */
@@ -172,8 +189,8 @@
 }
 
 .borrow-form-table th {
-    background-color: #f8f9fa;
-    color: #495057;
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
     font-weight: 600;
     white-space: nowrap;
     padding: 0.75rem 0.5rem;
@@ -197,8 +214,17 @@
     font-size: 0.85rem;
     padding: 0.4rem 0.5rem;
     width: 100%;
-    min-width: 100px;
+    min-width: 0;
+    /* Changed from 100px to 0 */
     box-sizing: border-box;
+    margin: 0 !important;
+    /* Added */
+}
+
+/* Date inputs need more space to show full DD/MM/YYYY format */
+.borrow-form-table td input[type="date"] {
+    min-width: 120px !important;
+    width: 100%;
 }
 
 /* Đặc biệt cho cột Dạy tiết */
@@ -224,12 +250,12 @@
 
 .borrow-form-table .device-name {
     font-weight: 600;
-    color: #212529;
+    color: var(--dark-gray);
 }
 
 .borrow-form-table .device-code {
     font-size: 0.75rem;
-    color: #6c757d;
+    color: var(--text-gray);
     margin-top: 0.25rem;
 }
 
@@ -246,51 +272,60 @@
     border-radius: 0 0 12px 12px;
     padding: 1rem 1.5rem;
 }
+
 .borrow-slip {
-            background-color: #f8f9fa;
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
- }
-        .slip-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .slip-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #495057;
-        }
-        .slip-id {
-            font-size: 1.1rem;
-            color: #6c757d;
-            margin-top: 10px;
-        }
-        .equipment-table {
-            font-size: 0.9rem;
-        }
-        .equipment-table th {
-            background-color: #e9ecef;
-            font-weight: 600;
-            text-align: center;
-        }
-        .equipment-table td {
-            vertical-align: middle;
-        }
-        .borrower-info {
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-        .btn-close.slip-close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #dc3545;
-            cursor: pointer;
-        }
+    background-color: var(--light-gray);
+    border: 2px solid var(--border-gray);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.slip-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.slip-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--dark-gray);
+}
+
+.slip-id {
+    font-size: 1.1rem;
+    color: var(--text-gray);
+    margin-top: 10px;
+}
+
+.equipment-table {
+    font-size: 0.9rem;
+}
+
+.equipment-table th {
+    background-color: var(--medium-gray);
+    font-weight: 600;
+    text-align: center;
+}
+
+.equipment-table td {
+    vertical-align: middle;
+}
+
+.borrower-info {
+    background-color: var(--medium-gray);
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.btn-close.slip-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--error-red);
+    cursor: pointer;
+}

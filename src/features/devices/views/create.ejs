@@ -157,15 +157,28 @@
                                                                             placeholder="0">
                                                                     </div>
 
-                                                                    <!-- Trạng thái thiết bị -->
+                                                                    <!-- Giá thành -->
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="giaThanh" class="form-label">
+                                                                            Giá thành (đơn giá)
+                                                                        </label>
+                                                                        <input type="number" class="form-control"
+                                                                            id="giaThanh" name="giaThanh" min="0"
+                                                                            value="<%= typeof formData !== 'undefined' ? formData.giaThanh || 0 : 0 %>"
+                                                                            placeholder="VNĐ">
+                                                                        <small class="form-text text-muted">
+                                                                            Giá mua mỗi đơn vị thiết bị
+                                                                        </small>
+                                                                    </div>
+
+                                                                    <!-- Tình trạng thiết bị (Physical Condition) -->
                                                                     <div class="col-md-6 mb-3">
                                                                         <label for="tinhTrangThietBi"
-                                                                            class="form-label">Trạng thái
-                                                                            thiết bị</label>
+                                                                            class="form-label">Tình trạng</label>
                                                                         <select class="form-select"
                                                                             id="tinhTrangThietBi"
                                                                             name="tinhTrangThietBi">
-                                                                            <option value="">-- Chọn trạng thái --
+                                                                            <option value="">-- Chọn tình trạng --
                                                                             </option>
                                                                             <% if (filterOptions &&
                                                                                 filterOptions.statuses) { %>
@@ -269,7 +282,16 @@
                                                                                                 trợ</option>
                                                                                             <option value="Hiến tặng">
                                                                                                 Hiến tặng</option>
+                                                                                            <option
+                                                                                                value="Giáo viên tự làm">
+                                                                                                Giáo viên tự làm
+                                                                                            </option>
                                                                         </select>
+                                                                        <small class="form-text text-muted">
+                                                                            <i class="fas fa-info-circle"></i>
+                                                                            Chọn "Giáo viên tự làm" sẽ tự động đặt giá
+                                                                            thành = 0đ
+                                                                        </small>
                                                                     </div>
 
                                                                     <!-- Ngày nhập -->
