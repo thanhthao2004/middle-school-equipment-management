@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .filter-section { background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e9ecef; }
+        .table-returns th { background-color: #e9ecef; }
+        .table-returns th, .table-returns td { vertical-align: middle; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <%- include('../../../../views/partials/header', { currentPage: 'return-slips', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar QLTB -->
+            <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'return-slips', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="container py-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 mb-0">DANH SÁCH PHIẾU TRẢ THIẾT BỊ</h1>
+                        <div class="d-flex align-items-center">
+                            <span class="text-muted small">QLTB</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter Section (Theo mockup) -->
+                    <div class="filter-section d-flex justify-content-end">
+                        <div class="input-group input-group-sm w-auto">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm...">
+                            <button class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i> Tìm kiếm</button>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="card mt-2">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover equipment-table table-returns mb-0" id="returnTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã Phiếu</th>
+                                            <th>Tên Giáo Viên</th>
+                                            <th>Bộ Môn</th>
+                                            <th>Ngày Mượn</th>
+                                            <th>Ngày Trả Dự Kiến</th>
+                                            <th>Ngày Trả Thực Tế</th>
+                                            <th>Trạng Thái</th>
+                                            <th>Xem Chi Tiết</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="returnBody">
+                                        <% if (slips && slips.length > 0) { %>
+                                            <% slips.forEach(slip => { %>
+                                                <tr>
+                                                    <td class="fw-bold"><%= slip.maPhieu %></td>
+                                                    <td><%= slip.tenGV %></td>
+                                                    <td><%= slip.boMon %></td>
+                                                    <td><%= slip.ngayMuon %></td>
+                                                    <td><%= slip.ngayTraDuKien %></td>
+                                                    <td><%= slip.ngayTraThucTe %></td>
+                                                    <td><span class="badge bg-success"><%= slip.trangThai %></span></td>
+                                                    <td><a class="btn btn-link p-0" href="/manager/return/<%= slip.maPhieu.replace('P00', '') %>">Xem</a></td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr><td colspan="8" class="text-center text-muted">Không có phiếu trả nào.</td></tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-end p-3">
+                                <button class="btn btn-primary"><i class="fas fa-plus me-1"></i>Thêm vào phiếu</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../../../../views/partials/footer') %>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

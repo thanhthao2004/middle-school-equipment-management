@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận Trả Thiết Bị</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .slip-container { border: 1px solid #1e3a8a; padding: 25px; border-radius: 8px; max-width: 900px; margin: 20px auto; }
+        .slip-header-info { border: 1px solid #ccc; padding: 15px; margin-bottom: 25px; }
+        .equipment-table th, .equipment-table td { font-size: 0.9rem; padding: 8px; }
+        .equipment-table th { background-color: #e9ecef; }
+        .btn-confirm { background-color: #28a745; color: white; }
+        .btn-issue { background-color: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <%- include('../../../../views/partials/header', { currentPage: 'return-slips', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar QLTB -->
+            <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'return-slips', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="container py-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 mb-0">XÁC NHẬN TRẢ THIẾT BỊ</h1>
+                        <div class="d-flex align-items-center">
+                            <span class="text-muted small">QLTB</span>
+                        </div>
+                    </div>
+
+                    <div class="slip-container">
+                        <!-- Thông tin Phiếu Trả (Theo mockup) -->
+                        <div class="slip-header-info">
+                            <p class="mb-1"><strong>Mã PM:</strong> PM_105</p>
+                            <p class="mb-1"><strong>GV:</strong> Hoàng Văn E</p>
+                            <p class="mb-1"><strong>Ngày mượn:</strong> 05/09/2025</p>
+                            <p class="mb-0"><strong>Ngày trả dự kiến:</strong> 15/09/2025</p>
+                        </div>
+
+                        <!-- Chi tiết Thiết bị trả (Theo mockup) -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered equipment-table">
+                                <thead>
+                                    <tr>
+                                        <th>S</th>
+                                        <th>Tên Thiết Bị</th>
+                                        <th>Đơn vị</th>
+                                        <th>Vị trí</th>
+                                        <th>Nguồn</th>
+                                        <th>Ngày mượn</th>
+                                        <th>Ngày trả</th>
+                                        <th>SL trả</th>
+                                        <th>SL lỗi/thiếu</th>
+                                        <th>Nội dung</th>
+                                        <th>Tình trạng trả</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Bộ dụng cụ thí nghiệm</td>
+                                        <td>cái</td>
+                                        <td>Phòng TN</td>
+                                        <td>NCC</td>
+                                        <td>05/09/2025</td>
+                                        <td>30/09/2025</td>
+                                        <td>3</td>
+                                        <td>0</td>
+                                        <td>Hóa học</td>
+                                        <td><span class="badge bg-success">Tốt</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Laptop Dell</td>
+                                        <td>cái</td>
+                                        <td>Phòng IT</td>
+                                        <td>NCC</td>
+                                        <td>10/09/2025</td>
+                                        <td>10/10/2025</td>
+                                        <td>2</td>
+                                        <td>1</td>
+                                        <td>Sách AI</td>
+                                        <td><span class="badge bg-danger">Bị mất</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="text-center mt-4 d-flex justify-content-center gap-3">
+                            <button class="btn btn-confirm px-4" onclick="handleConfirm('ok')">Xác nhận trả đủ</button>
+                            <button class="btn btn-issue px-4" onclick="handleConfirm('issue')">Xác nhận hỏng/thiếu</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../../../../views/partials/footer') %>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function handleConfirm(type) {
+            const actionText = type === 'ok' ? 'Xác nhận trả đủ' : 'Xác nhận có hỏng/thiếu';
+            if (confirm(`Bạn có chắc chắn muốn thực hiện hành động: ${actionText} không?`)) {
+                // Trong thực tế, gọi API POST /borrow/api/return/approve/:id hoặc API khác
+                alert(`Đã thực hiện: ${actionText}. (MOCK)`);
+                window.location.href = '/manager/return-slips'; // Chuyển hướng về danh sách phiếu trả
+            }
+        }
+    </script>
+</body>
+</html>

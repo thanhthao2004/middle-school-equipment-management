@@ -7,11 +7,11 @@ function loadPending() {
   const id = document.getElementById('filterId').value.trim();
   const from = document.getElementById('filterFrom').value;
   const to = document.getElementById('filterTo').value;
-  if (id) params.append('id', id);
+  if (id) params.append('search', id); // Use 'search' instead of 'id' to match API
   if (from) params.append('createdFrom', from);
   if (to) params.append('createdTo', to);
 
-  fetch(`/borrow/api/pending-approvals?${params.toString()}`)
+  fetch(`/teacher/borrow/api/pending-approvals?${params.toString()}`)
     .then(r => r.json())
     .then(res => {
       if (res.success) {
@@ -29,15 +29,16 @@ function renderTable() {
     return;
   }
   pendingData.forEach(item => {
+    const slipId = item.maPhieu || item.id || '';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td class="fw-semibold">${item.id}</td>
+      <td class="fw-semibold">${slipId}</td>
       <td>${formatDate(item.createdAt)}</td>
       <td>
-        <button class="btn btn-link p-0" data-id="${item.id}" onclick="viewSlip('${item.id}')">Xem</button>
+        <button class="btn btn-link p-0" data-id="${slipId}" onclick="viewSlip('${slipId}')">Xem</button>
       </td>
       <td>
-        <button class="btn btn-outline-danger btn-sm" onclick="openCancel('${item.id}')">Hủy mượn</button>
+        <button class="btn btn-outline-danger btn-sm" onclick="openCancel('${slipId}')">Hủy mượn</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -52,7 +53,7 @@ function formatDate(d) {
 }
 
 function viewSlip(id) {
-  window.location.href = `/borrow/slip/${id}?from=pending`;
+  window.location.href = `/teacher/borrow/${id}?from=pending`;
 }
 
 function openCancel(id) {
@@ -63,7 +64,7 @@ function openCancel(id) {
 
 function confirmCancel() {
   if (!cancelTargetId) return;
-  fetch(`/borrow/api/cancel/${cancelTargetId}`, { method: 'POST' })
+  fetch(`/teacher/borrow/api/cancel/${cancelTargetId}`, { method: 'POST' })
     .then(r => r.json())
     .then(res => {
       const modalEl = document.getElementById('confirmCancelModal');

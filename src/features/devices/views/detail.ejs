@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết thiết bị - <%= device.maTB %>
+    </title>
+
+    <!-- Bootstrap 5.3.0 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6.4.0 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/stylesheets/devices.css">
+    <link rel="stylesheet" href="/public/stylesheets/style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <%- include('../../../views/partials/header', { currentPage: 'devices' , user: typeof user !=='undefined' ? user : {
+        role: 'ql_thiet_bi' } }) %>
+
+        <!-- Main Layout with Sidebar -->
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                <!-- Sidebar QLTB -->
+                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices' , user: typeof user
+                    !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+                    <!-- Main Content -->
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container-fluid py-4">
+                            <!-- Page Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h1 class="h3 mb-0">CHI TIẾT THIẾT BỊ</h1>
+                                <div class="d-flex gap-2">
+                                    <a href="/manager/devices" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Quay lại
+                                    </a>
+                                    <a href="/manager/devices/edit/<%= device._id %>" class="btn btn-warning">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <a href="/manager/devices/delete/<%= device._id %>" class="btn btn-danger">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Flash Messages -->
+                            <% if (typeof messages !=='undefined' && messages.success) { %>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <%= messages.success %>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                <% } %>
+
+                                    <!-- Device Details -->
+                                    <div class="row">
+                                        <!-- Main Info Card -->
+                                        <div class="col-md-8">
+                                            <div class="card mb-4">
+                                                <div class="card-header bg-primary text-white">
+                                                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin thiết
+                                                        bị</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 fw-bold">Mã thiết bị:</div>
+                                                        <div class="col-md-8">
+                                                            <span class="code-box">
+                                                                <%= device.maTB || '-' %>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 fw-bold">Tên thiết bị:</div>
+                                                        <div class="col-md-8">
+                                                            <%= device.tenTB || '-' %>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 fw-bold">Danh mục:</div>
+                                                        <div class="col-md-8">
+                                                            <% if (device.category && device.category.tenDM) { %>
+                                                                <%= device.category.tenDM %>
+                                                                    <% } else if (device.maDM) { %>
+                                                                        <%= device.maDM %>
+                                                                            <% } else { %>
+                                                                                <span class="text-muted">-</span>
+                                                                                <% } %>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 fw-bold">Số lượng:</div>
+                                                        <div class="col-md-8">
+                                                            <span class="badge bg-info">
+                                                                <%= device.soLuong || 0 %>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 fw-bold">Trạng thái:</div>
+                                                        <div class="col-md-8">
+                                                            <% if (device.tinhTrangThietBi) { %>
+                                                                <span class="status-badge status-available">
+                                                                    <%= device.tinhTrangThietBi %>
+                                                                </span>
+                                                                <% } else { %>
+                                                                    <span class="text-muted">-</span>
+                                                                    <% } %>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 fw-bold">Vị trí lưu trữ:</div>
+                                                        <div class="col-md-8">
+                                                            <%= device.viTriLuuTru || '-' %>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 fw-bold">Nguồn gốc:</div>
+                                                        <div class="col-md-8">
+                                                            <%= device.nguonGoc || '-' %>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 fw-bold">Ngày nhập:</div>
+                                                        <div class="col-md-8">
+                                                            <% if (device.ngayNhap) { %>
+                                                                <%= new
+                                                                    Date(device.ngayNhap).toLocaleDateString('vi-VN') %>
+                                                                    <% } else { %>
+                                                                        <span class="text-muted">-</span>
+                                                                        <% } %>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 fw-bold">Ngày tạo:</div>
+                                                        <div class="col-md-8">
+                                                            <% if (device.createdAt) { %>
+                                                                <%= new Date(device.createdAt).toLocaleString('vi-VN')
+                                                                    %>
+                                                                    <% } else { %>
+                                                                        <span class="text-muted">-</span>
+                                                                        <% } %>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 fw-bold">Cập nhật lần cuối:</div>
+                                                        <div class="col-md-8">
+                                                            <% if (device.updatedAt) { %>
+                                                                <%= new Date(device.updatedAt).toLocaleString('vi-VN')
+                                                                    %>
+                                                                    <% } else { %>
+                                                                        <span class="text-muted">-</span>
+                                                                        <% } %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Hướng dẫn sử dụng -->
+                                            <% if (device.huongDanSuDung) { %>
+                                                <div class="card mb-4">
+                                                    <div class="card-header bg-info text-white">
+                                                        <h5 class="mb-0"><i class="fas fa-book"></i> Hướng dẫn sử dụng
+                                                        </h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <p class="mb-0">
+                                                            <%= device.huongDanSuDung %>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <% } %>
+                                        </div>
+
+                                        <!-- Image Card with Carousel -->
+                                        <div class="col-md-4">
+                                            <div class="card mb-4">
+                                                <div class="card-header bg-secondary text-white">
+                                                    <h5 class="mb-0"><i class="fas fa-images"></i> Hình ảnh</h5>
+                                                </div>
+                                                <div class="card-body text-center p-0">
+                                                    <% // Normalize hinhAnh to array (backward compatibility) let
+                                                        images=[]; if (device.hinhAnh) { if
+                                                        (Array.isArray(device.hinhAnh)) { images=device.hinhAnh; } else
+                                                        if (typeof device.hinhAnh==='string' ) {
+                                                        images=[device.hinhAnh]; } } %>
+
+                                                        <% if (images.length> 0) { %>
+                                                            <!-- Bootstrap Carousel -->
+                                                            <div id="deviceImageCarousel" class="carousel slide"
+                                                                data-bs-ride="carousel">
+                                                                <!-- Indicators -->
+                                                                <% if (images.length> 1) { %>
+                                                                    <div class="carousel-indicators">
+                                                                        <% images.forEach((img, index)=> { %>
+                                                                            <button type="button"
+                                                                                data-bs-target="#deviceImageCarousel"
+                                                                                data-bs-slide-to="<%= index %>"
+                                                                                class="<%= index === 0 ? 'active' : '' %>"
+                                                                                aria-label="Slide <%= index + 1 %>"></button>
+                                                                            <% }); %>
+                                                                    </div>
+                                                                    <% } %>
+
+                                                                        <!-- Slides -->
+                                                                        <div class="carousel-inner">
+                                                                            <% images.forEach((img, index)=> {
+                                                                                %>
+                                                                                <div
+                                                                                    class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                                                                    <img src="<%= img %>"
+                                                                                        class="d-block w-100"
+                                                                                        alt="<%= device.tenTB %> - <%= index + 1 %>"
+                                                                                        style="max-height: 400px; object-fit: contain; background: #f8f9fa;"
+                                                                                        onerror="this.src='https://via.placeholder.com/400x300?text=Lỗi+tải+ảnh'">
+                                                                                    <!-- Badge hiển thị số ảnh -->
+                                                                                    <div
+                                                                                        class="position-absolute top-0 end-0 m-2">
+                                                                                        <span
+                                                                                            class="badge bg-dark bg-opacity-75">
+                                                                                            <%= index + 1 %> / <%=
+                                                                                                    images.length %>
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <% }); %>
+                                                                        </div>
+
+                                                                        <!-- Controls (only if multiple images) -->
+                                                                        <% if (device.hinhAnh.length> 1) { %>
+                                                                            <button class="carousel-control-prev"
+                                                                                type="button"
+                                                                                data-bs-target="#deviceImageCarousel"
+                                                                                data-bs-slide="prev">
+                                                                                <span class="carousel-control-prev-icon"
+                                                                                    aria-hidden="true"></span>
+                                                                                <span
+                                                                                    class="visually-hidden">Previous</span>
+                                                                            </button>
+                                                                            <button class="carousel-control-next"
+                                                                                type="button"
+                                                                                data-bs-target="#deviceImageCarousel"
+                                                                                data-bs-slide="next">
+                                                                                <span class="carousel-control-next-icon"
+                                                                                    aria-hidden="true"></span>
+                                                                                <span
+                                                                                    class="visually-hidden">Next</span>
+                                                                            </button>
+                                                                            <% } %>
+                                                            </div>
+                                                            <% } else { %>
+                                                                <div class="text-muted py-5">
+                                                                    <i class="fas fa-image fa-3x mb-3"></i>
+                                                                    <p>Chưa có hình ảnh</p>
+                                                                </div>
+                                                                <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <%- include('../../../views/partials/footer') %>
+
+            <!-- Bootstrap JS -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

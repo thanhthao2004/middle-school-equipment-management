@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Biên bản Nghiệm thu</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .acceptance-detail-box { border: 1px solid #ddd; padding: 30px; border-radius: 8px; background-color: #fff; max-width: 900px; margin: 20px auto; }
+        .table-detail th, .table-detail td { font-size: 0.85rem; padding: 8px; }
+        .table-detail th { background-color: #e9ecef; }
+        .table-detail td { border-right: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <%- include('../../../views/partials/header', { currentPage: 'acceptance', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar QLTB -->
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'acceptance', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="container py-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 mb-0">CHI TIẾT NGHIỆM THU</h1>
+                        <span class="text-muted small">Quản lý thiết bị</span>
+                    </div>
+
+                    <div class="acceptance-detail-box">
+                        <h4 class="mb-4">Mã: NT007</h4>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-detail">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">STT</th>
+                                        <th colspan="2" class="text-center">Thông tin Thiết bị</th>
+                                        <th colspan="3" class="text-center">Kết quả</th>
+                                        <th colspan="2" class="text-center">Đánh giá</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Tên Danh mục</th>
+                                        <th>Tên TB</th>
+                                        <th>Số lượng đặt</th>
+                                        <th>Số lượng thực tế</th>
+                                        <th>Chất lượng</th>
+                                        <th>Lý do</th>
+                                        <th>Đạt/Không Đạt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Mock data theo mockup Sửa/Xóa -->
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Thiết bị dạy môn</td>
+                                        <td>Bộ thiết bị vẽ trên bảng trơ</td>
+                                        <td>5</td>
+                                        <td>5</td>
+                                        <td>Tốt</td>
+                                        <td></td>
+                                        <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Thiết bị dạy môn</td>
+                                        <td>Bộ thí nghiệm cơ học</td>
+                                        <td>3</td>
+                                        <td>3</td>
+                                        <td>Khá</td>
+                                        <td>Bị gãy 1 bộ -> yêu cầu đổi</td>
+                                        <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Thiết bị dạy Hóa</td>
+                                        <td>Bộ dụng cụ thí nghiệm hóa chất</td>
+                                        <td>4</td>
+                                        <td>4</td>
+                                        <td>Tốt</td>
+                                        <td>Bề ngoài nghiệm -</td>
+                                        <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Thiết bị dạy Sinh</td>
+                                        <td>Bộ kính hiển vi</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>Trung bình</td>
+                                        <td>1 kính bị mờ -> đề xuất bảo trì</td>
+                                        <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>Thiết bị dạy Tin</td>
+                                        <td>Máy chiếu</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>Tốt</td>
+                                        <td></td>
+                                        <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button class="btn btn-secondary" onclick="window.history.back()">Quay lại</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../../../views/partials/footer') %>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

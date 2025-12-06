@@ -18,7 +18,11 @@ const departments = ["CNTT", "Vật lý", "Hóa học", "Sinh học", "Toán"];
 
 // --- DANH SÁCH BÁO CÁO ---
 router.get("/", (req, res) => {
-    res.render("disposal/views/list", { disposal: dummyDisposal });
+    res.render("disposal/views/list", { 
+        disposal: dummyDisposal,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
 // --- THÊM BÁO CÁO ---
@@ -38,19 +42,35 @@ router.get("/add", (req, res) => {
     // Mảng thiết bị ban đầu trống
     const devices = [];
 
-    res.render("disposal/views/add", { code: newCode, year, created_at, devices });
+    res.render("disposal/views/add", { 
+        code: newCode, 
+        year, 
+        created_at, 
+        devices,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
-// --- TRANG TẠO BÁO CÁO ---
-router.get("/add", (req, res) => {
-    const lastCodeNumber = 7; // giả lập TL007
-    const newCode = "TL" + String(lastCodeNumber).padStart(3, "0");
+// --- TRANG TẠO BÁO CÁO (alias for /add) ---
+router.get("/create", (req, res) => {
+    // Redirect to /add or render same view
+    const lastDisposal = dummyDisposal[dummyDisposal.length - 1];
+    let lastCodeNumber = parseInt(lastDisposal.code.slice(2));
+    const newCode = "TL" + String(lastCodeNumber + 1).padStart(3, "0");
     const currentYear = new Date().getFullYear();
     const year = `${currentYear}-${currentYear + 1}`;
     const created_at = new Date().toLocaleDateString("vi-VN");
-    const devices = [];
+    const devices = req.query.devices ? JSON.parse(req.query.devices) : [];
 
-    res.render("disposal/views/add", { code: newCode, year, created_at, devices });
+    res.render("disposal/views/add", { 
+        code: req.query.code || newCode, 
+        year: req.query.year || year, 
+        created_at: req.query.created_at || created_at, 
+        devices,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
 // --- TRANG ADD DEVICES --- //
@@ -68,7 +88,10 @@ router.get("/add-devices", (req, res) => {
         created_at, 
         devices, 
         deviceTypes, 
-        departments });
+        departments,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
 // ------------------------
@@ -85,7 +108,13 @@ router.get("/edit/:id", (req, res) => {
     ];
 
     // Truyền thêm deviceTypes và departments
-    res.render("disposal/views/edit", { disposal, deviceTypes, departments });
+    res.render("disposal/views/edit", { 
+        disposal, 
+        deviceTypes, 
+        departments,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
 });
 
 
@@ -150,7 +179,60 @@ router.get("/view/:id", (req, res) => {
         ]
     };
 
-    res.render("disposal/views/view", { disposal, deviceTypes, departments });
+    res.render("disposal/views/view", { 
+        disposal, 
+        deviceTypes, 
+        departments,
+        currentPage: 'disposal',
+        user: req.user || { role: 'ql_thiet_bi' }
+    });
+});
+
+// =============================================
+// PRINCIPAL ROUTES (Hiệu trưởng - Duyệt thanh lý)
+// =============================================
+// GET /disposal/approve - Danh sách báo cáo thanh lý cần duyệt
+router.get("/approve", (req, res) => {
+    const pendingDisposals = dummyDisposal.filter(d => d.status === 'pending' || !d.status);
+    res.render("disposal/views/list", { 
+        disposal: pendingDisposals, 
+        deviceTypes, 
+        departments,
+        currentPage: 'disposal-approve',
+        user: req.user || { role: 'hieu_truong' }
+    });
+});
+
+// POST /disposal/approve/:id - Duyệt báo cáo thanh lý
+router.post("/approve/:id", (req, res) => {
+    // TODO: Implement approve logic
+    // Check if user is principal, redirect to principal route, else manager route
+    const userRole = req.user?.role || 'ql_thiet_bi';
+    if (userRole === 'hieu_truong') {
+        return res.redirect("/principal/disposal/approve");
+    }
+    return res.redirect("/manager/disposal");
+});
+
+// ==========================
+// POST Routes for CRUD operations
+// ==========================
+router.post("/", (req, res) => {
+    // TODO: Implement create disposal logic
+    // For now, just redirect back to list
+    res.redirect("/manager/disposal");
+});
+
+router.post("/:id", (req, res) => {
+    // TODO: Implement update disposal logic
+    // For now, just redirect back to list
+    res.redirect("/manager/disposal");
+});
+
+router.post("/:id/delete", (req, res) => {
+    // TODO: Implement delete disposal logic
+    // For now, just redirect back to list
+    res.redirect("/manager/disposal");
 });
 
 module.exports = router;

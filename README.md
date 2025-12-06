@@ -7,6 +7,8 @@ Express + EJS app organized by feature/use case. Each feature owns its API layer
 ```bash
 npm install
 node app.js  # http://localhost:3000
+npm start
+npm run dev # nếu có node demon
 ```
 
 Environment/config:

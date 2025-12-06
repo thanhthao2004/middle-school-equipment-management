@@ -1,175 +1,56 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const compression = require('compression');
-const path = require('path');
+/**
+ * Main Application Entry Point
+ * Tổ chức code theo cấu trúc rõ ràng, dễ đọc và dễ quản lý
+ */
 
-// Từ HEAD
-const config = require('./src/config/env');
-const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware');
-
-// Từ features/borrow
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
 require('dotenv').config();
 
+const express = require('express');
+const config = require('./src/config/env');
+const logger = require('./src/config/logger');
+const { configureMiddleware } = require('./src/config/middleware');
+const { configureViewEngine } = require('./src/config/view-engine');
+const { initializeDatabase } = require('./src/config/database');
+const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware');
+const routes = require('./src/routes');
+
+// ==========================
+// Initialize Express App
+// ==========================
 const app = express();
 
 // ==========================
-//  Cấu hình view engine
+// Configuration
 // ==========================
-// Cấu hình views directory: tìm trong src/features để có thể render feature views
-// Layouts và partials vẫn có thể được include từ src/views trong EJS templates
-// Cấu hình nơi Express tìm file template (EJS) để render HTML.
-app.set('views', path.join(__dirname, 'src/features')); 
-app.set('view engine', 'ejs');
+configureViewEngine(app);
+configureMiddleware(app);
 
 // ==========================
-//  Middleware & Static
+// Database Connection
 // ==========================
-// Compression middleware - nén response để giảm băng thông
-app.use(compression({
-	filter: (req, res) => {
-		// Chỉ nén nếu client hỗ trợ
-		if (req.headers['x-no-compression']) {
-			return false;
-		}
-		// Sử dụng compression mặc định
-		return compression.filter(req, res);
-	},
-	level: 6, // Mức độ nén (1-9, 6 là cân bằng tốt)
-	threshold: 1024 // Chỉ nén response > 1KB
-}));
-
-app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
-app.use(bodyParser.json({ limit: '10mb' }));
-
-app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
-app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
-// Serve public files với prefix /public để rõ ràng hơn
-app.use('/public', express.static(path.join(__dirname, 'public')));
+initializeDatabase();
 
 // ==========================
-//  Kết nối MongoDB (không block app startup)
+// Routes
 // ==========================
-// Kết nối MongoDB trong background, không chờ đợi
-setImmediate(async () => {
-	try {
-		const { connectMongo } = require('./src/config/db');
-		await connectMongo();
-		logger.info('MongoDB connection initiated');
-	} catch (e) {
-		logger.error('MongoDB init failed:', e.message);
-		logger.warn(' ** Server vẫn chạy nhưng chưa kết nối được MongoDB');
-		logger.warn(' ** Hướng dẫn: Chạy "npm run db:up" để khởi động MongoDB');
-	}
-});
+app.use(routes);
 
 // ==========================
-//  ROUTES
+// Error Handling
 // ==========================
-// Borrow (mượn thiết bị)
-const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
-app.use('/borrow', borrowRoutes);
-
-// Purchasing Plans
-const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
-app.use('/purchasing-plans', purchasingRoutes);
-// ⚙️ View Engine
-// ==========================
-app.set('views', path.join(__dirname, 'src/views'));
-app.set('view engine', 'ejs');
+app.use(notFoundHandler); // 404 - Phải đặt sau tất cả routes
+app.use(errorHandler);    // 500 - Phải đặt cuối cùng
 
 // ==========================
-// ⚙️ Middleware
+// Start Server
 // ==========================
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
-app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
-app.use(express.static(path.join(__dirname, 'public')));
-
-// ==========================
-// ⚙️ MongoDB Connection
-// ==========================
-(async () => {
-    try {
-        const { connectMongo } = require('./src/config/db');
-        await connectMongo();
-        console.log('MongoDB connection initiated');
-    } catch (e) {
-        console.error('MongoDB init failed:', e.message);
-        console.warn(' Server vẫn chạy nhưng chưa kết nối được MongoDB');
-        console.warn(' Hướng dẫn: Chạy "npm run db:up" để khởi động MongoDB');
+const PORT = config.port || 3000;
+app.listen(PORT, () => {
+    logger.info(`Server đang chạy tại: http://localhost:${PORT}`);
+    logger.info(`Environment: ${config.nodeEnv}`);
+    if (process.send) {
+        process.send('ready');
     }
-})();
-
-// ==========================
-// ⚙️ Routes
-// ==========================
-const borrowRoutes = require('./src/features/borrow/routes/borrow.routes');
-const purchasingRoutes = require('./src/features/purchasing-plans/routes/purchasing.routes');
-const categoriesRoutes = require('./src/features/categories/routes/categories.routes');
-
-app.use('/borrow', borrowRoutes);
-app.use('/purchasing-plans', purchasingRoutes);
-app.use('/categories', categoriesRoutes);
-// app.get('/', (req, res) => res.redirect('/teacher/home'));
-
-// Disposal feature
-const disposalRoutes = require('./src/features/disposal/routes/disposal.routes');
-app.use('/disposal', disposalRoutes);
-
-// Redirect trang chủ
-app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
-
-// ==========================
-// ⚙️ 404 Handler
-// ==========================
-app.use((req, res, next) => {
-    res.status(404).render('error_page', {
-        title: '404 - Không tìm thấy trang',
-        message: 'Trang bạn yêu cầu không tồn tại.',
-        status: 404
-    });
-});
-
-// Devices feature
-const devicesRoutes = require('./src/features/devices/routes/devices.routes');
-app.use('/devices', devicesRoutes);
-
-// Root redirect
-app.get('/', (req, res) => res.redirect('/borrow/teacher-home'));
-
-// ==========================
-// ⚙️ 500 Handler
-// ==========================
-app.use((err, req, res, next) => {
-    console.error('SERVER ERROR:', err.stack);
-    const status = err.status || 500;
-
-    res.status(status).render('error_page', {
-        title: `${status} - Lỗi máy chủ`,
-        message: 'Đã xảy ra lỗi nội bộ trên server.',
-        status: status,
-        errorDetail: app.get('env') === 'development' ? err.stack : undefined
-    });
-});
-
-// ==========================
-// ⚙️ Start Server
-// ==========================
-app.listen(config.port, () => {
-  logger.info(`Server đang chạy tại: http://localhost:${config.port}`);
-  logger.info(`Environment: ${config.nodeEnv}`);
-  if (process.send) {
-    process.send('ready');
-  }
-});
-    console.log(`Server đang chạy tại: http://localhost:${config.port}`);
-    console.log(`Environment: ${config.nodeEnv}`);
 });
 
 module.exports = app;

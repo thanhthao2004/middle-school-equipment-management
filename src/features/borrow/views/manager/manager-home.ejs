@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trang chủ QLTB</title>
+  <!-- Bootstrap 5.3.0 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome 6.4.0 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/public/stylesheets/style.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Header -->
+  <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'ql_thiet_bi', name: 'QLTB' }; %>
+  <%- include('../../../../views/partials/header', { currentPage: 'manager-home', user: userObj }) %>
+
+  <div class="container-fluid p-0">
+    <div class="row g-0">
+      <!-- Sidebar QLTB -->
+      <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'manager-home', user: userObj }) %>
+
+      <!-- Main Content -->
+      <div class="col-md-9 col-lg-10 main-content">
+        <div class="container py-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h1 class="h3 mb-1" style="color: var(--dark-gray)">
+                Trang chủ Quản lý Thiết bị
+              </h1>
+              <p class="text-muted mb-0">
+                Hệ thống quản lý mượn trả và kiểm kê thiết bị
+              </p>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <!-- Thẻ 1: Duyệt Phiếu Mượn/Trả -->
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card feature-card h-100 shadow-sm">
+                <div class="card-body d-flex gap-3 align-items-start">
+                  <div class="feature-icon bg-warning text-dark rounded p-3">
+                    <i class="fas fa-clipboard-check fa-2x"></i>
+                  </div>
+                  <div>
+                    <h5 class="card-title mb-1">Duyệt Phiếu Mượn & Trả</h5>
+                    <p class="card-text text-muted mb-3">
+                      Xem và xử lý các yêu cầu mượn/trả đang chờ duyệt.
+                    </p>
+                    <a class="btn btn-outline-primary btn-sm" href="/manager/approvals">
+                      Duyệt ngay <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Thẻ 2: Quản lý Thiết bị -->
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card feature-card h-100 shadow-sm">
+                <div class="card-body d-flex gap-3 align-items-start">
+                  <div class="feature-icon bg-primary text-white rounded p-3">
+                    <i class="fas fa-laptop fa-2x"></i>
+                  </div>
+                  <div>
+                    <h5 class="card-title mb-1">Quản lý Thiết bị</h5>
+                    <p class="card-text text-muted mb-3">
+                      Thêm, sửa, xóa các thiết bị và danh mục.
+                    </p>
+                    <a class="btn btn-outline-primary btn-sm" href="/manager/devices">
+                      Quản lý <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Thẻ 3: Báo cáo Định kỳ -->
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card feature-card h-100 shadow-sm">
+                <div class="card-body d-flex gap-3 align-items-start">
+                  <div class="feature-icon bg-success text-white rounded p-3">
+                    <i class="fas fa-chart-line fa-2x"></i>
+                  </div>
+                  <div>
+                    <h5 class="card-title mb-1">Báo cáo Định kỳ</h5>
+                    <p class="card-text text-muted mb-3">
+                      Xem các báo cáo về tình trạng sử dụng và thanh lý thiết bị.
+                    </p>
+                    <a class="btn btn-outline-primary btn-sm" href="/manager/periodic-reports">
+                      Xem báo cáo <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Thẻ 4: Danh mục thiết bị -->
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card feature-card h-100 shadow-sm">
+                <div class="card-body d-flex gap-3 align-items-start">
+                  <div class="feature-icon bg-info text-white rounded p-3">
+                    <i class="fas fa-folder fa-2x"></i>
+                  </div>
+                  <div>
+                    <h5 class="card-title mb-1">Danh mục Thiết bị</h5>
+                    <p class="card-text text-muted mb-3">
+                      Quản lý các danh mục và phân loại thiết bị.
+                    </p>
+                    <a class="btn btn-outline-primary btn-sm" href="/manager/categories">
+                      Quản lý <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Thẻ 5: Nhà cung cấp -->
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card feature-card h-100 shadow-sm">
+                <div class="card-body d-flex gap-3 align-items-start">
+                  <div class="feature-icon bg-secondary text-white rounded p-3">
+                    <i class="fas fa-building fa-2x"></i>
+                  </div>
+                  <div>
+                    <h5 class="card-title mb-1">Nhà cung cấp</h5>
+                    <p class="card-text text-muted mb-3">
+                      Quản lý thông tin các nhà cung cấp thiết bị.
+                    </p>
+                    <a class="btn btn-outline-primary btn-sm" href="/manager/suppliers">
+                      Quản lý <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Thẻ 6: Biên bản nghiệm thu -->
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card feature-card h-100 shadow-sm">
+                <div class="card-body d-flex gap-3 align-items-start">
+                  <div class="feature-icon bg-danger text-white rounded p-3">
+                    <i class="fas fa-file-alt fa-2x"></i>
+                  </div>
+                  <div>
+                    <h5 class="card-title mb-1">Biên bản Nghiệm thu</h5>
+                    <p class="card-text text-muted mb-3">
+                      Quản lý các biên bản nghiệm thu thiết bị.
+                    </p>
+                    <a class="btn btn-outline-primary btn-sm" href="/manager/acceptance">
+                      Xem biên bản <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

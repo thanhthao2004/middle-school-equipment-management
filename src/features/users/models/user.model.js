@@ -6,6 +6,7 @@ const UserSchema = new Schema(
 	{
 		maNV: { type: String, required: true, unique: true, trim: true },
 		hoTen: { type: String, required: true, trim: true },
+		username: { type: String, required: true, unique: true, trim: true, lowercase: true },
 		email: { type: String, required: true, lowercase: true, trim: true, unique: true },
 		soDienThoai: { type: String, default: '' },
 		diaChi: { type: String, default: '' },
@@ -18,6 +19,7 @@ const UserSchema = new Schema(
 );
 
 UserSchema.index({ maNV: 1 });
+UserSchema.index({ username: 1 });
 UserSchema.index({ email: 1 });
 
 UserSchema.pre('validate', async function ensureMaNV(next) {

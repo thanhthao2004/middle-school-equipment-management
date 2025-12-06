@@ -1,409 +1,451 @@
-// Device Management JavaScript
-// Global variables
-let allDevices = [];
-let filteredDevices = [];
+/* ================================
+   devices.js - Scripts for Devices Management
+================================ */
 
-// Initialize page
-document.addEventListener('DOMContentLoaded', function() {
-    initializePage();
-    setupEventListeners();
-});
+document.addEventListener("DOMContentLoaded", () => {
+    /* -----------------------------
+       Delete Modal Handler
+    ----------------------------- */
+    const deleteModal = document.getElementById("deleteModal");
+    const deleteText = document.getElementById("deleteText");
+    const deleteForm = document.getElementById("deleteForm");
+    const cancelBtn = document.getElementById("cancelBtn");
 
-function initializePage() {
-    // Initialize all devices from table
-    const tableBody = document.getElementById('equipmentTableBody');
-    if (tableBody) {
-        allDevices = Array.from(tableBody.querySelectorAll('tr'));
-        filteredDevices = [...allDevices];
-    }
-}
+    const openDeleteModal = (id, name) => {
+        if (!deleteModal || !deleteText || !deleteForm) return;
 
-function setupEventListeners() {
-    // Search input
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(applyFilters, 300));
-    }
-    
-    // Filter selects
-    const filterIds = [
-        'categoryFilter', 
-        'classFilter', 
-        'statusFilter', 
-        'conditionFilter', 
-        'locationFilter', 
-        'supplierFilter'
-    ];
-    
-    filterIds.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('change', applyFilters);
-        }
-    });
-    
-    // Date filters
-    const dateFilters = ['dateFrom', 'dateTo'];
-    dateFilters.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('change', applyFilters);
-        }
-    });
-}
-
-// Debounce function for search
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+        deleteText.textContent = `Bạn có chắc chắn muốn xóa thiết bị "${name}" không? Hành động này không thể hoàn tác!`;
+        deleteForm.action = `/manager/devices/delete/${id}`;
+        deleteModal.style.display = "flex";
+        setTimeout(() => deleteModal.classList.add("active"), 10);
     };
-}
 
-// Apply all filters
-function applyFilters() {
-    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
-    const category = document.getElementById('categoryFilter')?.value || '';
-    const classFilter = document.getElementById('classFilter')?.value || '';
-    const status = document.getElementById('statusFilter')?.value || '';
-    const condition = document.getElementById('conditionFilter')?.value || '';
-    const location = document.getElementById('locationFilter')?.value || '';
-    const supplier = document.getElementById('supplierFilter')?.value || '';
-    const dateFrom = document.getElementById('dateFrom')?.value || '';
-    const dateTo = document.getElementById('dateTo')?.value || '';
-    
-    const tableBody = document.getElementById('equipmentTableBody');
-    if (!tableBody) return;
-    
-    const rows = tableBody.querySelectorAll('tr');
-    let visibleCount = 0;
-    
-    rows.forEach(row => {
-        let show = true;
-        
-        // Search filter
-        if (searchTerm) {
-            const text = row.textContent.toLowerCase();
-            if (!text.includes(searchTerm)) {
-                show = false;
+    const closeDeleteModal = () => {
+        if (!deleteModal) return;
+
+        deleteModal.classList.remove("active");
+        deleteModal.addEventListener("transitionend", () => {
+            if (!deleteModal.classList.contains("active")) {
+                deleteModal.style.display = "none";
             }
-        }
-        
-        // Category filter
-        if (show && category) {
-            const rowCategory = row.getAttribute('data-category') || '';
-            if (!rowCategory.includes(category)) {
-                show = false;
+        }, { once: true });
+    };
+
+    // Handle delete buttons
+    document.querySelectorAll(".btn-delete").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const deviceId = btn.dataset.id;
+            const deviceName = btn.dataset.name;
+            if (deviceId && deviceName) {
+                openDeleteModal(deviceId, deviceName);
             }
-        }
-        
-        // Class filter
-        if (show && classFilter) {
-            const rowClass = row.getAttribute('data-class') || '';
-            if (!rowClass.includes(classFilter)) {
-                show = false;
+        });
+    });
+
+    // Close modal handlers
+    if (cancelBtn) {
+        cancelBtn.addEventListener("click", closeDeleteModal);
+    }
+
+    if (deleteModal) {
+        deleteModal.addEventListener("click", (e) => {
+            if (e.target === deleteModal) {
+                closeDeleteModal();
             }
-        }
-        
-        // Status filter
-        if (show && status) {
-            const rowStatus = row.getAttribute('data-status') || '';
-            if (rowStatus !== status) {
-                show = false;
+        });
+    }
+
+    /* -----------------------------
+       Form Validation (Improvement: prevent submission with errors)
+    ----------------------------- */
+    const deviceForm = document.getElementById('deviceForm');
+    if (deviceForm) {
+        deviceForm.addEventListener('submit', function (e) {
+            const ngayNhapInput = document.getElementById('ngayNhap');
+            const tenTBInput = document.getElementById('tenTB');
+            const soLuongInput = document.getElementById('soLuong');
+
+            let hasError = false;
+            let errorMessages = [];
+
+            // Validate Tên thiết bị (required)
+            if (tenTBInput && tenTBInput.value.trim() === '') {
+                hasError = true;
+                errorMessages.push('- Tên thiết bị không được để trống');
+                tenTBInput.classList.add('is-invalid');
+            } else if (tenTBInput) {
+                tenTBInput.classList.remove('is-invalid');
             }
-        }
-        
-        // Condition filter
-        if (show && condition) {
-            const rowCondition = row.getAttribute('data-condition') || '';
-            if (rowCondition !== condition) {
-                show = false;
-            }
-        }
-        
-        // Location filter
-        if (show && location) {
-            const locationCell = row.cells[8]; // Vị trí lưu trữ column
-            if (locationCell && !locationCell.textContent.includes(location)) {
-                show = false;
-            }
-        }
-        
-        // Supplier filter
-        if (show && supplier) {
-            const supplierCell = row.cells[9]; // Nhà cung cấp column
-            if (supplierCell && !supplierCell.textContent.includes(supplier)) {
-                show = false;
-            }
-        }
-        
-        // Date filter
-        if (show && (dateFrom || dateTo)) {
-            const dateCell = row.cells[10]; // Ngày nhập column
-            if (dateCell) {
-                const dateText = dateCell.textContent.trim();
-                if (dateText !== 'N/A' && dateText) {
-                    try {
-                        const rowDate = new Date(dateText.split('/').reverse().join('-'));
-                        if (dateFrom) {
-                            const fromDate = new Date(dateFrom);
-                            if (rowDate < fromDate) {
-                                show = false;
-                            }
-                        }
-                        if (dateTo) {
-                            const toDate = new Date(dateTo);
-                            toDate.setHours(23, 59, 59, 999);
-                            if (rowDate > toDate) {
-                                show = false;
-                            }
-                        }
-                    } catch (e) {
-                        // If date parsing fails, show the row
-                    }
+
+            // Validate Số lượng (must be positive integer)
+            if (soLuongInput && soLuongInput.value.trim() !== '') {
+                const soLuong = parseInt(soLuongInput.value);
+                if (isNaN(soLuong) || soLuong < 0) {
+                    hasError = true;
+                    errorMessages.push('- Số lượng phải là số nguyên dương (≥ 0)');
+                    soLuongInput.classList.add('is-invalid');
+                } else {
+                    soLuongInput.classList.remove('is-invalid');
                 }
             }
+
+            // Validate Ngày nhập (cannot be future date)
+            if (ngayNhapInput && ngayNhapInput.value) {
+                const selectedDate = new Date(ngayNhapInput.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (selectedDate > today) {
+                    hasError = true;
+                    errorMessages.push('- Ngày nhập không thể là ngày trong tương lai');
+                    ngayNhapInput.classList.add('is-invalid');
+                } else {
+                    ngayNhapInput.classList.remove('is-invalid');
+                }
+            }
+
+            // Show errors and prevent submission if validation fails
+            if (hasError) {
+                e.preventDefault();
+                if (errorMessages.length > 0) {
+                    alert('Vui lòng kiểm tra lại:\n\n' + errorMessages.join('\n'));
+                }
+                return false;
+            }
+
+            // Show loading spinner during submission
+            showLoadingSpinner();
+        });
+
+        // Real-time validation for required fields
+        const tenTBInput = document.getElementById('tenTB');
+        const soLuongInput = document.getElementById('soLuong');
+        const ngayNhapInput = document.getElementById('ngayNhap');
+
+        if (tenTBInput) {
+            tenTBInput.addEventListener('blur', () => {
+                if (!tenTBInput.value.trim()) {
+                    tenTBInput.classList.add('is-invalid');
+                } else {
+                    tenTBInput.classList.remove('is-invalid');
+                }
+            });
+
+            tenTBInput.addEventListener('input', () => {
+                if (tenTBInput.value.trim()) {
+                    tenTBInput.classList.remove('is-invalid');
+                }
+            });
         }
-        
-        // Show/hide row
-        if (show) {
-            row.style.display = '';
-            visibleCount++;
-        } else {
-            row.style.display = 'none';
-        }
-    });
-    
-    // Show empty state if no rows visible
-    showEmptyStateIfNeeded(visibleCount === 0);
-}
 
-// Reset all filters
-function resetFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('categoryFilter').value = '';
-    document.getElementById('classFilter').value = '';
-    document.getElementById('statusFilter').value = '';
-    document.getElementById('conditionFilter').value = '';
-    document.getElementById('locationFilter').value = '';
-    document.getElementById('supplierFilter').value = '';
-    document.getElementById('dateFrom').value = '';
-    document.getElementById('dateTo').value = '';
-    
-    applyFilters();
-}
-
-// Toggle advanced filters
-function toggleAdvancedFilters() {
-    const advancedFilters = document.getElementById('advancedFilters');
-    const toggleBtn = document.getElementById('toggleAdvancedBtn');
-    const icon = toggleBtn.querySelector('i');
-    
-    if (advancedFilters.style.display === 'none' || !advancedFilters.style.display) {
-        advancedFilters.style.display = 'block';
-        icon.classList.remove('fa-chevron-down');
-        icon.classList.add('fa-chevron-up');
-    } else {
-        advancedFilters.style.display = 'none';
-        icon.classList.remove('fa-chevron-up');
-        icon.classList.add('fa-chevron-down');
-    }
-}
-
-// Clear advanced filters
-function clearAdvancedFilters() {
-    document.getElementById('locationFilter').value = '';
-    document.getElementById('supplierFilter').value = '';
-    document.getElementById('dateFrom').value = '';
-    document.getElementById('dateTo').value = '';
-    
-    applyFilters();
-}
-
-// Show empty state if needed
-function showEmptyStateIfNeeded(show) {
-    const tableBody = document.getElementById('equipmentTableBody');
-    if (!tableBody) return;
-    
-    const tableCard = tableBody.closest('.card');
-    if (!tableCard) return;
-    
-    // Check if empty state already exists
-    let emptyState = tableCard.querySelector('.empty-state-filtered');
-    
-    if (show && !emptyState) {
-        // Create empty state message
-        emptyState = document.createElement('div');
-        emptyState.className = 'empty-state-filtered text-center py-5';
-        emptyState.innerHTML = `
-            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-            <h5 class="text-muted">Không tìm thấy thiết bị nào phù hợp với bộ lọc</h5>
-            <button class="btn btn-outline-primary mt-3" onclick="resetFilters()">
-                <i class="fas fa-undo me-2"></i>Xóa bộ lọc
-            </button>
-        `;
-        tableCard.querySelector('.card-body').appendChild(emptyState);
-    } else if (!show && emptyState) {
-        emptyState.remove();
-    }
-}
-
-// Edit device
-function editDevice(deviceId) {
-    // Navigate to edit page
-    window.location.href = `/devices/${deviceId}/edit`;
-}
-
-// Delete device
-let currentDeleteDeviceId = null;
-let currentDeleteDeviceInfo = null;
-
-function deleteDevice(deviceId) {
-    currentDeleteDeviceId = deviceId;
-    
-    // Get device info from table row
-    const row = document.querySelector(`tr[data-device-id="${deviceId}"]`);
-    if (row) {
-        const nameCell = row.querySelector('td:nth-child(2) .fw-bold');
-        if (nameCell) {
-            currentDeleteDeviceInfo = `${nameCell.textContent.trim()} (Mã: ${deviceId})`;
-        } else {
-            currentDeleteDeviceInfo = `Mã thiết bị: ${deviceId}`;
-        }
-    } else {
-        currentDeleteDeviceInfo = `Mã thiết bị: ${deviceId}`;
-    }
-    
-    // Update modal content
-    const deviceInfoEl = document.getElementById('deviceInfo');
-    if (deviceInfoEl) {
-        deviceInfoEl.textContent = currentDeleteDeviceInfo;
-    }
-    
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-    modal.show();
-}
-
-// Confirm delete action
-document.addEventListener('DOMContentLoaded', function() {
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    if (confirmDeleteBtn) {
-        confirmDeleteBtn.addEventListener('click', function() {
-            if (currentDeleteDeviceId) {
-                // Make API call to delete device
-                fetch(`/devices/${currentDeleteDeviceId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Hide modal
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
-                        if (modal) {
-                            modal.hide();
-                        }
-                        
-                        // Show success message
-                        showDeleteSuccessMessage('Xóa thiết bị thành công!');
-                        
-                        // Reload page or remove row after a short delay
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000);
+        if (soLuongInput) {
+            soLuongInput.addEventListener('blur', () => {
+                if (soLuongInput.value.trim() !== '') {
+                    const soLuong = parseInt(soLuongInput.value);
+                    if (isNaN(soLuong) || soLuong < 0) {
+                        soLuongInput.classList.add('is-invalid');
                     } else {
-                        return response.json().then(err => Promise.reject(err));
+                        soLuongInput.classList.remove('is-invalid');
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    const errorMessage = error.message || 'Có lỗi xảy ra khi xóa thiết bị';
-                    
-                    // Hide modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
-                    if (modal) {
-                        modal.hide();
+                }
+            });
+        }
+
+        if (ngayNhapInput) {
+            ngayNhapInput.addEventListener('change', () => {
+                if (ngayNhapInput.value) {
+                    const selectedDate = new Date(ngayNhapInput.value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (selectedDate > today) {
+                        ngayNhapInput.classList.add('is-invalid');
+                    } else {
+                        ngayNhapInput.classList.remove('is-invalid');
                     }
-                    
-                    // Show error message
-                    showDeleteErrorMessage(errorMessage);
+                }
+            });
+        }
+    }
+
+    /* -----------------------------
+       Filter Form Enhancement
+    ----------------------------- */
+    const filterForm = document.getElementById("filterForm");
+    const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener("click", () => {
+            window.location.href = "/manager/devices";
+        });
+    }
+
+    /* -----------------------------
+       Table Row Animation
+    ----------------------------- */
+    const tableRows = document.querySelectorAll("table tbody tr");
+    tableRows.forEach((row, index) => {
+        row.style.opacity = "0";
+        row.style.transform = "translateY(10px)";
+        row.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+
+        setTimeout(() => {
+            row.style.opacity = "1";
+            row.style.transform = "translateY(0)";
+        }, index * 50);
+    });
+
+    /* -----------------------------
+       Input Focus Effects
+    ----------------------------- */
+    const inputs = document.querySelectorAll(".form-control, .form-select");
+    inputs.forEach(input => {
+        input.addEventListener("focus", () => {
+            input.style.borderColor = "#2563eb";
+            input.style.boxShadow = "0 0 0 0.2rem rgba(37, 99, 235, 0.25)";
+        });
+
+        input.addEventListener("blur", () => {
+            if (!input.classList.contains("is-invalid")) {
+                input.style.borderColor = "";
+                input.style.boxShadow = "";
+            }
+        });
+    });
+
+    /* -----------------------------
+       Image Preview (for create/edit forms with MULTIPLE FILE upload)
+    ----------------------------- */
+    const hinhAnhInput = document.getElementById("hinhAnh");
+    const imagePreviewContainer = document.getElementById("imagePreviewContainer");
+    const imagePreviewGrid = document.getElementById("imagePreviewGrid");
+
+    if (hinhAnhInput && imagePreviewContainer && imagePreviewGrid) {
+        hinhAnhInput.addEventListener("change", (e) => {
+            const files = Array.from(e.target.files);
+
+            // Clear previous previews
+            imagePreviewGrid.innerHTML = '';
+
+            if (files.length === 0) {
+                imagePreviewContainer.style.display = 'none';
+                return;
+            }
+
+            // Validate max 5 images
+            if (files.length > 5) {
+                alert('Chỉ được chọn tối đa 5 ảnh!');
+                hinhAnhInput.value = '';
+                imagePreviewContainer.style.display = 'none';
+                return;
+            }
+
+            // Process each file
+            files.forEach((file, index) => {
+                // Validate file type
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert(`File "${file.name}" không phải định dạng ảnh hợp lệ!`);
+                    return;
+                }
+
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`File "${file.name}" vượt quá 5MB!`);
+                    return;
+                }
+
+                // Create preview for each image
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const col = document.createElement('div');
+                    col.className = 'col-6 col-md-4 col-lg-3';
+
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'position-relative';
+                    imgContainer.style.border = '2px solid #dee2e6';
+                    imgContainer.style.borderRadius = '8px';
+                    imgContainer.style.overflow = 'hidden';
+                    imgContainer.style.aspectRatio = '1/1';
+
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.className = 'w-100 h-100';
+                    img.style.objectFit = 'cover';
+                    img.alt = `Preview ${index + 1}`;
+
+                    const badge = document.createElement('span');
+                    badge.className = 'position-absolute top-0 start-0 badge bg-primary m-1';
+                    badge.textContent = `${index + 1}`;
+
+                    imgContainer.appendChild(img);
+                    imgContainer.appendChild(badge);
+                    col.appendChild(imgContainer);
+                    imagePreviewGrid.appendChild(col);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            imagePreviewContainer.style.display = 'block';
+        });
+    }
+
+    /* -----------------------------
+       Confirm Navigation (if form has changes)
+    ----------------------------- */
+    const forms = document.querySelectorAll("form");
+    forms.forEach(form => {
+        let formChanged = false;
+        const formInputs = form.querySelectorAll("input, select, textarea");
+
+        formInputs.forEach(input => {
+            input.addEventListener("change", () => {
+                formChanged = true;
+            });
+        });
+
+        // Check before leaving page
+        window.addEventListener("beforeunload", (e) => {
+            if (formChanged) {
+                e.preventDefault();
+                e.returnValue = "";
+            }
+        });
+
+        form.addEventListener("submit", () => {
+            formChanged = false;
+        });
+    });
+
+    /* -----------------------------
+       Custom Location Handler (Edit/Create Forms)
+       Improved version with name attribute switching
+    ----------------------------- */
+    const locationSelect = document.getElementById('viTriLuuTru');
+    const customLocationInput = document.getElementById('customViTriLuuTru');
+
+    if (locationSelect && customLocationInput) {
+        // Khởi tạo trạng thái ban đầu (cho edit form khi load với custom value)
+        if (locationSelect.value === '__custom__') {
+            customLocationInput.style.display = 'block';
+            customLocationInput.setAttribute('name', 'viTriLuuTru');
+            locationSelect.removeAttribute('name');
+        } else {
+            customLocationInput.style.display = 'none';
+        }
+
+        // Toggle custom input visibility
+        locationSelect.addEventListener('change', function () {
+            if (this.value === '__custom__') {
+                customLocationInput.style.display = 'block';
+                customLocationInput.setAttribute('name', 'viTriLuuTru');
+                this.removeAttribute('name');
+                customLocationInput.focus();
+            } else {
+                customLocationInput.style.display = 'none';
+                customLocationInput.removeAttribute('name');
+                this.setAttribute('name', 'viTriLuuTru');
+            }
+        });
+    }
+
+    /* -----------------------------
+       Delete Image Handler (Edit Form)
+       With live count update and text refresh
+    ----------------------------- */
+    const deletedImagesInput = document.getElementById('deletedImages');
+    const imageCountSpan = document.getElementById('imageCount');
+
+    if (deletedImagesInput) {
+        let deletedImages = [];
+
+        // Handle delete image button clicks
+        document.querySelectorAll('.delete-image-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const imagePath = this.dataset.imagePath;
+                const imageCard = this.closest('[data-image-path]');
+
+                if (confirm('Bạn có chắc muốn xóa ảnh này?')) {
+                    // Add to deleted list
+                    deletedImages.push(imagePath);
+                    deletedImagesInput.value = JSON.stringify(deletedImages);
+
+                    // Remove from UI
+                    imageCard.remove();
+
+                    // Update count
+                    const currentCount = document.querySelectorAll('#currentImagesGrid [data-image-path]').length;
+                    if (imageCountSpan) {
+                        imageCountSpan.textContent = currentCount;
+                    }
+
+                    // Hide grid if no images left
+                    if (currentCount === 0) {
+                        const grid = document.getElementById('currentImagesGrid');
+                        if (grid && grid.parentElement) {
+                            grid.parentElement.style.display = 'none';
+                        }
+                    }
+
+                    // Cập nhật thông báo giới hạn ảnh (chỉ cho edit form)
+                    const helpText = document.querySelector('#hinhAnhFile + small.form-text');
+                    if (helpText && currentCount >= 0) {
+                        helpText.innerHTML =
+                            '<i class="fas fa-info-circle"></i> Chọn thêm ảnh mới (tối đa ' +
+                            Math.max(0, 5 - currentCount) +
+                            ' ảnh). Ảnh mới sẽ được THÊM vào.';
+                    }
+                }
+            });
+        });
+    }
+
+    /* -----------------------------
+       Image Preview Handler (Create/Edit Forms)
+       Works with 'hinhAnhFile' ID for edit, 'hinhAnh' for create
+    ----------------------------- */
+    const imageInput = document.getElementById('hinhAnhFile') || document.getElementById('hinhAnh');
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    const previewGrid = document.getElementById('imagePreviewGrid');
+
+    if (imageInput && previewContainer && previewGrid) {
+        imageInput.addEventListener('change', function () {
+            previewGrid.innerHTML = '';
+            if (this.files.length > 0) {
+                previewContainer.style.display = 'block';
+                Array.from(this.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const col = document.createElement('div');
+                        col.className = 'col-6 col-md-4 col-lg-3';
+                        col.innerHTML = `
+                            <div style="border: 2px solid #ccc; border-radius: 8px; overflow: hidden; aspect-ratio: 1/1;">
+                                <img src="${e.target.result}" alt="Ảnh mới" class="w-100 h-100" style="object-fit: cover;">
+                            </div>
+                        `;
+                        previewGrid.appendChild(col);
+                    };
+                    reader.readAsDataURL(file);
                 });
+            } else {
+                previewContainer.style.display = 'none';
             }
         });
     }
 });
 
-function showDeleteSuccessMessage(message) {
-    const toast = document.createElement('div');
-    toast.className = 'toast align-items-center text-white bg-success border-0';
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                <i class="fas fa-check-circle me-2"></i>${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    `;
-    
-    let container = document.querySelector('.toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.className = 'toast-container position-fixed top-0 end-0 p-3';
-        document.body.appendChild(container);
-    }
-    
-    container.appendChild(toast);
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
-    
-    toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
-    });
-}
+/* -----------------------------
+   Helper Functions
+----------------------------- */
+function showLoadingSpinner() {
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.id = 'loadingOverlay';
 
-function showDeleteErrorMessage(message) {
-    const toast = document.createElement('div');
-    toast.className = 'toast align-items-center text-white bg-danger border-0';
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                <i class="fas fa-exclamation-circle me-2"></i>${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    `;
-    
-    let container = document.querySelector('.toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.className = 'toast-container position-fixed top-0 end-0 p-3';
-        document.body.appendChild(container);
-    }
-    
-    container.appendChild(toast);
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
-    
-    toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
-    });
-}
+    const spinner = document.createElement('div');
+    spinner.className = 'loading-spinner';
 
-// Add device
-function addDevice() {
-    window.location.href = '/devices/create';
+    overlay.appendChild(spinner);
+    document.body.appendChild(overlay);
 }
-

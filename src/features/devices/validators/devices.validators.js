@@ -1,163 +1,114 @@
-// Devices Validators
-const { body, param, query } = require('express-validator');
+const { body } = require('express-validator');
 
-const createDevice = [
+const validateCreateDevice = [
     body('tenTB')
         .trim()
         .notEmpty()
-        .withMessage('Vui lòng nhập tên thiết bị.')
-        .isLength({ min: 1, max: 200 })
-        .withMessage('Tên thiết bị phải từ 1-200 ký tự'),
-    
-    body('category')
-        .notEmpty()
-        .withMessage('Vui lòng chọn danh mục thiết bị.'),
-    
-    body('soLuong')
-        .notEmpty()
-        .withMessage('Số lượng tồn là bắt buộc.')
-        .isInt({ min: 0 })
-        .withMessage('Số lượng tồn phải là số nguyên không âm.'),
-    
-    body('viTriLuuTru')
-        .notEmpty()
-        .withMessage('Vui lòng chọn vị trí lưu trữ thiết bị.'),
-    
-    body('supplier')
-        .notEmpty()
-        .withMessage('Vui lòng chọn nhà cung cấp.'),
-    
-    body('ngayNhap')
-        .notEmpty()
-        .withMessage('Vui lòng chọn ngày nhập.')
-        .isISO8601()
-        .withMessage('Ngày nhập không hợp lệ.')
-        .custom((value) => {
-            const selectedDate = new Date(value);
-            const today = new Date();
-            today.setHours(23, 59, 59, 999);
-            
-            if (selectedDate > today) {
-                throw new Error('Ngày nhập không hợp lệ.');
-            }
-            return true;
-        }),
-    
-    body('hinhAnh')
-        .custom((value, { req }) => {
-            // Check if file is uploaded
-            if (!req.file) {
-                throw new Error('Vui lòng chọn hình ảnh thiết bị.');
-            }
-            return true;
-        })
-];
-
-const updateDevice = [
-    param('id')
-        .notEmpty()
-        .withMessage('ID thiết bị là bắt buộc'),
-    
-    body('tenTB')
-        .trim()
-        .notEmpty()
-        .withMessage('Vui lòng nhập tên thiết bị.')
-        .isLength({ min: 1, max: 200 })
-        .withMessage('Tên thiết bị phải từ 1-200 ký tự'),
-    
-    body('category')
-        .notEmpty()
-        .withMessage('Vui lòng chọn danh mục thiết bị.'),
-    
-    body('soLuong')
-        .notEmpty()
-        .withMessage('Số lượng tồn là bắt buộc.')
-        .isInt({ min: 0 })
-        .withMessage('Số lượng tồn phải là số nguyên không âm.'),
-    
-    body('viTriLuuTru')
-        .notEmpty()
-        .withMessage('Vui lòng chọn vị trí lưu trữ thiết bị.'),
-    
-    body('supplier')
-        .notEmpty()
-        .withMessage('Vui lòng chọn nhà cung cấp.'),
-    
-    body('ngayNhap')
-        .notEmpty()
-        .withMessage('Vui lòng chọn ngày nhập.')
-        .isISO8601()
-        .withMessage('Ngày nhập không hợp lệ.')
-        .custom((value) => {
-            const selectedDate = new Date(value);
-            const today = new Date();
-            today.setHours(23, 59, 59, 999);
-            
-            if (selectedDate > today) {
-                throw new Error('Ngày nhập không hợp lệ.');
-            }
-            return true;
-        }),
-    
-    body('hinhAnh')
+        .withMessage('Tên thiết bị không được để trống')
+        .isLength({ min: 3, max: 200 })
+        .withMessage('Tên thiết bị phải từ 3-200 ký tự'),
+    body('maTB')
         .optional()
-        .custom((value, { req }) => {
-            // If file is uploaded, validate it
-            if (req.file && !req.file.mimetype.startsWith('image/')) {
-                throw new Error('Vui lòng chọn file hình ảnh hợp lệ.');
-            }
-            return true;
-        })
-];
-
-const deleteDevice = [
-    param('id')
-        .notEmpty()
-        .withMessage('ID thiết bị là bắt buộc')
-];
-
-const getDevices = [
-    query('search')
+        .trim()
+        .isLength({ max: 50 })
+        .withMessage('Mã thiết bị không được quá 50 ký tự'),
+    body('soLuong')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Số lượng phải là số nguyên dương (≥ 0)')
+        .toInt(),
+    body('tinhTrangThietBi')
+        .optional()
+        .trim()
+        .isIn(['Tốt', 'Khá', 'Trung bình', 'Hỏng', ''])
+        .withMessage('Trạng thái thiết bị không hợp lệ'),
+    body('viTriLuuTru')
         .optional()
         .trim()
         .isLength({ max: 100 })
-        .withMessage('Từ khóa tìm kiếm không hợp lệ'),
-    
-    query('category')
+        .withMessage('Vị trí lưu trữ không được quá 100 ký tự'),
+    body('nguonGoc')
         .optional()
-        .isString()
-        .withMessage('Danh mục không hợp lệ'),
-    
-    query('condition')
-        .optional()
-        .isIn(['Tốt', 'Hỏng', 'Đang sửa chữa', 'Bảo trì'])
-        .withMessage('Tình trạng không hợp lệ'),
-    
-    query('location')
-        .optional()
-        .isString()
-        .withMessage('Vị trí không hợp lệ'),
-    
-    query('supplier')
-        .optional()
-        .isString()
-        .withMessage('Nhà cung cấp không hợp lệ'),
-    
-    query('dateFrom')
+        .trim()
+        .isLength({ max: 100 })
+        .withMessage('Nguồn gốc không được quá 100 ký tự'),
+    body('ngayNhap')
         .optional()
         .isISO8601()
-        .withMessage('Ngày bắt đầu không hợp lệ'),
-    
-    query('dateTo')
+        .withMessage('Ngày nhập không hợp lệ')
+        .custom(value => {
+            if (value && new Date(value) > new Date()) {
+                throw new Error('Ngày nhập không thể là ngày trong tương lai');
+            }
+            return true;
+        }),
+    body('huongDanSuDung')
+        .optional()
+        .trim()
+        .isLength({ max: 2000 })
+        .withMessage('Hướng dẫn sử dụng không được quá 2000 ký tự'),
+    body('category')
+        .optional()
+        .isMongoId()
+        .withMessage('Danh mục không hợp lệ')
+];
+
+const validateUpdateDevice = [
+    body('tenTB')
+        .optional()
+        .trim()
+        .notEmpty()
+        .withMessage('Tên thiết bị không được để trống')
+        .isLength({ min: 3, max: 200 })
+        .withMessage('Tên thiết bị phải từ 3-200 ký tự'),
+    body('maTB')
+        .optional()
+        .trim()
+        .isLength({ max: 50 })
+        .withMessage('Mã thiết bị không được quá 50 ký tự'),
+    body('soLuong')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Số lượng phải là số nguyên dương (≥ 0)')
+        .toInt(),
+    body('tinhTrangThietBi')
+        .optional()
+        .trim()
+        .isIn(['Tốt', 'Khá', 'Trung bình', 'Hỏng', ''])
+        .withMessage('Trạng thái thiết bị không hợp lệ'),
+    body('viTriLuuTru')
+        .optional()
+        .trim()
+        .isLength({ max: 100 })
+        .withMessage('Vị trí lưu trữ không được quá 100 ký tự'),
+    body('nguonGoc')
+        .optional()
+        .trim()
+        .isLength({ max: 100 })
+        .withMessage('Nguồn gốc không được quá 100 ký tự'),
+    body('ngayNhap')
         .optional()
         .isISO8601()
-        .withMessage('Ngày kết thúc không hợp lệ')
+        .withMessage('Ngày nhập không hợp lệ')
+        .custom(value => {
+            if (value && new Date(value) > new Date()) {
+                throw new Error('Ngày nhập không thể là ngày trong tương lai');
+            }
+            return true;
+        }),
+    body('huongDanSuDung')
+        .optional()
+        .trim()
+        .isLength({ max: 2000 })
+        .withMessage('Hướng dẫn sử dụng không được quá 2000 ký tự'),
+    body('category')
+        .optional()
+        .isMongoId()
+        .withMessage('Danh mục không hợp lệ')
 ];
 
 module.exports = {
-    createDevice,
-    updateDevice,
-    deleteDevice,
-    getDevices
+    validateCreateDevice,
+    validateUpdateDevice
 };
 
