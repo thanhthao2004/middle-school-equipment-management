@@ -26,3 +26,7 @@ PeriodicReportSchema.pre('validate', async function ensureMaBC(next) {
 	}
 });
 module.exports = model('PeriodicReport', PeriodicReportSchema);
+
+
+
+//test
