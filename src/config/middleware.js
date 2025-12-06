@@ -7,7 +7,9 @@ const express = require('express');
 const path = require('path');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const logger = require('morgan');
+const config = require('./env');
 
 /**
  * Cấu hình middleware cho Express app
@@ -34,11 +36,25 @@ function configureMiddleware(app) {
 	app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 	app.use(cookieParser());
 
+	// Session middleware (FIX for req.session.flash)
+	app.use(session({
+		secret: config.session.secret || 'middle-school-equipment-secret-key-2024',
+		resave: false,
+		saveUninitialized: true,
+		cookie: {
+			secure: config.nodeEnv === 'production',
+			maxAge: 24 * 60 * 60 * 1000 // 24 hours
+		}
+	}));
+
 	// Static files
 	app.use('/css', express.static(path.join(__dirname, '../../node_modules/bootstrap/dist/css')));
 	app.use('/js', express.static(path.join(__dirname, '../../node_modules/bootstrap/dist/js')));
 	app.use('/public', express.static(path.join(__dirname, '../../public')));
+	// Serve uploads directory for uploaded images
+	app.use('/uploads', express.static(path.join(__dirname, '../../public/uploads')));
 }
 
 module.exports = { configureMiddleware };
+
 

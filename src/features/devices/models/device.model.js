@@ -11,7 +11,7 @@ const DeviceSchema = new Schema(
 		tinhTrangThietBi: { type: String, default: '' },
 		viTriLuuTru: { type: String, default: '' },
 		ngayNhap: { type: Date },
-		hinhAnh: { type: String, default: '' },
+		hinhAnh: { type: [String], default: [] }, // Array of image paths (multiple images)
 		huongDanSuDung: { type: String, default: '' },
 		maDM: { type: String, trim: true },
 		category: { type: Types.ObjectId, ref: 'Category' },

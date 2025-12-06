@@ -1,187 +1,498 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sửa thiết bị</title>
-    
-    <!-- Bootstrap 5.3.0 -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome 6.4.0 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/public/stylesheets/devices.css">
     <link rel="stylesheet" href="/public/stylesheets/style.css">
 </head>
+
 <body>
-    <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+    <%- include('../../../views/partials/header', { currentPage: 'devices' , user: (typeof user !=='undefined' ? user :
+        { role: 'ql_thiet_bi' }) }) %>
 
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <!-- Sidebar QLTB -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices' , user: (typeof user
+                    !=='undefined' ? user : { role: 'ql_thiet_bi' }) }) %>
 
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 main-content">
-                <div class="container py-4">
-                    <!-- Page Header -->
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1 class="h3 mb-0">SỬA THIẾT BỊ</h1>
-                        <a href="/manager/devices/detail/<%= device._id %>" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Quay lại
-                        </a>
-                    </div>
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container-fluid py-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h1 class="h3 mb-0">SỬA THIẾT BỊ</h1>
+                                <a href="/manager/devices/detail/<%= device._id %>" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại
+                                </a>
+                            </div>
 
-                    <!-- Flash Messages -->
-                    <% if (typeof messages !== 'undefined' && messages.error) { %>
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <%= messages.error %>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    <% } %>
-
-                    <!-- Form -->
-                    <div class="card">
-                        <div class="card-body">
-                            <form action="/manager/devices/update/<%= device._id %>" method="POST" id="deviceForm">
-                                <div class="row">
-                                    <!-- Mã thiết bị -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="maTB" class="form-label">
-                                            Mã thiết bị <span class="text-danger">*</span>
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="maTB" 
-                                               name="maTB" 
-                                               required
-                                               value="<%= device.maTB || '' %>">
-                                    </div>
-
-                                    <!-- Tên thiết bị -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="tenTB" class="form-label">
-                                            Tên thiết bị <span class="text-danger">*</span>
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="tenTB" 
-                                               name="tenTB" 
-                                               required
-                                               value="<%= device.tenTB || '' %>">
-                                    </div>
-
-                                    <!-- Danh mục -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="category" class="form-label">Danh mục</label>
-                                        <select class="form-select" id="category" name="category">
-                                            <option value="">Chọn danh mục</option>
-                                            <% if (categories && categories.length > 0) { %>
-                                                <% categories.forEach(cat => { %>
-                                                    <option value="<%= cat._id %>" 
-                                                            <%= device.category && device.category._id && device.category._id.toString() === cat._id.toString() ? 'selected' : '' %>>
-                                                        <%= cat.tenDM || cat.name || '' %>
-                                                    </option>
-                                                <% }); %>
-                                            <% } %>
-                                        </select>
-                                    </div>
-
-                                    <!-- Số lượng -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="soLuong" class="form-label">Số lượng</label>
-                                        <input type="number" 
-                                               class="form-control" 
-                                               id="soLuong" 
-                                               name="soLuong" 
-                                               min="0"
-                                               value="<%= device.soLuong || 0 %>">
-                                    </div>
-
-                                    <!-- Trạng thái thiết bị -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="tinhTrangThietBi" class="form-label">Trạng thái thiết bị</label>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="tinhTrangThietBi" 
-                                               name="tinhTrangThietBi" 
-                                               value="<%= device.tinhTrangThietBi || '' %>">
-                                    </div>
-
-                                    <!-- Vị trí lưu trữ -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="viTriLuuTru" class="form-label">Vị trí lưu trữ</label>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="viTriLuuTru" 
-                                               name="viTriLuuTru" 
-                                               value="<%= device.viTriLuuTru || '' %>">
-                                    </div>
-
-                                    <!-- Nguồn gốc -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="nguonGoc" class="form-label">Nguồn gốc</label>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="nguonGoc" 
-                                               name="nguonGoc" 
-                                               value="<%= device.nguonGoc || '' %>">
-                                    </div>
-
-                                    <!-- Ngày nhập -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="ngayNhap" class="form-label">Ngày nhập</label>
-                                        <input type="date" 
-                                               class="form-control" 
-                                               id="ngayNhap" 
-                                               name="ngayNhap"
-                                               value="<%= device.ngayNhap ? new Date(device.ngayNhap).toISOString().split('T')[0] : '' %>">
-                                    </div>
-
-                                    <!-- Hình ảnh -->
-                                    <div class="col-md-12 mb-3">
-                                        <label for="hinhAnh" class="form-label">Hình ảnh (URL)</label>
-                                        <input type="url" 
-                                               class="form-control" 
-                                               id="hinhAnh" 
-                                               name="hinhAnh" 
-                                               value="<%= device.hinhAnh || '' %>">
-                                        <small class="form-text text-muted">Nhập đường dẫn URL của hình ảnh</small>
-                                    </div>
-
-                                    <!-- Hướng dẫn sử dụng -->
-                                    <div class="col-md-12 mb-3">
-                                        <label for="huongDanSuDung" class="form-label">Hướng dẫn sử dụng</label>
-                                        <textarea class="form-control" 
-                                                  id="huongDanSuDung" 
-                                                  name="huongDanSuDung" 
-                                                  rows="4"><%= device.huongDanSuDung || '' %></textarea>
-                                    </div>
+                            <% if (typeof messages !=='undefined' && messages.error) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Lỗi!</strong>
+                                    <%= messages.error %>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
+                                <% } %>
 
-                                <!-- Form Actions -->
-                                <div class="d-flex justify-content-end gap-2 mt-4">
-                                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/manager/devices/detail/<%= device._id %>'">
-                                        <i class="fas fa-times"></i> Hủy
-                                    </button>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Lưu
-                                    </button>
-                                </div>
-                            </form>
+                                    <% if (typeof messages !=='undefined' && messages.success) { %>
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            <strong>Thành công!</strong>
+                                            <%= messages.success %>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="alert"></button>
+                                        </div>
+                                        <% } %>
+
+                                            <% if (typeof messages !=='undefined' && messages.validationErrors &&
+                                                messages.validationErrors.length> 0) { %>
+
+                                                <div class="modal fade" id="errorModal" tabindex="-1"
+                                                    aria-labelledby="errorModalLabel" aria-hidden="true"
+                                                    data-bs-backdrop="static">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content border-danger">
+                                                            <div class="modal-header bg-danger text-white">
+                                                                <h5 class="modal-title" id="errorModalLabel">
+                                                                    <i class="fas fa-exclamation-circle me-2"></i> Dữ
+                                                                    liệu không hợp lệ
+                                                                </h5>
+                                                                <button type="button" class="btn-close btn-close-white"
+                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p class="mb-2">Vui lòng kiểm tra lại các lỗi sau:</p>
+                                                                <ul class="list-unstyled mb-0">
+                                                                    <% messages.validationErrors.forEach(function(error)
+                                                                        { %>
+                                                                        <li class="mb-2">
+                                                                            <i
+                                                                                class="fas fa-times-circle text-danger me-2"></i>
+                                                                            <%= error %>
+                                                                        </li>
+                                                                        <% }); %>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-danger"
+                                                                    data-bs-dismiss="modal">
+                                                                    <i class="fas fa-check me-1"></i> Đã hiểu
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <% } %>
+
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <form action="/manager/devices/update/<%= device._id %>"
+                                                                method="POST" id="deviceForm"
+                                                                enctype="multipart/form-data">
+                                                                <div class="row">
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="maTB" class="form-label">Mã thiết bị
+                                                                            <span class="text-danger">*</span></label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="maTB" name="maTB" required readonly
+                                                                            value="<%= device.maTB || '' %>">
+                                                                        <small class="form-text text-muted">Mã thiết bị
+                                                                            không thể thay đổi</small>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="tenTB" class="form-label">Tên thiết
+                                                                            bị <span
+                                                                                class="text-danger">*</span></label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="tenTB" name="tenTB" required
+                                                                            value="<%= device.tenTB || '' %>">
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="category" class="form-label">Danh
+                                                                            mục</label>
+                                                                        <select class="form-select" id="category"
+                                                                            name="category">
+                                                                            <option value="">Chọn danh mục</option>
+                                                                            <% if (categories && categories.length> 0) {
+                                                                                %>
+                                                                                <% categories.forEach(function(cat) { %>
+                                                                                    <option value="<%= cat._id %>"
+                                                                                        <%=(device.category &&
+                                                                                        device.category._id &&
+                                                                                        device.category._id.toString()===cat._id.toString())
+                                                                                        ? 'selected' : '' %>><%=
+                                                                                            cat.tenDM || cat.name || ''
+                                                                                            %>
+                                                                                    </option>
+                                                                                    <% }); %>
+                                                                                        <% } %>
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="soLuong" class="form-label">Số
+                                                                            lượng</label>
+                                                                        <input type="number" class="form-control"
+                                                                            id="soLuong" name="soLuong" min="0"
+                                                                            value="<%= device.soLuong || 0 %>">
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="tinhTrangThietBi"
+                                                                            class="form-label">Trạng thái thiết
+                                                                            bị</label>
+                                                                        <select class="form-select"
+                                                                            id="tinhTrangThietBi"
+                                                                            name="tinhTrangThietBi">
+                                                                            <option value="">-- Chọn trạng thái --
+                                                                            </option>
+
+                                                                            <% if (filterOptions &&
+                                                                                filterOptions.statuses) { %>
+                                                                                <% filterOptions.statuses.forEach(function(status)
+                                                                                    { %>
+                                                                                    <option value="<%= status %>"
+                                                                                        <%=(device.tinhTrangThietBi===status)
+                                                                                        ? 'selected' : '' %>><%= status
+                                                                                            %>
+                                                                                    </option>
+                                                                                    <% }); %>
+                                                                                        <% } %>
+
+                                                                                            <option value="Tốt"
+                                                                                                <%=(device.tinhTrangThietBi==='Tốt'
+                                                                                                ) ? 'selected' : '' %>
+                                                                                                >Tốt</option>
+                                                                                            <option value="Khá"
+                                                                                                <%=(device.tinhTrangThietBi==='Khá'
+                                                                                                ) ? 'selected' : '' %>
+                                                                                                >Khá</option>
+                                                                                            <option value="Trung bình"
+                                                                                                <%=(device.tinhTrangThietBi==='Trung bình'
+                                                                                                ) ? 'selected' : '' %>
+                                                                                                >Trung bình</option>
+                                                                                            <option value="Hỏng"
+                                                                                                <%=(device.tinhTrangThietBi==='Hỏng'
+                                                                                                ) ? 'selected' : '' %>
+                                                                                                >Hỏng</option>
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="viTriLuuTru" class="form-label">Vị
+                                                                            trí lưu trữ</label>
+
+                                                                        <% const isCustomLocation=(device &&
+                                                                            device.viTriLuuTru && filterOptions &&
+                                                                            filterOptions.locations &&
+                                                                            !filterOptions.locations.includes(device.viTriLuuTru));
+                                                                            %>
+
+                                                                            <select class="form-select" id="viTriLuuTru"
+                                                                                name="viTriLuuTru">
+                                                                                <option value="">-- Chọn vị trí --
+                                                                                </option>
+                                                                                <% if (filterOptions &&
+                                                                                    filterOptions.locations) { %>
+                                                                                    <% filterOptions.locations.forEach(function(location)
+                                                                                        { %>
+                                                                                        <option value="<%= location %>"
+                                                                                            <%=(device.viTriLuuTru===location)
+                                                                                            ? 'selected' : '' %>><%=
+                                                                                                location %>
+                                                                                        </option>
+                                                                                        <% }); %>
+                                                                                            <% } %>
+                                                                                                <option
+                                                                                                    value="__custom__"
+                                                                                                    <%=isCustomLocation
+                                                                                                    ? 'selected' : '' %>
+                                                                                                    >Khác (nhập tự do)
+                                                                                                </option>
+                                                                            </select>
+
+                                                                            <input type="text" class="form-control mt-2"
+                                                                                id="customViTriLuuTru"
+                                                                                name="customViTriLuuTru"
+                                                                                placeholder="Nhập vị trí lưu trữ tùy chỉnh"
+                                                                                value="<%= isCustomLocation ? device.viTriLuuTru : '' %>"
+                                                                                style="display: <%= isCustomLocation ? 'block' : 'none' %>;">
+
+                                                                            <small class="form-text text-muted">Chọn từ
+                                                                                danh sách hoặc chọn "Khác" để nhập tự
+                                                                                do</small>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="nguonGoc" class="form-label">Nguồn
+                                                                            gốc</label>
+                                                                        <select class="form-select" id="nguonGoc"
+                                                                            name="nguonGoc">
+                                                                            <option value="">-- Chọn nguồn gốc --
+                                                                            </option>
+                                                                            <% if (filterOptions &&
+                                                                                filterOptions.origins) { %>
+                                                                                <% filterOptions.origins.forEach(function(origin)
+                                                                                    { %>
+                                                                                    <option value="<%= origin %>"
+                                                                                        <%=(device.nguonGoc===origin)
+                                                                                        ? 'selected' : '' %>><%= origin
+                                                                                            %>
+                                                                                    </option>
+                                                                                    <% }); %>
+                                                                                        <% } %>
+                                                                                            <option value="Mua mới"
+                                                                                                <%=(device.nguonGoc==='Mua mới'
+                                                                                                ) ? 'selected' : '' %>
+                                                                                                >Mua mới</option>
+                                                                                            <option value="Tài trợ"
+                                                                                                <%=(device.nguonGoc==='Tài trợ'
+                                                                                                ) ? 'selected' : '' %>
+                                                                                                >Tài trợ</option>
+                                                                                            <option value="Hiến tặng"
+                                                                                                <%=(device.nguonGoc==='Hiến tặng'
+                                                                                                ) ? 'selected' : '' %>
+                                                                                                >Hiến tặng</option>
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="ngayNhap" class="form-label">Ngày
+                                                                            nhập</label>
+                                                                        <input type="date" class="form-control"
+                                                                            id="ngayNhap" name="ngayNhap"
+                                                                            value="<%= device.ngayNhap ? new Date(device.ngayNhap).toISOString().split('T')[0] : '' %>">
+                                                                    </div>
+
+                                                                    <div class="col-md-12 mb-3">
+                                                                        <label for="hinhAnh" class="form-label"><i
+                                                                                class="fas fa-images me-1"></i> Hình ảnh
+                                                                            thiết bị</label>
+
+                                                                        <% const images=(device && device.hinhAnh) ?
+                                                                            (Array.isArray(device.hinhAnh) ?
+                                                                            device.hinhAnh : [device.hinhAnh]) : []; %>
+
+                                                                            <% if (images.length> 0) { %>
+                                                                                <div class="mb-3">
+                                                                                    <label
+                                                                                        class="form-label text-muted small">Ảnh
+                                                                                        hiện tại (<span id="imageCount">
+                                                                                            <%= images.length %>
+                                                                                        </span> ảnh):</label>
+                                                                                    <div class="row g-2"
+                                                                                        id="currentImagesGrid">
+                                                                                        <% images.forEach(function(img,
+                                                                                            index) { %>
+                                                                                            <div class="col-6 col-md-4 col-lg-3"
+                                                                                                data-image-path="<%= img %>">
+                                                                                                <div class="position-relative"
+                                                                                                    style="border: 2px solid #dee2e6; border-radius: 8px; overflow: hidden; aspect-ratio: 1/1;">
+                                                                                                    <img src="<%= img %>"
+                                                                                                        alt="<%= device.tenTB %> - <%= index + 1 %>"
+                                                                                                        class="w-100 h-100"
+                                                                                                        style="object-fit: cover;"
+                                                                                                        onerror="this.closest('[data-image-path]').style.display='none';">
+                                                                                                    <span
+                                                                                                        class="position-absolute top-0 start-0 badge bg-primary m-1">
+                                                                                                        <%= index + 1 %>
+                                                                                                    </span>
+                                                                                                    <button
+                                                                                                        type="button"
+                                                                                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 delete-image-btn"
+                                                                                                        data-image-path="<%= img %>"
+                                                                                                        title="Xóa ảnh này">
+                                                                                                        <i
+                                                                                                            class="fas fa-times"></i>
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <% }); %>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <% } %>
+
+                                                                                    <input type="hidden"
+                                                                                        id="deletedImages"
+                                                                                        name="deletedImages" value="">
+
+                                                                                    <input type="file"
+                                                                                        class="form-control"
+                                                                                        id="hinhAnhFile" name="hinhAnh"
+                                                                                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                                                                        multiple>
+                                                                                    <small class="form-text text-muted">
+                                                                                        <i
+                                                                                            class="fas fa-info-circle"></i>
+                                                                                        <% if (images.length> 0) { %>
+                                                                                            Chọn thêm ảnh mới (tối đa
+                                                                                            <%= Math.max(0, 5 -
+                                                                                                images.length) %> ảnh).
+                                                                                                Ảnh mới sẽ được THÊM
+                                                                                                vào.
+                                                                                                <% } else { %>
+                                                                                                    Chọn tối đa 5 ảnh
+                                                                                                    (JPG/PNG/GIF/WEBP -
+                                                                                                    mỗi ảnh ≤ 5MB)
+                                                                                                    <% } %>
+                                                                                    </small>
+
+                                                                                    <div id="imagePreviewContainer"
+                                                                                        class="mt-3"
+                                                                                        style="display:none;">
+                                                                                        <label
+                                                                                            class="form-label text-muted small">Xem
+                                                                                            trước ảnh mới:</label>
+                                                                                        <div id="imagePreviewGrid"
+                                                                                            class="row g-2"></div>
+                                                                                    </div>
+                                                                    </div>
+
+                                                                    <div class="col-md-12 mb-3">
+                                                                        <label for="huongDanSuDung"
+                                                                            class="form-label">Hướng dẫn sử dụng</label>
+                                                                        <textarea class="form-control"
+                                                                            id="huongDanSuDung" name="huongDanSuDung"
+                                                                            rows="4"><%= device.huongDanSuDung || '' %></textarea>
+                                                                    </div>
+
+                                                                </div>
+
+                                                                <div class="d-flex justify-content-end gap-2 mt-4">
+                                                                    <button type="button" class="btn btn-secondary"
+                                                                        onclick="window.location.href='/manager/devices/detail/<%= device._id %>'">
+                                                                        <i class="fas fa-times"></i> Hủy
+                                                                    </button>
+                                                                    <button type="submit" class="btn btn-primary">
+                                                                        <i class="fas fa-save"></i> Lưu
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+
                         </div>
                     </div>
-                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Footer -->
-    <%- include('../../../views/partials/footer') %>
+        <%- include('../../../views/partials/footer') %>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/public/javascripts/devices.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/public/javascripts/devices.js"></script>
+
+            <script>
+                // Ensure modal shows after bootstrap is available
+                document.addEventListener('DOMContentLoaded', function () {
+                    function showModalWhenReady() {
+                        var modalEl = document.getElementById('errorModal');
+                        if (window.bootstrap && modalEl) {
+                            var errorModal = new bootstrap.Modal(modalEl);
+                            errorModal.show();
+                        } else if (modalEl) {
+                            setTimeout(showModalWhenReady, 50);
+                        }
+                    }
+                    showModalWhenReady();
+                });
+
+                // Handle custom location show/hide and sync before submit
+                (function () {
+                    var viTriSelect = document.getElementById('viTriLuuTru');
+                    var customInput = document.getElementById('customViTriLuuTru');
+                    var form = document.getElementById('deviceForm');
+
+                    function toggleCustom() {
+                        if (!viTriSelect || !customInput) return;
+                        if (viTriSelect.value === '__custom__') {
+                            customInput.style.display = 'block';
+                            customInput.focus();
+                        } else {
+                            customInput.style.display = 'none';
+                        }
+                    }
+
+                    if (viTriSelect) viTriSelect.addEventListener('change', toggleCustom);
+
+                    if (form) {
+                        form.addEventListener('submit', function (e) {
+                            // if custom is selected, copy custom value into a hidden input named viTriLuuTru before submit
+                            if (viTriSelect && viTriSelect.value === '__custom__') {
+                                var val = customInput ? customInput.value.trim() : '';
+                                if (!val) {
+                                    e.preventDefault();
+                                    alert('Vui lòng nhập vị trí lưu trữ tùy chỉnh.');
+                                    customInput.focus();
+                                    return false;
+                                }
+                                // create a hidden input to override viTriLuuTru value
+                                var hidden = document.createElement('input');
+                                hidden.type = 'hidden';
+                                hidden.name = 'viTriLuuTru';
+                                hidden.value = val;
+                                form.appendChild(hidden);
+                            }
+
+                            // Validate image files count and size (max 5 files total, each <= 5MB)
+                            var fileInput = document.getElementById('hinhAnhFile');
+                            var existingCount = document.querySelectorAll('#currentImagesGrid [data-image-path]').length;
+                            if (fileInput && fileInput.files.length) {
+                                var total = existingCount + fileInput.files.length;
+                                if (total > 5) {
+                                    e.preventDefault();
+                                    alert('Tổng số ảnh không được vượt quá 5. Vui lòng xóa bớt ảnh hoặc không chọn quá nhiều ảnh.');
+                                    return false;
+                                }
+                                for (var i = 0; i < fileInput.files.length; i++) {
+                                    if (fileInput.files[i].size > 5 * 1024 * 1024) {
+                                        e.preventDefault();
+                                        alert('Mỗi ảnh phải nhỏ hơn hoặc bằng 5MB.');
+                                        return false;
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // Delete image button behavior
+                    /* Image deletion handler moved to devices.js for consistency */
+
+                    // Preview selected images
+                    var fileInputPreview = document.getElementById('hinhAnhFile');
+                    var previewContainer = document.getElementById('imagePreviewContainer');
+                    var previewGrid = document.getElementById('imagePreviewGrid');
+                    if (fileInputPreview) {
+                        fileInputPreview.addEventListener('change', function () {
+                            previewGrid.innerHTML = '';
+                            if (fileInputPreview.files.length) {
+                                previewContainer.style.display = 'block';
+                                Array.from(fileInputPreview.files).forEach(function (file, idx) {
+                                    var reader = new FileReader();
+                                    var col = document.createElement('div');
+                                    col.className = 'col-6 col-md-4 col-lg-3';
+                                    reader.onload = function (e) {
+                                        col.innerHTML = '<div class="position-relative" style="border: 2px solid #dee2e6; border-radius: 8px; overflow: hidden; aspect-ratio: 1/1;"><img src="' + e.target.result + '" class="w-100 h-100" style="object-fit:cover;" alt="preview-' + (idx + 1) + '"></div>';
+                                        previewGrid.appendChild(col);
+                                    };
+                                    reader.readAsDataURL(file);
+                                });
+                            } else {
+                                previewContainer.style.display = 'none';
+                            }
+                        });
+                    }
+
+                })();
+            </script>
+
 </body>
-</html>
 
+</html>
