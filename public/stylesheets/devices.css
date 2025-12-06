@@ -52,6 +52,13 @@
     color: #dc3545;
 }
 
+/* --- Main Content Container --- */
+.main-content {
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 56px);
+    padding-top: 0 !important;
+}
+
 /* --- Table Styles --- */
 .table {
     font-size: 14px;
@@ -207,6 +214,7 @@
         transform: translateY(-20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -265,26 +273,127 @@
 /* --- Responsive --- */
 @media (max-width: 768px) {
     .main-content {
-        padding: 18px !important;
+        padding: 15px !important;
     }
 
     .card-body {
-        padding: 20px !important;
+        padding: 15px !important;
+    }
+
+    .card-header h5 {
+        font-size: 14px;
     }
 
     .table-responsive {
         font-size: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin: 0;
+    }
+
+    .table thead th {
+        font-size: 11px;
+        padding: 8px 6px;
+        white-space: nowrap;
+    }
+
+    .table tbody td {
+        font-size: 12px;
+        padding: 8px 6px;
     }
 
     .btn-group-sm .btn {
-        padding: 4px 8px;
-        font-size: 12px;
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+
+    .btn-group-sm .btn i {
+        font-size: 10px;
     }
 
     .modal-box {
-        margin: 20px;
+        margin: 15px;
         padding: 20px;
+        max-width: calc(100% - 30px);
     }
+
+    /* Make buttons more touch-friendly on mobile */
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .btn-group-sm .btn {
+        min-height: 36px;
+        min-width: 36px;
+    }
+
+    /* Stack page header on mobile */
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .d-flex.justify-content-between .btn {
+        width: 100%;
+    }
+
+    /* Form labels and inputs */
+    .form-label {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .form-control,
+    .form-select {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    /* Status badges */
+    .status-badge,
+    .code-box {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+}
+
+/* Tablet specific improvements */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .table-responsive {
+        font-size: 13px;
+    }
+
+    .btn-group-sm .btn {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+}
+
+/* Better horizontal scrolling for tables on small screens */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f8f9fa;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
 }
 
 /* --- Loading State --- */
@@ -293,12 +402,46 @@
     pointer-events: none;
 }
 
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #1e3a8a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 /* --- Animation --- */
 @keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -353,4 +496,3 @@
     font-size: 13px;
     margin-top: 5px;
 }
-
