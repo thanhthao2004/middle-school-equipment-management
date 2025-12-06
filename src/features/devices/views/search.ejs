@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm kiếm thiết bị</title>
+    
+    <!-- Bootstrap 5.3.0 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6.4.0 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="/public/stylesheets/devices.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <%- include('../../../views/partials/header') %>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <%- include('../../../views/partials/device-sidebar') %>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="container py-4">
+                    <!-- Page Title -->
+                    <h1 class="text-center mb-4" style="color: var(--dark-gray); font-weight: 700;">TÌM KIẾM THIẾT BỊ</h1>
+
+                    <!-- Search Form -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form method="GET" action="/devices/search" class="row g-3">
+                                <div class="col-md-8">
+                                    <label class="form-label fw-bold text-muted small">TÌM KIẾM</label>
+                                    <div class="search-container">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               name="q" 
+                                               placeholder="Nhập tên thiết bị, mã thiết bị..." 
+                                               value="<%= filters.search || '' %>">
+                                        <i class="fas fa-search search-icon"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-register text-white w-100">
+                                        <i class="fas fa-search me-2"></i>Tìm kiếm
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <% if (devices && devices.length > 0) { %>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="mb-3">Kết quả tìm kiếm: <%= devices.length %> thiết bị</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover equipment-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Mã TB</th>
+                                                <th>Tên Thiết Bị</th>
+                                                <th>Danh mục</th>
+                                                <th>Số lượng</th>
+                                                <th>Trạng thái</th>
+                                                <th>Lựa chọn</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% devices.forEach(function(device) { %>
+                                                <tr>
+                                                    <td><span class="fw-bold text-primary"><%= device.maTB || device.id %></span></td>
+                                                    <td><%= device.tenTB || device.name %></td>
+                                                    <td><span class="badge bg-info"><%= device.categoryName || 'N/A' %></span></td>
+                                                    <td><%= device.soLuong || device.quantity || 0 %></td>
+                                                    <td>
+                                                        <span class="status-<%= device.status === 'Có sẵn' ? 'available' : 'borrowed' %>">
+                                                            <%= device.status || 'N/A' %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex gap-1">
+                                                            <a href="/devices/<%= device._id || device.id %>/edit" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteDevice('<%= device.maTB || device.id %>')" title="Xóa">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% }); %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Không tìm thấy thiết bị nào</h5>
+                                <p class="text-muted">Vui lòng thử lại với từ khóa khác</p>
+                                <a href="/devices" class="btn btn-register text-white">
+                                    <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+                                </a>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../../../views/partials/footer') %>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Device Management JavaScript -->
+    <script src="/public/javascripts/devices.js"></script>
+</body>
+</html>
+

@@ -15,11 +15,13 @@ class BorrowRepository {
                 console.warn('Invalid userId, using mockup userId');
                 userId = new mongoose.Types.ObjectId();
             }
-            
+
             // 1. Create BorrowTicket
             const ticket = new BorrowTicket({
                 ngayMuon: new Date(borrowData.borrowDate),
                 ngayDuKienTra: new Date(borrowData.returnDate),
+                caMuon: borrowData.sessionTime || 'sang', // Default to morning if not provided
+                caTra: borrowData.sessionTimeReturn || borrowData.sessionTime || 'sang', // Default to same shift as borrow
                 lyDo: borrowData.content,
                 nguoiLapPhieuId: new mongoose.Types.ObjectId(userId),
                 trangThai: 'dang_muon', // Default status
@@ -165,9 +167,9 @@ class BorrowRepository {
             // 2. Lấy danh sách phiếu trả liên quan đến các phiếu mượn của user
             if (borrowTickets.length > 0) {
                 const maPhieuMuonList = borrowTickets.map(t => t.maPhieu);
-                
+
                 const returnQuery = { maPhieuMuon: { $in: maPhieuMuonList } };
-                
+
                 if (filters.createdFrom) {
                     returnQuery.createdAt = { $gte: new Date(filters.createdFrom) };
                 }
@@ -245,13 +247,18 @@ class BorrowRepository {
                 ];
             }
 
+            // CRITICAL: Only show devices in GOOD condition
+            // Allow: 'Tốt', 'Khá'
+            // Exclude: 'Trung bình', 'Hỏng'
+            query.tinhTrangThietBi = { $in: ['Tốt', 'Khá'] };
+
             const devices = await Device.find(query).populate('category');
-            
+
             // Nếu không có data trong DB, trả về mockup data
             if (!devices || devices.length === 0) {
                 return this.getMockupDevices(filters);
             }
-            
+
             return devices;
         } catch (error) {
             console.error('Error getting devices:', error);
@@ -359,8 +366,8 @@ class BorrowRepository {
 
         if (filters.search) {
             const searchLower = filters.search.toLowerCase();
-            filtered = filtered.filter(d => 
-                d.tenTB.toLowerCase().includes(searchLower) || 
+            filtered = filtered.filter(d =>
+                d.tenTB.toLowerCase().includes(searchLower) ||
                 d.maTB.toLowerCase().includes(searchLower)
             );
         }
@@ -464,6 +471,153 @@ class BorrowRepository {
             return tickets;
         } catch (error) {
             console.error('Error getting pending approvals:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get total borrowed quantity for a device at a specific time slot
+     * CRITICAL: This prevents double-booking by checking all overlapping reservations
+     * 
+     * @param {string} maTB - Device code
+     * @param {Date} targetDate - Target date to check
+     * @param {string} targetShift - 'sang' or 'chieu'
+     * @returns {Promise<number>} - Total quantity already borrowed for this slot
+     */
+    async getBorrowedQuantityForSlot(maTB, targetDate, targetShift) {
+        try {
+            // Normalize target date to start of day
+            const targetDay = new Date(targetDate);
+            targetDay.setHours(0, 0, 0, 0);
+
+            const nextDay = new Date(targetDay);
+            nextDay.setDate(nextDay.getDate() + 1);
+
+            // Convert shift to numeric index for comparison
+            const shiftIndex = { 'sang': 1, 'chieu': 2 };
+            const targetIndex = shiftIndex[targetShift];
+
+            if (!targetIndex) {
+                throw new Error(`Invalid shift: ${targetShift}`);
+            }
+
+            // Aggregate query to sum borrowed quantities for overlapping tickets
+            const result = await BorrowDetail.aggregate([
+                // Stage 1: Match device
+                {
+                    $match: { maTB: maTB }
+                },
+                // Stage 2: Join with BorrowTicket
+                {
+                    $lookup: {
+                        from: 'borrowtickets',
+                        localField: 'maPhieu',
+                        foreignField: 'maPhieu',
+                        as: 'ticket'
+                    }
+                },
+                {
+                    $unwind: '$ticket'
+                },
+                // Stage 3: Filter for active tickets and overlapping slots
+                {
+                    $match: {
+                        // Only count pending and approved tickets
+                        'ticket.trangThai': { $in: ['dang_muon', 'approved'] },
+
+                        // Complex overlap logic - 4 scenarios:
+                        $or: [
+                            // Scenario 1: Same-day booking with shift overlap
+                            {
+                                $and: [
+                                    { 'ticket.ngayMuon': { $gte: targetDay, $lt: nextDay } },
+                                    { 'ticket.ngayDuKienTra': { $gte: targetDay, $lt: nextDay } },
+                                    // Check shift overlap within same day
+                                    { 'ticket.caMuon': { $ne: null } },
+                                    { 'ticket.caTra': { $ne: null } },
+                                    {
+                                        $expr: {
+                                            $and: [
+                                                // Shift index conversion and comparison
+                                                {
+                                                    $lte: [
+                                                        { $cond: [{ $eq: ['$ticket.caMuon', 'sang'] }, 1, 2] },
+                                                        targetIndex
+                                                    ]
+                                                },
+                                                {
+                                                    $gte: [
+                                                        { $cond: [{ $eq: ['$ticket.caTra', 'sang'] }, 1, 2] },
+                                                        targetIndex
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+
+                            // Scenario 2: Multi-day booking that encompasses target date
+                            {
+                                $and: [
+                                    { 'ticket.ngayMuon': { $lt: targetDay } },
+                                    { 'ticket.ngayDuKienTra': { $gte: nextDay } }
+                                ]
+                            },
+
+                            // Scenario 3: Starts before target, ends on target day
+                            {
+                                $and: [
+                                    { 'ticket.ngayMuon': { $lt: targetDay } },
+                                    { 'ticket.ngayDuKienTra': { $gte: targetDay, $lt: nextDay } },
+                                    { 'ticket.caTra': { $ne: null } },
+                                    {
+                                        $expr: {
+                                            $gte: [
+                                                { $cond: [{ $eq: ['$ticket.caTra', 'sang'] }, 1, 2] },
+                                                targetIndex
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+
+                            // Scenario 4: Starts on target day, ends after
+                            {
+                                $and: [
+                                    { 'ticket.ngayMuon': { $gte: targetDay, $lt: nextDay } },
+                                    { 'ticket.ngayDuKienTra': { $gte: nextDay } },
+                                    { 'ticket.caMuon': { $ne: null } },
+                                    {
+                                        $expr: {
+                                            $lte: [
+                                                { $cond: [{ $eq: ['$ticket.caMuon', 'sang'] }, 1, 2] },
+                                                targetIndex
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                // Stage 4: Sum total borrowed quantity
+                {
+                    $group: {
+                        _id: null,
+                        totalBorrowed: { $sum: '$soLuongMuon' }
+                    }
+                }
+            ]);
+
+            const borrowedQty = result.length > 0 ? result[0].totalBorrowed : 0;
+
+            console.log(`[getBorrowedQuantityForSlot] Device: ${maTB}, Date: ${targetDate.toLocaleDateString()}, Shift: ${targetShift}, Borrowed: ${borrowedQty}`);
+
+            return borrowedQty;
+
+        } catch (error) {
+            console.error(`Error in getBorrowedQuantityForSlot for ${maTB}:`, error);
             throw error;
         }
     }

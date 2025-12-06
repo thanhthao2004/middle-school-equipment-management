@@ -46,11 +46,11 @@ app.use(errorHandler);    // 500 - Phải đặt cuối cùng
 // ==========================
 const PORT = config.port || 3000;
 app.listen(PORT, () => {
-	logger.info(`Server đang chạy tại: http://localhost:${PORT}`);
-	logger.info(`Environment: ${config.nodeEnv}`);
-	if (process.send) {
-		process.send('ready');
-	}
+    logger.info(`Server đang chạy tại: http://localhost:${PORT}`);
+    logger.info(`Environment: ${config.nodeEnv}`);
+    if (process.send) {
+        process.send('ready');
+    }
 });
 
 module.exports = app;

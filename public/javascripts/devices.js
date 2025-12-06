@@ -351,6 +351,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* -----------------------------
+       Auto-Price Handler for Teacher-Made Equipment
+       When "Giáo viên tự làm" is selected, price = 0đ
+    ----------------------------- */
+    const nguonGocSelect = document.getElementById('nguonGoc');
+    const giaThanhInput = document.getElementById('giaThanh');
+
+    if (nguonGocSelect && giaThanhInput) {
+        nguonGocSelect.addEventListener('change', function () {
+            if (this.value === 'Giáo viên tự làm') {
+                giaThanhInput.value = 0;
+                giaThanhInput.readOnly = true;
+                giaThanhInput.style.backgroundColor = '#e9ecef';
+                giaThanhInput.title = 'Thiết bị do giáo viên tự làm không có chi phí';
+            } else {
+                giaThanhInput.readOnly = false;
+                giaThanhInput.style.backgroundColor = '';
+                giaThanhInput.title = '';
+            }
+        });
+    }
+
+    /* -----------------------------
        Delete Image Handler (Edit Form)
        With live count update and text refresh
     ----------------------------- */

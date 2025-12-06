@@ -18,10 +18,14 @@ const validate = (validators) => {
 			if (!errors.isEmpty()) {
 				const errorMessages = errors.array().map(err => err.msg);
 
-				// Kiểm tra nếu là form submission (HTML) hay API request (JSON)
-				const acceptsHtml = req.accepts('html');
+				// Kiểm tra nếu là API request (JSON) hay form submission (HTML)
+				// Ưu tiên check Content-Type vì fetch() gửi application/json
+				const isApiRequest = req.get('Content-Type')?.includes('application/json');
 
-				if (acceptsHtml) {
+				if (isApiRequest) {
+					// API request - trả về JSON
+					return sendError(res, getErrorMessage(ERROR_CODES.VALIDATION_ERROR), 400, errorMessages);
+				} else {
 					// Form submission - redirect với flash message
 					if (!req.session.flash) req.session.flash = {};
 					req.session.flash.error = errorMessages.join(', ');
@@ -33,9 +37,6 @@ const validate = (validators) => {
 					// Redirect về trang trước đó hoặc trang tạo mới
 					const referer = req.get('referer') || '/manager/devices/create';
 					return res.redirect(referer);
-				} else {
-					// API request - trả về JSON
-					return sendError(res, getErrorMessage(ERROR_CODES.VALIDATION_ERROR), 400, errorMessages);
 				}
 			}
 
