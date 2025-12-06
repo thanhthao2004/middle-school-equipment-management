@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,12 +15,14 @@
       max-width: 800px;
       margin: 0 auto;
     }
+
     .form-card {
       background: #fff;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       padding: 2rem;
     }
+
     .form-section-title {
       font-size: 1.1rem;
       font-weight: 600;
@@ -28,9 +31,11 @@
       padding-bottom: 0.5rem;
       border-bottom: 2px solid var(--light-gray);
     }
+
     .input-group-custom {
       margin-bottom: 1.25rem;
     }
+
     .input-group-custom label {
       display: block;
       font-size: 0.9rem;
@@ -38,6 +43,7 @@
       margin-bottom: 0.5rem;
       color: var(--dark-gray);
     }
+
     .input-group-custom input,
     .input-group-custom select {
       width: 100%;
@@ -47,235 +53,277 @@
       border-radius: 5px;
       transition: border-color 0.15s;
     }
+
     .input-group-custom input:focus,
     .input-group-custom select:focus {
       outline: none;
       border-color: var(--primary-blue);
       box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.1);
     }
+
     .input-group-custom input.invalid,
     .input-group-custom select.invalid {
       border-color: #dc3545;
       background-color: #fff5f5;
     }
+
     .error-msg {
       color: #dc3545;
       font-size: 0.85rem;
       margin-top: 0.25rem;
       min-height: 1.2rem;
     }
+
     .radio-group {
       display: flex;
       gap: 1.5rem;
       margin-top: 0.5rem;
     }
+
     .radio-group input[type="radio"] {
       width: auto;
       margin-right: 0.5rem;
     }
+
     .radio-group label {
       font-weight: 400;
       margin-bottom: 0;
     }
   </style>
 </head>
+
 <body>
   <!-- Header -->
-  <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'admin' }; %>
-  <%- include('../../../views/partials/header', { currentPage: 'users-create', user: userObj }) %>
+  <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'admin' }; %>
+    <%- include('../../../views/partials/header', { currentPage: 'users-create' , user: userObj }) %>
 
-  <div class="container-fluid p-0">
-    <div class="row g-0">
-      <!-- Sidebar Admin -->
-      <%- include('../../../views/partials/admin-sidebar', { currentPage: 'users-create', user: userObj }) %>
+      <div class="container-fluid p-0">
+        <div class="row g-0">
+          <!-- Sidebar Admin -->
+          <%- include('../../../views/partials/admin-sidebar', { currentPage: 'users-create' , user: userObj }) %>
 
-      <!-- Main Content -->
-      <div class="col-md-9 col-lg-10 main-content">
-        <div class="container py-4">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">Tạo Tài Khoản Người Dùng</h1>
-            <a href="/admin" class="btn btn-outline-secondary">
-              <i class="fas fa-arrow-left me-2"></i>Quay lại
-            </a>
-          </div>
-
-          <div class="form-container">
-            <div class="form-card">
-              <% if (error) { %>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                  <i class="fas fa-exclamation-circle me-2"></i><%= error %>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-              <% } %>
-              <% if (success) { %>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  <i class="fas fa-check-circle me-2"></i><%= success %>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-              <% } %>
-
-              <form action="/admin/create" method="POST" autocomplete="off">
-                <div class="form-section-title">
-                  <i class="fas fa-user me-2"></i>Thông tin cá nhân
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="input-group-custom">
-                      <label>Họ và tên <span class="text-danger">*</span></label>
-                      <input type="text" name="fullname" value="<%= form.fullname || '' %>" 
-                             class="<%= errors && errors.fullname ? 'invalid' : '' %>" required>
-                      <div class="error-msg"><%= errors && errors.fullname ? errors.fullname : '' %></div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="input-group-custom">
-                      <label>Số điện thoại <span class="text-danger">*</span></label>
-                      <input type="text" name="phone" value="<%= form.phone || '' %>" 
-                             class="<%= errors && errors.phone ? 'invalid' : '' %>" required>
-                      <div class="error-msg"><%= errors && errors.phone ? errors.phone : '' %></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="input-group-custom">
-                  <label>Địa chỉ</label>
-                  <input type="text" name="address" value="<%= form.address || '' %>" 
-                         class="<%= errors && errors.address ? 'invalid' : '' %>">
-                  <div class="error-msg"><%= errors && errors.address ? errors.address : '' %></div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="input-group-custom">
-                      <label>Ngày sinh <span class="text-danger">*</span></label>
-                      <input type="date" name="dob" value="<%= form.dob || '' %>" 
-                             class="<%= errors && errors.dob ? 'invalid' : '' %>" required>
-                      <div class="error-msg"><%= errors && errors.dob ? errors.dob : '' %></div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="input-group-custom">
-                      <label>Giới tính <span class="text-danger">*</span></label>
-                      <div class="radio-group">
-                        <% const isMale = !form.gender || form.gender === 'Nam'; %>
-                        <% const isFemale = form.gender === 'Nữ'; %>
-                        <input type="radio" id="gioitinhnam" name="gender" value="Nam" 
-                               <%= isMale ? 'checked' : '' %>>
-                        <label for="gioitinhnam" style="margin-bottom: 0;">Nam</label>
-                        <input type="radio" id="gioitinhnu" name="gender" value="Nữ" 
-                               <%= isFemale ? 'checked' : '' %>>
-                        <label for="gioitinhnu" style="margin-bottom: 0;">Nữ</label>
-                      </div>
-                      <div class="error-msg"><%= errors && errors.gender ? errors.gender : '' %></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-section-title mt-4">
-                  <i class="fas fa-key me-2"></i>Thông tin đăng nhập
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="input-group-custom">
-                      <label>Tên đăng nhập <span class="text-danger">*</span></label>
-                      <input type="text" name="username" value="<%= form.username || '' %>" 
-                             class="<%= errors && errors.username ? 'invalid' : '' %>" required>
-                      <div class="error-msg"><%= errors && errors.username ? errors.username : '' %></div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="input-group-custom">
-                      <label>Mật khẩu <span class="text-danger">*</span> 
-                        <small class="text-muted">(6-32 ký tự)</small></label>
-                      <input type="password" name="password" minlength="6" maxlength="32" 
-                             autocomplete="new-password" 
-                             class="<%= errors && errors.password ? 'invalid' : '' %>" required>
-                      <div class="error-msg"><%= errors && errors.password ? errors.password : '' %></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-section-title mt-4">
-                  <i class="fas fa-briefcase me-2"></i>Thông tin công việc
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="input-group-custom">
-                      <label>Chức vụ <span class="text-danger">*</span></label>
-                      <select name="role" class="<%= errors && errors.role ? 'invalid' : '' %>" required>
-                        <option value="">-- Chọn chức vụ --</option>
-                        <option value="hieu_truong" <%= form.role==='hieu_truong' ? 'selected' : '' %>>Hiệu Trưởng</option>
-                        <option value="to_truong" <%= form.role==='to_truong' ? 'selected' : '' %>>Tổ Trưởng Chuyên Môn</option>
-                        <option value="giao_vien" <%= form.role==='giao_vien' ? 'selected' : '' %>>Giáo Viên</option>
-                        <option value="ql_thiet_bi" <%= form.role==='ql_thiet_bi' ? 'selected' : '' %>>Nhân Viên QLTB</option>
-                        <option value="admin" <%= form.role==='admin' ? 'selected' : '' %>>Quản Trị Viên</option>
-                      </select>
-                      <div class="error-msg"><%= errors && errors.role ? errors.role : '' %></div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="input-group-custom">
-                      <label>Năm kinh nghiệm <span class="text-danger">*</span></label>
-                      <select name="experience" class="<%= errors && errors.experience ? 'invalid' : '' %>" required>
-                        <option value="">-- Chọn năm kinh nghiệm --</option>
-                        <option value="1 năm" <%= form.experience==='1 năm' ? 'selected' : '' %>>1 năm</option>
-                        <option value="2 năm" <%= form.experience==='2 năm' ? 'selected' : '' %>>2 năm</option>
-                        <option value="3 năm" <%= form.experience==='3 năm' ? 'selected' : '' %>>3 năm</option>
-                        <option value="Trên 5 năm" <%= form.experience==='Trên 5 năm' ? 'selected' : '' %>>Trên 5 năm</option>
-                      </select>
-                      <div class="error-msg"><%= errors && errors.experience ? errors.experience : '' %></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="input-group-custom">
-                      <label>Bộ môn (nếu có)</label>
-                      <select name="subject" class="<%= errors && errors.subject ? 'invalid' : '' %>">
-                        <option value="">-- Chọn bộ môn --</option>
-                        <option value="Toán" <%= form.subject==='Toán' ? 'selected' : '' %>>Toán</option>
-                        <option value="Văn" <%= form.subject==='Văn' ? 'selected' : '' %>>Văn</option>
-                        <option value="Anh" <%= form.subject==='Anh' ? 'selected' : '' %>>Anh</option>
-                        <option value="Lý" <%= form.subject==='Lý' ? 'selected' : '' %>>Lý</option>
-                        <option value="Hóa" <%= form.subject==='Hóa' ? 'selected' : '' %>>Hóa</option>
-                        <option value="Sinh" <%= form.subject==='Sinh' ? 'selected' : '' %>>Sinh</option>
-                        <option value="Sử" <%= form.subject==='Sử' ? 'selected' : '' %>>Sử</option>
-                        <option value="Địa" <%= form.subject==='Địa' ? 'selected' : '' %>>Địa</option>
-                      </select>
-                      <div class="error-msg"><%= errors && errors.subject ? errors.subject : '' %></div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="input-group-custom">
-                      <label>Trình độ chuyên môn</label>
-                      <input type="text" name="specialization" value="<%= form.specialization || '' %>" 
-                             class="<%= errors && errors.specialization ? 'invalid' : '' %>"
-                             placeholder="Ví dụ: Cử nhân, Thạc sĩ...">
-                      <div class="error-msg"><%= errors && errors.specialization ? errors.specialization : '' %></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+              <div class="container py-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h1 class="h3 mb-0">Tạo Tài Khoản Người Dùng</h1>
                   <a href="/admin" class="btn btn-outline-secondary">
-                    <i class="fas fa-times me-2"></i>Hủy
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại
                   </a>
-                  <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save me-2"></i>Tạo tài khoản
-                  </button>
                 </div>
-              </form>
+
+                <div class="form-container">
+                  <div class="form-card">
+                    <% if (error) { %>
+                      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <%= error %>
+                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      </div>
+                      <% } %>
+                        <% if (success) { %>
+                          <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <%= success %>
+                              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                          </div>
+                          <% } %>
+
+                            <form action="/admin/create" method="POST" autocomplete="off">
+                              <div class="form-section-title">
+                                <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                              </div>
+
+                              <div class="row">
+                                <div class="col-md-6">
+                                  <div class="input-group-custom">
+                                    <label>Họ và tên <span class="text-danger">*</span></label>
+                                    <input type="text" name="fullname" value="<%= form.fullname || '' %>"
+                                      class="<%= errors && errors.fullname ? 'invalid' : '' %>" required>
+                                    <div class="error-msg">
+                                      <%= errors && errors.fullname ? errors.fullname : '' %>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="input-group-custom">
+                                    <label>Số điện thoại <span class="text-danger">*</span></label>
+                                    <input type="text" name="phone" value="<%= form.phone || '' %>"
+                                      class="<%= errors && errors.phone ? 'invalid' : '' %>" required>
+                                    <div class="error-msg">
+                                      <%= errors && errors.phone ? errors.phone : '' %>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="input-group-custom">
+                                <label>Địa chỉ</label>
+                                <input type="text" name="address" value="<%= form.address || '' %>"
+                                  class="<%= errors && errors.address ? 'invalid' : '' %>">
+                                <div class="error-msg">
+                                  <%= errors && errors.address ? errors.address : '' %>
+                                </div>
+                              </div>
+
+                              <div class="row">
+                                <div class="col-md-6">
+                                  <div class="input-group-custom">
+                                    <label>Ngày sinh <span class="text-danger">*</span></label>
+                                    <input type="date" name="dob" value="<%= form.dob || '' %>"
+                                      class="<%= errors && errors.dob ? 'invalid' : '' %>" required>
+                                    <div class="error-msg">
+                                      <%= errors && errors.dob ? errors.dob : '' %>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="input-group-custom">
+                                    <label>Giới tính <span class="text-danger">*</span></label>
+                                    <div class="radio-group">
+                                      <% const isMale=!form.gender || form.gender==='Nam' ; %>
+                                        <% const isFemale=form.gender==='Nữ' ; %>
+                                          <input type="radio" id="gioitinhnam" name="gender" value="Nam" <%=isMale
+                                            ? 'checked' : '' %>>
+                                          <label for="gioitinhnam" style="margin-bottom: 0;">Nam</label>
+                                          <input type="radio" id="gioitinhnu" name="gender" value="Nữ" <%=isFemale
+                                            ? 'checked' : '' %>>
+                                          <label for="gioitinhnu" style="margin-bottom: 0;">Nữ</label>
+                                    </div>
+                                    <div class="error-msg">
+                                      <%= errors && errors.gender ? errors.gender : '' %>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="form-section-title mt-4">
+                                <i class="fas fa-key me-2"></i>Thông tin đăng nhập
+                              </div>
+
+                              <div class="row">
+                                <div class="col-md-6">
+                                  <div class="input-group-custom">
+                                    <label>Tên đăng nhập <span class="text-danger">*</span></label>
+                                    <input type="text" name="username" value="<%= form.username || '' %>"
+                                      class="<%= errors && errors.username ? 'invalid' : '' %>" required>
+                                    <div class="error-msg">
+                                      <%= errors && errors.username ? errors.username : '' %>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="input-group-custom">
+                                    <label>Mật khẩu <span class="text-danger">*</span>
+                                      <small class="text-muted">(6-32 ký tự)</small></label>
+                                    <input type="password" name="password" minlength="6" maxlength="32"
+                                      autocomplete="new-password"
+                                      class="<%= errors && errors.password ? 'invalid' : '' %>" required>
+                                    <div class="error-msg">
+                                      <%= errors && errors.password ? errors.password : '' %>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="form-section-title mt-4">
+                                <i class="fas fa-briefcase me-2"></i>Thông tin công việc
+                              </div>
+
+                              <div class="row">
+                                <div class="col-md-6">
+                                  <div class="input-group-custom">
+                                    <label>Chức vụ <span class="text-danger">*</span></label>
+                                    <select name="role" class="<%= errors && errors.role ? 'invalid' : '' %>" required>
+                                      <option value="">-- Chọn chức vụ --</option>
+                                      <option value="hieu_truong" <%=form.role==='hieu_truong' ? 'selected' : '' %>>Hiệu
+                                        Trưởng</option>
+                                      <option value="to_truong" <%=form.role==='to_truong' ? 'selected' : '' %>>Tổ
+                                        Trưởng Chuyên Môn</option>
+                                      <option value="giao_vien" <%=form.role==='giao_vien' ? 'selected' : '' %>>Giáo
+                                        Viên</option>
+                                      <option value="ql_thiet_bi" <%=form.role==='ql_thiet_bi' ? 'selected' : '' %>>Nhân
+                                        Viên QLTB</option>
+                                      <option value="admin" <%=form.role==='admin' ? 'selected' : '' %>>Quản Trị Viên
+                                      </option>
+                                    </select>
+                                    <div class="error-msg">
+                                      <%= errors && errors.role ? errors.role : '' %>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="input-group-custom">
+                                    <label>Năm kinh nghiệm <span class="text-danger">*</span></label>
+                                    <select name="experience"
+                                      class="<%= errors && errors.experience ? 'invalid' : '' %>" required>
+                                      <option value="">-- Chọn năm kinh nghiệm --</option>
+                                      <option value="1 năm" <%=form.experience==='1 năm' ? 'selected' : '' %>>1 năm
+                                      </option>
+                                      <option value="2 năm" <%=form.experience==='2 năm' ? 'selected' : '' %>>2 năm
+                                      </option>
+                                      <option value="3 năm" <%=form.experience==='3 năm' ? 'selected' : '' %>>3 năm
+                                      </option>
+                                      <option value="Trên 5 năm" <%=form.experience==='Trên 5 năm' ? 'selected' : '' %>
+                                        >Trên 5 năm</option>
+                                    </select>
+                                    <div class="error-msg">
+                                      <%= errors && errors.experience ? errors.experience : '' %>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="row">
+                                <div class="col-md-6">
+                                  <div class="input-group-custom">
+                                    <label>Bộ môn (nếu có)</label>
+                                    <select name="subject" class="<%= errors && errors.subject ? 'invalid' : '' %>">
+                                      <option value="">-- Chọn bộ môn --</option>
+                                      <option value="Toán" <%=form.subject==='Toán' ? 'selected' : '' %>>Toán</option>
+                                      <option value="Văn" <%=form.subject==='Văn' ? 'selected' : '' %>>Văn</option>
+                                      <option value="Anh" <%=form.subject==='Anh' ? 'selected' : '' %>>Anh</option>
+                                      <option value="Lý" <%=form.subject==='Lý' ? 'selected' : '' %>>Lý</option>
+                                      <option value="Hóa" <%=form.subject==='Hóa' ? 'selected' : '' %>>Hóa</option>
+                                      <option value="Sinh" <%=form.subject==='Sinh' ? 'selected' : '' %>>Sinh</option>
+                                      <option value="Sử" <%=form.subject==='Sử' ? 'selected' : '' %>>Sử</option>
+                                      <option value="Địa" <%=form.subject==='Địa' ? 'selected' : '' %>>Địa</option>
+                                    </select>
+                                    <div class="error-msg">
+                                      <%= errors && errors.subject ? errors.subject : '' %>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="input-group-custom">
+                                    <label>Trình độ chuyên môn</label>
+                                    <input type="text" name="specialization" value="<%= form.specialization || '' %>"
+                                      class="<%= errors && errors.specialization ? 'invalid' : '' %>"
+                                      placeholder="Ví dụ: Cử nhân, Thạc sĩ...">
+                                    <div class="error-msg">
+                                      <%= errors && errors.specialization ? errors.specialization : '' %>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                                <a href="/admin" class="btn btn-outline-secondary">
+                                  <i class="fas fa-times me-2"></i>Hủy
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                  <i class="fas fa-save me-2"></i>Tạo tài khoản
+                                </button>
+                              </div>
+                            </form>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

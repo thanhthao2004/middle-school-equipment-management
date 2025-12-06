@@ -7,13 +7,19 @@ const BorrowTicketSchema = new Schema(
 		maPhieu: { type: String, required: true, unique: true, trim: true },
 		ngayMuon: { type: Date },
 		ngayDuKienTra: { type: Date },
+		caMuon: { type: String, enum: ['sang', 'chieu'], required: true, default: 'sang' }, // Shift for borrow date
+		caTra: { type: String, enum: ['sang', 'chieu'], required: true, default: 'sang' }, // Shift for return date
 		lyDo: { type: String, default: '' },
 		nguoiLapPhieuId: { type: Types.ObjectId, ref: 'User', required: true },
-		trangThai: { type: String, default: 'dang_muon', trim: true }, // dang_muon | da_hoan_tat | huy
+		trangThai: { type: String, default: 'dang_muon', trim: true }, // dang_muon | approved | da_hoan_tat | huy | rejected
 		ghiChu: { type: String, default: '' },
 	},
 	{ timestamps: true }
 );
+
+// Add compound index for efficient slot-based queries
+BorrowTicketSchema.index({ ngayMuon: 1, caMuon: 1, trangThai: 1 });
+BorrowTicketSchema.index({ ngayDuKienTra: 1, caTra: 1, trangThai: 1 });
 
 // ChiTietPhieuMuon: danh sách thiết bị và số lượng được mượn theo từng phiếu mượn
 const BorrowDetailSchema = new Schema(

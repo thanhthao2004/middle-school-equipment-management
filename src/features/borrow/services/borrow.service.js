@@ -24,18 +24,20 @@ class BorrowService {
                 // Tính số lượng đã mượn (chưa trả) từ BorrowDetail
                 // Nếu là mockup device (có _id bắt đầu bằng 'mock'), skip aggregate
                 let soLuongConLai = device.soLuong || 0;
-                
+
                 if (device.maTB && !device._id.toString().startsWith('mock')) {
                     try {
                         const borrowedDetails = await BorrowDetail.aggregate([
                             { $match: { maTB: device.maTB } },
-                            { $group: { 
-                                _id: null, 
-                                totalBorrowed: { $sum: '$soLuongMuon' },
-                                totalReturned: { $sum: '$soLuongDaTra' }
-                            }}
+                            {
+                                $group: {
+                                    _id: null,
+                                    totalBorrowed: { $sum: '$soLuongMuon' },
+                                    totalReturned: { $sum: '$soLuongDaTra' }
+                                }
+                            }
                         ]);
-                        
+
                         const totalBorrowed = borrowedDetails[0]?.totalBorrowed || 0;
                         const totalReturned = borrowedDetails[0]?.totalReturned || 0;
                         const soLuongDangMuon = totalBorrowed - totalReturned;
@@ -45,7 +47,7 @@ class BorrowService {
                         console.warn('Error calculating borrowed quantity, using original quantity:', err.message);
                     }
                 }
-                
+
                 // Map category name
                 let categoryName = '';
                 if (device.category) {
@@ -57,13 +59,13 @@ class BorrowService {
                 } else if (device.maDM) {
                     categoryName = device.maDM;
                 }
-                
+
                 // Map condition to frontend format
                 let condition = 'good';
                 if (device.tinhTrangThietBi) {
                     condition = device.tinhTrangThietBi === 'Tốt' ? 'good' : 'damaged';
                 }
-                
+
                 // Map category name to frontend format
                 const categoryMap = {
                     'hóa học': 'chemistry',
@@ -77,7 +79,7 @@ class BorrowService {
                 };
                 const categoryKey = categoryName.toLowerCase().replace(/\s+/g, '');
                 const mappedCategory = categoryMap[categoryKey] || 'chemistry';
-                
+
                 return {
                     id: device.maTB || device._id.toString(),
                     name: device.tenTB || '',
@@ -89,7 +91,8 @@ class BorrowService {
                     status: soLuongConLai > 0 ? 'available' : 'borrowed',
                     unit: 'cái', // Mặc định
                     class: '', // Có thể thêm vào model sau
-                    description: device.huongDanSuDung || ''
+                    description: device.huongDanSuDung || '',
+                    images: device.hinhAnh || [] // Map from hinhAnh field in DB
                 };
             }));
 
@@ -103,16 +106,15 @@ class BorrowService {
         }
     }
 
-    // Tạo yêu cầu mượn mới
+    // Tạo yêu cầu mượn mới (Asynchronous with RabbitMQ)
     async createBorrowRequest(userId, borrowData) {
         try {
             // --- Phần 1: Validation ---
-            // Validate userId
             const mongoose = require('mongoose');
             if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
                 throw new Error('Người dùng không hợp lệ. Vui lòng đăng nhập lại.');
             }
-            
+
             if (!borrowData.devices || borrowData.devices.length === 0) {
                 throw new Error('Vui lòng chọn ít nhất một thiết bị');
             }
@@ -134,53 +136,61 @@ class BorrowService {
                 throw new Error('Ngày trả phải sau hoặc bằng ngày mượn');
             }
 
-            // Phải đăng ký ít nhất 1 ngày trước (tức là >= tomorrow)
+            // Phải đăng ký ít nhất 1 ngày trước
             if (borrowDate < tomorrow) {
                 throw new Error('Cần đăng ký sớm hơn (≥1 ngày) trước buổi dạy');
             }
 
-            // --- Phần 2: Tạo phiếu mượn trong DB (hoặc mockup) ---
-            try {
-                // Thử tạo trong DB
-                const ticket = await borrowRepo.createBorrowRequest(userId, borrowData);
-                
-                // Gửi message tới RabbitMQ (nếu có)
-                try {
-                    const messagePayload = {
-                        userId: userId,
-                        borrowData: borrowData,
-                        requestedAt: new Date().toISOString()
-                    };
-                    await publishMessage(messagePayload);
-                } catch (mqError) {
-                    // Nếu RabbitMQ không available, chỉ log warning
-                    console.warn('RabbitMQ not available, skipping message publish:', mqError.message);
-                }
+            // --- Phần 2: Publish Message to RabbitMQ ---
+            const messagePayload = {
+                userId: userId,
+                borrowData: borrowData,
+                requestedAt: new Date().toISOString()
+            };
 
+            // Generate temporary ticket ID
+            const tempMaPhieu = 'PM_' + Date.now().toString().slice(-8);
+
+            try {
+                // Try to publish message to RabbitMQ
+                await publishMessage(messagePayload);
+                console.log(`Published borrow request message for user ${userId}`);
+
+                // Return pending status immediately
                 return {
                     success: true,
-                    message: 'Đăng ký mượn thành công!',
+                    message: 'Đăng ký mượn thành công! Yêu cầu đang được xử lý.',
                     data: {
-                        maPhieu: ticket.maPhieu || 'PM0001',
-                        ticket: ticket
-                    }
-                };
-            } catch (dbError) {
-                // Nếu DB error, tạo mockup response
-                console.warn('Database error, returning mockup response:', dbError.message);
-                return {
-                    success: true,
-                    message: 'Yêu cầu mượn của bạn đã được tiếp nhận và đang chờ xử lý. (Mockup mode)',
-                    data: {
-                        maPhieu: 'PM' + String(Date.now()).slice(-6),
-                        ticket: {
-                            maPhieu: 'PM' + String(Date.now()).slice(-6),
+                        maPhieu: tempMaPhieu,
+                        trangThai: 'pending',
+                        tempTicket: {
+                            maPhieu: tempMaPhieu,
                             ngayMuon: borrowData.borrowDate,
                             ngayDuKienTra: borrowData.returnDate,
-                            trangThai: 'dang_muon'
+                            trangThai: 'pending',
+                            createdAt: new Date()
                         }
                     }
                 };
+            } catch (mqError) {
+                // If RabbitMQ fails, fallback to direct DB creation
+                console.warn('RabbitMQ not available, falling back to direct DB creation:', mqError.message);
+
+                try {
+                    const ticket = await borrowRepo.createBorrowRequest(userId, borrowData);
+                    return {
+                        success: true,
+                        message: 'Đăng ký mượn thành công!',
+                        data: {
+                            maPhieu: ticket.maPhieu || tempMaPhieu,
+                            trangThai: ticket.trangThai || 'dang_muon',
+                            ticket: ticket
+                        }
+                    };
+                } catch (dbError) {
+                    console.error('Both RabbitMQ and direct DB creation failed:', dbError.message);
+                    throw new Error('Không thể xử lý yêu cầu mượn. Vui lòng thử lại sau.');
+                }
             }
 
         } catch (error) {
@@ -264,12 +274,12 @@ class BorrowService {
         try {
             // Nếu có filter type, chỉ lấy loại đó
             const history = await borrowRepo.getBorrowHistoryByUserId(userId, filters);
-            
+
             // Filter theo type nếu có
             if (filters.type) {
                 return history.filter(item => item.type === filters.type);
             }
-            
+
             return history;
         } catch (error) {
             console.error('Error in getBorrowHistory service:', error);
@@ -304,7 +314,7 @@ class BorrowService {
             throw error;
         }
     }
-      // API cho QLTB: Lấy danh sách phiếu mượn đang chờ duyệt
+    // API cho QLTB: Lấy danh sách phiếu mượn đang chờ duyệt
     async getPendingBorrows() {
         // Mock data
         return [
@@ -340,7 +350,7 @@ class BorrowService {
         return { id: slipId, status: 'confirmed' };
     }
 
-    
+
 }
 
 module.exports = new BorrowService();

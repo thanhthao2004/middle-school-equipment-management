@@ -5,7 +5,7 @@ class BorrowController {
     // GET /borrow/register - Đăng ký mượn thiết bị
     async getRegisterPage(req, res) {
         try {
-            res.render('borrow/views/register', { 
+            res.render('borrow/views/register', {
                 title: 'Đăng ký mượn thiết bị',
                 currentPage: 'register',
                 sidebarType: 'borrow-sidebar',
@@ -65,7 +65,7 @@ class BorrowController {
     // GET /borrow/history - Lịch sử mượn/trả
     async getHistoryPage(req, res) {
         try {
-            res.render('borrow/views/history', { 
+            res.render('borrow/views/history', {
                 title: 'Lịch sử mượn/trả',
                 currentPage: 'history',
                 sidebarType: 'borrow-sidebar',
@@ -112,24 +112,21 @@ class BorrowController {
         }
     }
 
-    // POST /borrow/register - Xử lý đăng ký mượn
+    // POST /borrow/register - Xử lý đăng ký mượn (Asynchronous)
     async createBorrowRequest(req, res) {
         try {
             const borrowData = req.body;
-            const userId = req.user?.id || null; // Không dùng giá trị mặc định số
-            
+            const userId = req.user?.id || null;
+
             const result = await borrowService.createBorrowRequest(userId, borrowData);
-            
-            res.json({
-                success: true,
-                message: 'Đăng ký mượn thành công!',
-                data: result
-            });
+
+            // Return HTTP 202 Accepted for async processing
+            res.status(202).json(result);
         } catch (error) {
             console.error('Error creating borrow request:', error);
-            res.status(500).json({
+            res.status(400).json({
                 success: false,
-                message: 'Lỗi khi đăng ký mượn',
+                message: error.message || 'Lỗi khi đăng ký mượn',
                 error: process.env.NODE_ENV === 'development' ? error.message : 'Có lỗi xảy ra'
             });
         }
@@ -141,7 +138,7 @@ class BorrowController {
             const slipId = req.params.id;
             const from = req.query.from || ''; // Get 'from' query parameter
             const slip = await borrowService.getBorrowSlip(slipId);
-            
+
             res.render('borrow/views/slip', {
                 title: `Phiếu mượn ${slipId}`,
                 currentPage: 'slip',
@@ -162,7 +159,7 @@ class BorrowController {
         try {
             const slipId = req.params.id;
             const slip = await borrowService.getReturnSlip(slipId);
-            
+
             res.render('borrow/views/return-slip', {
                 title: `Phiếu trả ${slipId}`,
                 currentPage: 'history',
@@ -181,12 +178,12 @@ class BorrowController {
         try {
             const userId = req.user?.id || null; // Không dùng giá trị mặc định số
             const { status, createdFrom, createdTo, search, type } = req.query;
-            const items = await borrowService.getBorrowHistory(userId, { 
-                status, 
-                createdFrom, 
-                createdTo, 
+            const items = await borrowService.getBorrowHistory(userId, {
+                status,
+                createdFrom,
+                createdTo,
                 search,
-                type 
+                type
             });
             res.json({ success: true, data: items });
         } catch (error) {
@@ -198,7 +195,7 @@ class BorrowController {
     async getDevices(req, res) {
         try {
             const { category, class: classFilter, status, condition, location, origin, search } = req.query;
-            
+
             const devices = await borrowService.getDevices({
                 category,
                 class: classFilter,
@@ -208,7 +205,7 @@ class BorrowController {
                 origin,
                 search
             });
-            
+
             res.json({
                 success: true,
                 data: devices
