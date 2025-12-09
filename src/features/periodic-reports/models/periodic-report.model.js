@@ -1,28 +1,40 @@
-const { Schema, model } = require('mongoose');
-const { getNextCode } = require('../../../core/libs/sequence');
+const mongoose = require('mongoose');
 
-// BaoCaoTinhTrangTBBinhKy
-const PeriodicReportSchema = new Schema(
-	{
-		maBaoCao: { type: String, required: true, unique: true, trim: true },
-		kyBaoCao: { type: String, trim: true },
-		ngayLap: { type: Date },
-		trangThaiBaoCao: { type: String, trim: true },
-		tenFile: { type: String, trim: true },
-		duongDanFile: { type: String, default: '' },
-	},
-	{ timestamps: true }
+const PeriodicReportSchema = new mongoose.Schema(
+  {
+    maBaoCao: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true
+    },
+    kyBaoCao: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    ngayLap: {
+      type: Date,
+      required: true
+    },
+    trangThaiBaoCao: {
+      type: String,
+      enum: ['pending', 'completed', 'rejected'],
+      default: 'pending'
+    },
+    tenFile: {
+      type: String,
+      default: ''
+    },
+    duongDanFile: {
+      type: String,
+      default: ''
+    }
+  },
+  {
+    timestamps: true,
+    collection: 'periodic_reports'
+  }
 );
 
-
-PeriodicReportSchema.pre('validate', async function ensureMaBC(next) {
-	try {
-		if (!this.maBaoCao) {
-			this.maBaoCao = await getNextCode('BC', 3); // BC001
-		}
-		next();
-	} catch (e) {
-		next(e);
-	}
-});
-module.exports = model('PeriodicReport', PeriodicReportSchema);
+module.exports = mongoose.model('PeriodicReport', PeriodicReportSchema);
