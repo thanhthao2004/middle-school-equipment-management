@@ -1,22 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const PurchasingController = require('../controllers/purchasing.controller');
 
 // Temporary routes for purchasing plans (using in-memory sample data)
 
 function samplePlans() {
-    return [
-        { id: 1, code: 'KH001', schoolYear: '2019-2020', status: 'approved' },
-        { id: 2, code: 'KH002', schoolYear: '2020-2021', status: 'approved' },
-        { id: 3, code: 'KH003', schoolYear: '2021-2022', status: 'approved' },
-        { id: 4, code: 'KH004', schoolYear: '2022-2023', status: 'approved' },
-        { id: 5, code: 'KH005', schoolYear: '2023-2024', status: 'approved' },
-        { id: 6, code: 'KH006', schoolYear: '2024-2025', status: 'approved' },
-        { id: 7, code: 'KH007', schoolYear: '2025-2026', status: 'pending' }
-    ];
+    return [];
 }
 
 function sampleYears() {
-    return ['2019-2020', '2020-2021', '2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
+    return [];
 }
 
 function getPlanById(id) {
@@ -28,9 +21,9 @@ function getPlanById(id) {
 router.get('/', (req, res) => {
     const plans = samplePlans();
     const years = sampleYears();
-    res.render('purchasing-plans/views/list', { 
-        title: 'Quản lý kế hoạch mua sắm', 
-        plans, 
+    res.render('purchasing-plans/views/list', {
+        title: 'Quản lý kế hoạch mua sắm',
+        plans,
         years,
         user: req.user || { role: 'to_truong' }
     });
@@ -38,12 +31,21 @@ router.get('/', (req, res) => {
 
 // Render create form
 router.get('/create', (req, res) => {
-    res.render('purchasing-plans/views/create', { 
-        title: 'Lập kế hoạch mua sắm', 
+    res.render('purchasing-plans/views/create', {
+        title: 'Lập kế hoạch mua sắm',
         plan: {},
         user: req.user || { role: 'to_truong' }
     });
 });
+
+// API: Get next plan code
+router.get('/api/next-code', PurchasingController.getNextPlanCode);
+
+// API: Get all devices for selection modal
+router.get('/api/devices', PurchasingController.getDevices);
+
+// API: Get devices by category
+router.get('/api/devices/category/:categoryId', PurchasingController.getDevicesByCategory);
 
 // Create action (temporary: redirect back to list)
 router.post('/', (req, res) => {
@@ -98,8 +100,8 @@ router.delete('/:id', (req, res) => {
 // GET /purchasing-plans/approve - Danh sách kế hoạch cần duyệt
 router.get('/approve', (req, res) => {
     const plans = samplePlans().filter(p => p.status === 'pending');
-    res.render('purchasing-plans/views/list', { 
-        title: 'Duyệt kế hoạch mua sắm', 
+    res.render('purchasing-plans/views/list', {
+        title: 'Duyệt kế hoạch mua sắm',
         plans,
         years: sampleYears(),
         currentPage: 'purchasing-approve',
@@ -111,8 +113,8 @@ router.get('/approve', (req, res) => {
 router.get('/:id/approve', (req, res) => {
     const plan = getPlanById(req.params.id);
     if (!plan) return res.status(404).send('Kế hoạch không tồn tại');
-    res.render('purchasing-plans/views/edit', { 
-        title: 'Duyệt kế hoạch', 
+    res.render('purchasing-plans/views/edit', {
+        title: 'Duyệt kế hoạch',
         plan,
         currentPage: 'purchasing-approve',
         user: req.user || { role: 'hieu_truong' }

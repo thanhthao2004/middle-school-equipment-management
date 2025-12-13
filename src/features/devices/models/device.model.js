@@ -9,6 +9,7 @@ const DeviceSchema = new Schema(
 		nguonGoc: { type: String, default: '' },
 		soLuong: { type: Number, default: 0 },
 		giaThanh: { type: Number, default: 0 }, // Unit price (giá thành mua)
+		donViTinh: { type: String, default: 'Cái' }, // Unit of measurement (Cái, Bộ, Chiếc, v.v.)
 		tinhTrangThietBi: { type: String, default: '' }, // Physical condition: Tốt, Khá, Trung bình, Hỏng
 		viTriLuuTru: { type: String, default: '' },
 		ngayNhap: { type: Date },
