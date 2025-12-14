@@ -1,3 +1,4 @@
+
 /**
  * Routes Aggregator
  * Tập trung tất cả routes của ứng dụng
@@ -23,7 +24,6 @@ router.use('/admin', require('../features/users/routes/users.routes'));
 // ==========================
 // MANAGER (Nhân viên quản lý thiết bị - QLTB)
 // ==========================
-router.use('/manager', require('../features/manager/routes/manager.routes'));
 
 // ==========================
 // QLTB FEATURES (Quản lý thiết bị)
@@ -36,6 +36,8 @@ router.use('/manager/suppliers', require('../features/suppliers/routes/suppliers
 router.use('/manager/acceptance', require('../features/acceptance/routes/acceptance.routes'));
 router.use('/manager/periodic-reports', require('../features/periodic-reports/routes/periodic-report.routes'));
 router.use('/manager/disposal', require('../features/disposal/routes/disposal.routes'));
+
+router.use('/manager', require('../features/manager/routes/manager.routes'));
 
 // ==========================
 // TEACHER (Giáo viên bộ môn)
