@@ -9,10 +9,7 @@ class CategoriesController {
 
             let query = {};
             if (keyword) {
-                query.$or = [
-                    { name: { $regex: keyword, $options: "i" } },
-                    { id: { $regex: keyword, $options: "i" } },
-                ];
+                query.name = { $regex: keyword, $options: "i" }; // tìm theo tên danh mục
             }
 
             const categories = await Category.find(query).sort({ createdAt: -1 });
