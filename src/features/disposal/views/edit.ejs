@@ -7,160 +7,195 @@
     <title>Chỉnh sửa báo cáo thanh lý</title>
 
     <!-- Bootstrap -->
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
+
+    <!-- CSS -->
     <link rel="stylesheet" href="/stylesheets/disposal.css">
     <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 
 <body>
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <!-- Sidebar -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'disposal' , user: typeof user
-                !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+    <!-- ===== HEADER ===== -->
+    <%- include('../../../views/partials/header', { currentPage: 'disposal' , user: typeof user !=='undefined' ? user :
+        { role: 'ql_thiet_bi' } }) %>
 
-                <!-- Main Content -->
-                <div class="col-md-9 col-lg-10 main-content">
-                    <!-- Header -->
-                    <%- include('../../../views/partials/header', { currentPage: 'disposal' , user: typeof user
-                        !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
-                        <div class="container py-4">
-                            <!-- MAIN -->
-                            <div class="main">
+        <!-- ===== MAIN LAYOUT ===== -->
+        <div class="container-fluid p-0">
+            <div class="row g-0">
 
-                                <!-- HEADER -->
-                                <div class="main-header">
-                                    <div style="display:flex; align-items:center;">
-                                        <button class="btn-menu" id="toggleSidebar"><i class="fas fa-bars"></i></button>
-                                        <h2>CHỈNH SỬA BÁO CÁO THANH LÝ THIẾT BỊ HỎNG</h2>
+                <!-- ===== SIDEBAR ===== -->
+                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'disposal' , user: typeof user
+                    !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+
+                    <!-- ===== MAIN CONTENT ===== -->
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container-fluid py-4">
+
+                            <!-- Page Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h1 class="h3 mb-0">CHỈNH SỬA BÁO CÁO THANH LÝ THIẾT BỊ HỎNG</h1>
+                                <a href="/manager/disposal" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại
+                                </a>
+                            </div>
+
+                            <!-- ===== INFO BOXES ===== -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="d-flex flex-wrap gap-3 align-items-center">
+
+                                        <div class="info-box info-code">
+                                            <label>Mã biên bản</label>
+                                            <div class="value">
+                                                <%= disposal.code %>
+                                            </div>
+                                        </div>
+
+                                        <div class="info-box info-year">
+                                            <label>Năm học</label>
+                                            <div class="value">
+                                                <%= disposal.year %>
+                                            </div>
+                                        </div>
+
+                                        <div class="info-box info-date">
+                                            <label>Ngày lập</label>
+                                            <div class="value">
+                                                <%= disposal.created_at %>
+                                            </div>
+                                        </div>
+
                                     </div>
-                                    <div class="user"><i class="fas fa-user"></i> QLTB</div>
                                 </div>
+                            </div>
 
-                                <!-- INFO SECTION + SEARCH BOX -->
-                                <div class="disposal-info d-flex align-items-center gap-3 flex-wrap">
+                            <!-- ===== FORM ===== -->
+                            <form action="/manager/disposal/<%= disposal.id %>" method="POST">
 
-                                    <!-- Info boxes -->
-                                    <div class="info-box info-code">
-                                        <label>Mã biên bản</label>
-                                        <span class="value">
-                                            <%= disposal.code %>
-                                        </span>
-                                    </div>
-
-                                    <div class="info-box info-year">
-                                        <label>Năm học</label>
-                                        <span class="value">
-                                            <%= disposal.year %>
-                                        </span>
-                                    </div>
-
-                                    <div class="info-box info-date">
-                                        <label>Ngày lập</label>
-                                        <span class="value">
-                                            <%= disposal.created_at %>
-                                        </span>
-                                    </div>
-
-                                    <!-- Search box -->
-                                    <div class="search-box">
-                                        <input type="text" id="searchDevice" placeholder="Tìm thiết bị...">
-                                        <button type="button" class="search-btn"><i class="fas fa-search"></i> Tìm
-                                            kiếm</button>
-                                    </div>
-
-                                </div>
-
-
-                                <!-- FORM ẨN -->
-                                <form id="editDisposalForm" action="/manager/disposal/<%= disposal.id %>" method="POST"
-                                    style="display:none;">
-                                    <input type="hidden" name="code" value="<%= disposal.code %>">
-                                    <input type="hidden" name="year" value="<%= disposal.year %>">
-                                    <input type="hidden" name="created_at" value="<%= disposal.created_at %>">
-                                </form>
-
-                                <!-- BẢNG CHỈNH SỬA -->
-                                <div class="table-responsive" style="overflow-x:auto;">
-                                    <table class="table-modern" style="width:100%;">
-                                        <thead>
-                                            <tr>
-                                                <th>Tên thiết bị</th>
-                                                <th>Loại thiết bị</th>
-                                                <th>Bộ môn quản lý</th>
-                                                <th>Ngày phát hiện hỏng</th>
-                                                <th>Mức độ hỏng</th>
-                                                <th>Lý do hỏng</th>
-                                                <th>Giá bán dự kiến</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <% if (disposal.details && disposal.details.length> 0) { %>
-                                                <% disposal.details.forEach((d, index)=> { %>
+                                <!-- ===== TABLE ===== -->
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle">
+                                                <thead>
                                                     <tr>
-                                                        <td><input type="text" class="form-control"
-                                                                value="<%= d.name %>"></td>
-                                                        <td>
-                                                            <select class="form-select">
-                                                                <% deviceTypes.forEach(type=> { %>
-                                                                    <option value="<%= type %>" <%=d.type===type
-                                                                        ? 'selected' : '' %>><%= type %>
-                                                                    </option>
-                                                                    <% }) %>
-                                                            </select>
-                                                        </td>
-                                                        <td>
-                                                            <select class="form-select">
-                                                                <% departments.forEach(dep=> { %>
-                                                                    <option value="<%= dep %>" <%=d.department===dep
-                                                                        ? 'selected' : '' %>>
-                                                                        <%= dep %>
-                                                                    </option>
-                                                                    <% }) %>
-                                                            </select>
-                                                        </td>
-                                                        <td><input type="date" class="form-control"
-                                                                value="<%= d.broken_date %>"></td>
-                                                        <td><input type="text" class="form-control"
-                                                                value="<%= d.level %>"></td>
-                                                        <td><input type="text" class="form-control"
-                                                                value="<%= d.reason %>"></td>
-                                                        <td><input type="number" class="form-control"
-                                                                value="<%= d.price %>" min="0"></td>
+                                                        <th>Tên thiết bị</th>
+                                                        <th>Loại thiết bị</th>
+                                                        <th>Bộ môn quản lý</th>
+                                                        <th>Ngày phát hiện</th>
+                                                        <th>Mức độ hỏng</th>
+                                                        <th>Lý do</th>
+                                                        <th>Giá bán</th>
                                                     </tr>
-                                                    <% }) %>
-                                                        <% } else { %>
+                                                </thead>
+                                                <tbody>
+                                                    <% if (disposal.details && disposal.details.length> 0) { %>
+                                                        <% disposal.details.forEach((d, index)=> { %>
                                                             <tr>
-                                                                <td colspan="7" class="text-center">Chưa có thiết bị nào
-                                                                    trong báo cáo</td>
+                                                                <td>
+                                                                    <input type="text"
+                                                                        name="details[<%= index %>][name]"
+                                                                        class="form-control" value="<%= d.name %>">
+                                                                </td>
+
+                                                                <td>
+                                                                    <select name="details[<%= index %>][type]"
+                                                                        class="form-select">
+                                                                        <% deviceTypes.forEach(type=> { %>
+                                                                            <option value="<%= type %>" <%=d.type===type
+                                                                                ? 'selected' : '' %>>
+                                                                                <%= type %>
+                                                                            </option>
+                                                                            <% }) %>
+                                                                    </select>
+                                                                </td>
+
+                                                                <td>
+                                                                    <select name="details[<%= index %>][department]"
+                                                                        class="form-select">
+                                                                        <% departments.forEach(dep=> { %>
+                                                                            <option value="<%= dep %>"
+                                                                                <%=d.department===dep ? 'selected' : ''
+                                                                                %>>
+                                                                                <%= dep %>
+                                                                            </option>
+                                                                            <% }) %>
+                                                                    </select>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input type="date"
+                                                                        name="details[<%= index %>][broken_date]"
+                                                                        class="form-control"
+                                                                        value="<%= d.broken_date || '' %>">
+                                                                </td>
+
+                                                                <td>
+                                                                    <select name="details[<%= index %>][level]"
+                                                                        class="form-select">
+                                                                        <option value="Hỏng nhẹ" <%=d.level==='Hỏng nhẹ'
+                                                                            ? 'selected' : '' %>>
+                                                                            Hỏng nhẹ
+                                                                        </option>
+                                                                        <option value="Hỏng nặng"
+                                                                            <%=d.level==='Hỏng nặng' ? 'selected' : ''
+                                                                            %>>
+                                                                            Hỏng nặng
+                                                                        </option>
+                                                                    </select>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input type="text"
+                                                                        name="details[<%= index %>][reason]"
+                                                                        class="form-control" value="<%= d.reason %>">
+                                                                </td>
+
+                                                                <td>
+                                                                    <input type="number"
+                                                                        name="details[<%= index %>][price]"
+                                                                        class="form-control" min="0"
+                                                                        value="<%= d.price %>">
+                                                                </td>
                                                             </tr>
-                                                            <% } %>
-                                        </tbody>
-                                    </table>
+                                                            <% }) %>
+                                                                <% } else { %>
+                                                                    <tr>
+                                                                        <td colspan="7" class="text-center text-muted">
+                                                                            Chưa có thiết bị nào trong báo cáo
+                                                                        </td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <!-- NÚT HÀNH ĐỘNG -->
-                                <div class="d-flex justify-content-end mt-3 gap-2">
-                                    <button class="btn btn-primary"
-                                        onclick="document.getElementById('editDisposalForm').submit();">
+                                <!-- ===== ACTION BUTTONS ===== -->
+                                <div class="d-flex justify-content-end gap-2 mt-4">
+                                    <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-save"></i> Lưu thay đổi
                                     </button>
-                                    <a href="/manager/disposal" class="btn btn-secondary"><i class="fas fa-times"></i>
-                                        Hủy</a>
+                                    <a href="/manager/disposal" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Hủy
+                                    </a>
                                 </div>
 
-                            </div>
+                            </form>
+
                         </div>
-                        <!-- Footer -->
-                        <%- include('../../../views/partials/footer') %>
-                </div>
+                    </div>
+            </div>
         </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/public/javascripts/disposal.js"></script>
+
+        <!-- ===== FOOTER ===== -->
+        <%- include('../../../views/partials/footer') %>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

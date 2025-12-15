@@ -4,176 +4,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xem chi tiết báo cáo thanh lý</title>
+    <title>Chi tiết báo cáo thanh lý</title>
 
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="/stylesheets/disposal.css">
     <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 
 <body>
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <!-- Sidebar -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'disposal' , user: typeof user
-                !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+    <!-- ===== HEADER ===== -->
+    <%- include('../../../views/partials/header', { currentPage: 'disposal' , user: typeof user !=='undefined' ? user :
+        { role: 'ql_thiet_bi' } }) %>
 
-                <!-- Main Content -->
-                <div class="col-md-9 col-lg-10 main-content">
-                    <!-- Header -->
-                    <%- include('../../../views/partials/header', { currentPage: 'disposal' , user: typeof user
-                        !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
-                        <div class="container py-4">
-                            <!-- MAIN -->
-                            <div class="main">
+        <!-- ===== MAIN LAYOUT ===== -->
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                <!-- ===== SIDEBAR ===== -->
+                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'disposal' , user: typeof user
+                    !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
-                                <!-- HEADER -->
-                                <div class="main-header">
-                                    <div style="display:flex; align-items:center;">
-                                        <button class="btn-menu" id="toggleSidebar"><i class="fas fa-bars"></i></button>
-                                        <h2>CHI TIẾT BÁO CÁO THANH LÝ THIẾT BỊ HỎNG</h2>
-                                    </div>
-                                    <div class="user"><i class="fas fa-user"></i> QLTB</div>
-                                </div>
+                    <!-- ===== MAIN CONTENT ===== -->
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container-fluid py-4">
 
-                                <!-- INFO SECTION -->
-                                <div class="disposal-info" style="margin-bottom: 30px;">
-
-                                    <div class="info-box info-code">
-                                        <label>Mã biên bản</label>
-                                        <span class="value">
-                                            <%= disposal.code %>
-                                        </span>
-                                    </div>
-
-                                    <div class="info-box info-year">
-                                        <label>Năm học</label>
-                                        <span class="value">
-                                            <%= disposal.year %>
-                                        </span>
-                                    </div>
-
-                                    <div class="info-box info-date">
-                                        <label>Ngày lập</label>
-                                        <span class="value">
-                                            <%= disposal.created_at %>
-                                        </span>
-                                    </div>
-
-                                    <!-- ====================== FILTERS ====================== -->
-                                    <div class="disposal-filters"
-                                        style="display:flex; gap:10px; align-items:center; margin-left:auto;">
-                                        <div class="disposal-filter">
-                                            <label for="filterSeverity">Mức độ hỏng:</label>
-                                            <select id="filterSeverity">
-                                                <option value="all">Tất cả</option>
-                                                <option value="Hỏng nhẹ">Hỏng nhẹ</option>
-                                                <option value="Hỏng nặng">Hỏng nặng</option>
-                                            </select>
-                                        </div>
-                                        <div class="disposal-filter">
-                                            <label for="filterDepartment">Bộ môn quản lý:</label>
-                                            <select id="filterDepartment">
-                                                <option value="all">Tất cả</option>
-                                                <% // Lấy danh sách bộ môn từ disposal.details let departments=[];
-                                                    disposal.details.forEach(d=>{
-                                                    if (!departments.includes(d.department))
-                                                    departments.push(d.department);
-                                                    });
-                                                    departments.forEach(dep=>{ %>
-                                                    <option value="<%= dep %>">
-                                                        <%= dep %>
-                                                    </option>
-                                                    <% }) %>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-
-                                <!-- TABLE THIẾT BỊ -->
-                                <div class="table-responsive" style="margin-bottom:20px;">
-                                    <table class="table-modern" style="width:100%;">
-                                        <thead>
-                                            <tr>
-                                                <th>Tên thiết bị</th>
-                                                <th>Loại thiết bị</th>
-                                                <th>Bộ môn quản lý</th>
-                                                <th>Ngày phát hiện hỏng</th>
-                                                <th>Mức độ hỏng</th>
-                                                <th>Lý do hỏng</th>
-                                                <th>Giá bán</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <% if (disposal.details && disposal.details.length> 0) { %>
-                                                <% disposal.details.forEach(d=> { %>
-                                                    <tr>
-                                                        <td>
-                                                            <%= d.name %>
-                                                        </td>
-                                                        <td>
-                                                            <%= d.type %>
-                                                        </td>
-                                                        <td>
-                                                            <%= d.department %>
-                                                        </td>
-                                                        <td>
-                                                            <%= d.broken_date || d.detected_at || '' %>
-                                                        </td>
-                                                        <td>
-                                                            <% if(d.level || d.severity || ''==='Hỏng nặng' ) { %>
-                                                                <div class="level-badge level-severe">Hỏng nặng
-                                                                </div>
-                                                                <% } else if(d.level || d.severity || ''==='Hỏng nhẹ' )
-                                                                    { %>
-                                                                    <div class="level-badge level-low">Hỏng nhẹ
-                                                                    </div>
-                                                                    <% } else { %>
-                                                                        <div class="level-badge">
-                                                                            <%= d.level || d.severity || '' %>
-                                                                        </div>
-                                                                        <% } %>
-                                                        </td>
-                                                        <td>
-                                                            <%= d.reason %>
-                                                        </td>
-                                                        <td>
-                                                            <%= d.price %>
-                                                        </td>
-                                                    </tr>
-                                                    <% }) %>
-                                                        <% } else { %>
-                                                            <tr>
-                                                                <td colspan="7"
-                                                                    style="text-align:center; color:#6b7280;">
-                                                                    Chưa có thiết bị nào được thêm
-                                                                </td>
-                                                            </tr>
-                                                            <% } %>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Nút đóng -->
-                                <div style="margin-bottom: 20px; margin-top:10px;">
-                                    <a href="/manager/disposal" class="btn btn-secondary">
-                                        <i class="fas fa-times"></i> Đóng
-                                    </a>
-                                </div>
-
+                            <!-- Page Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h1 class="h3 mb-0">CHI TIẾT BÁO CÁO THANH LÝ THIẾT BỊ HỎNG</h1>
+                                <a href="/manager/disposal" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại
+                                </a>
                             </div>
-                        </div>
-                        <!-- Footer -->
-                        <%- include('../../../views/partials/footer') %>
-                </div>
-        </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/public/javascripts/disposal.js"></script>
+                            <!-- ===== INFO BOXES (GIỮ NGUYÊN STYLE) ===== -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="d-flex flex-wrap gap-3 align-items-center">
+
+                                        <div class="info-box info-code">
+                                            <label>Mã biên bản</label>
+                                            <div class="value">
+                                                <%= disposal.code %>
+                                            </div>
+                                        </div>
+
+                                        <div class="info-box info-year">
+                                            <label>Năm học</label>
+                                            <div class="value">
+                                                <%= disposal.year %>
+                                            </div>
+                                        </div>
+
+                                        <div class="info-box info-date">
+                                            <label>Ngày lập</label>
+                                            <div class="value">
+                                                <%= disposal.created_at %>
+                                            </div>
+                                        </div>
+
+                                        <!-- Filters -->
+                                        <div class="disposal-filters ms-auto">
+                                            <div class="disposal-filter">
+                                                <label for="filterSeverity">Mức độ hỏng</label>
+                                                <select id="filterSeverity">
+                                                    <option value="all">Tất cả</option>
+                                                    <option value="Hỏng nhẹ">Hỏng nhẹ</option>
+                                                    <option value="Hỏng nặng">Hỏng nặng</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="disposal-filter">
+                                                <label for="filterDepartment">Bộ môn quản lý</label>
+                                                <select id="filterDepartment">
+                                                    <option value="all">Tất cả</option>
+                                                    <% let departments=[]; disposal.details.forEach(d=> {
+                                                        if (!departments.includes(d.department)) {
+                                                        departments.push(d.department);
+                                                        }
+                                                        });
+                                                        departments.forEach(dep => {
+                                                        %>
+                                                        <option value="<%= dep %>">
+                                                            <%= dep %>
+                                                        </option>
+                                                        <% }) %>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ===== TABLE ===== -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Tên thiết bị</th>
+                                                    <th>Loại thiết bị</th>
+                                                    <th>Bộ môn quản lý</th>
+                                                    <th>Ngày phát hiện</th>
+                                                    <th>Mức độ hỏng</th>
+                                                    <th>Lý do</th>
+                                                    <th>Giá bán</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (disposal.details && disposal.details.length> 0) { %>
+                                                    <% disposal.details.forEach(d=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= d.name %>
+                                                            </td>
+                                                            <td>
+                                                                <%= d.type %>
+                                                            </td>
+                                                            <td>
+                                                                <%= d.department %>
+                                                            </td>
+                                                            <td>
+                                                                <%= d.broken_date || d.detected_at || '' %>
+                                                            </td>
+                                                            <td>
+                                                                <% if ((d.level || d.severity)==='Hỏng nặng' ) { %>
+                                                                    <span class="level-badge level-severe">Hỏng
+                                                                        nặng</span>
+                                                                    <% } else if ((d.level || d.severity)==='Hỏng nhẹ' )
+                                                                        { %>
+                                                                        <span class="level-badge level-low">Hỏng
+                                                                            nhẹ</span>
+                                                                        <% } else { %>
+                                                                            <span class="level-badge">
+                                                                                <%= d.level || d.severity || '' %>
+                                                                            </span>
+                                                                            <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <%= d.reason %>
+                                                            </td>
+                                                            <td>
+                                                                <%= d.price %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="7" class="text-center text-muted">
+                                                                        Chưa có thiết bị nào được thêm
+                                                                    </td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <%- include('../../../views/partials/footer') %>
+
+            <!-- JS -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/public/javascripts/disposal.js"></script>
 </body>
 
 </html>
