@@ -2,6 +2,10 @@
    DISPOSAL
    ============================ */
 
+/* ---------- Global ---------- */
+* {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
 
 
 body {
@@ -35,29 +39,95 @@ body {
     margin-top: 20px;
 }
 
-/* ---------- Search ---------- */
-.main-content .form-control {
-    height: 44px;
-    border-radius: 10px;
-    border-color: #e2e8f0;
-}
-
-.main-content .form-control:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-}
-
+/* ---------- Primary Button ---------- */
 .main-content .btn-primary {
-    height: 44px;
-    border-radius: 10px;
+    height: 42px;
+    padding: 0 18px;
+    border-radius: 8px;
     font-weight: 600;
     background: #2563eb;
-    border-color: #2563eb;
+    border: 1px solid #2563eb;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+    transition: all 0.2s ease;
 }
 
 .main-content .btn-primary:hover {
-    background: #1d4ed8;
+    background: #1e40af;
+    box-shadow: 0 6px 16px rgba(37,99,235,0.45);
+    transform: translateY(-1px);
 }
+
+.main-content .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(37,99,235,0.3);
+}
+
+/* ---------- Search Box (Suppliers-style) ---------- */
+.search-box {
+    display: flex;
+    align-items: stretch;
+    max-width: 320px;
+}
+
+.search-box input {
+    height: 42px;
+    flex: 1;
+    border-radius: 8px 0 0 8px;
+    border: 1px solid #e2e8f0;
+    border-right: none;
+    padding: 0 14px;
+    font-size: 14px;
+}
+
+.search-box input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+    outline: none;
+}
+
+.search-box .search-btn {
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 0 8px 8px 0;
+    border: 1px solid #2563eb;
+
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+    transition: all 0.2s ease;
+}
+
+.search-box .search-btn:hover {
+    background: #1e40af;
+    box-shadow: 0 6px 16px rgba(37,99,235,0.45);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .search-box {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .search-box input,
+    .search-box .search-btn {
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+}
+
+
 
 /* ---------- Table ---------- */
 .table {
@@ -209,23 +279,6 @@ body {
     .disposal-filter select {
         width: 100%;
     }
-}
-
-
-/* ---------- Action Buttons ---------- */
-.table .btn {
-    border-radius: 8px;
-    padding: 4px 10px;
-}
-
-.table .btn-outline-primary {
-    color: #2563eb;
-    border-color: #2563eb;
-}
-
-.table .btn-outline-primary:hover {
-    background: #2563eb;
-    color: #fff;
 }
 
 /* ---------- Level Badge ---------- */
