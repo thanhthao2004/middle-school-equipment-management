@@ -14,15 +14,38 @@
 </head>
 
 <body>
-    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'to_truong' }; %>
-        <!-- Header -->
-        <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans' , user: userObj }) %>
+    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
+    
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <%- include('../../../views/partials/borrow-sidebar', { currentPage: 'purchasing-plans', user: userObj }) %>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans', user: userObj }) %>
+            
+            <!-- Page Content -->
+            <div class="container-fluid py-4">
+                <div class="page-header">
+                    <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
+                </div>
 
-            <div class="container-fluid p-0">
-                <div class="row g-0">
-                    <div class="col-md-3 col-lg-2">
-                        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans' , user:
-                            userObj }) %>
+                <div class="controls">
+                    <div class="left">
+                        <select id="year-filter" class="form-select search-select" aria-label="Năm học">
+                            <option value="">Năm học</option>
+                            <% if (years && years.length) { %>
+                                <% years.forEach(function(y){ %>
+                                    <option value="<%= y %>">
+                                        <%= y %>
+                                    </option>
+                                    <% }); %>
+                                        <% } %>
+                        </select>
+                        <button id="year-filter-btn" class="btn btn-outline-primary">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
                     </div>
 
                     <div class="col-md-9 col-lg-10 main-content">
