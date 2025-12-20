@@ -9,129 +9,136 @@
     </title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="/public/stylesheets/style.css" rel="stylesheet">
-    <link href="/public/stylesheets/training-plans.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/training-plans.css" rel="stylesheet">
 </head>
 
 <body>
-    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
-    <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'trainingPlans', user: userObj }) %>
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'to_truong' }; %>
+        <!-- Header -->
+        <%- include('../../../views/partials/header', { currentPage: 'trainingPlans' , user: userObj }) %>
 
-    <div class="container-fluid p-0">
-      <div class="row g-0">
-        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'trainingPlans', user: userObj }) %>
+            <div class="container-fluid p-0">
+                <div class="row g-0">
+                    <div class="col-md-3 col-lg-2">
+                        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'trainingPlans' , user:
+                            userObj }) %>
+                    </div>
 
-        <div class="col-md-9 col-lg-10 main-content">
-          <div class="container py-4">
-            <div class="app-shell">
-                <main class="main-content">
-                <div class="page-header">
-                    <h1>Xem kế hoạch đào tạo</h1>
-                </div>
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container py-4">
+                            <div class="app-shell">
+                                <main class="main-content">
+                                    <div class="page-header">
+                                        <h1>Xem kế hoạch đào tạo</h1>
+                                    </div>
 
-                <div class="controls">
-                    <div class="left">
-                        <select id="year-filter" class="form-select search-select" aria-label="Năm học">
-                            <option value="">Năm học</option>
-                            <% if (years && years.length) { %>
-                                <% years.forEach(function(y){ %>
-                                    <option value="<%= y %>" <%=(queryYear==y ? 'selected' : '' ) %>>
-                                        <%= y %>
-                                    </option>
-                                    <% }) %>
-                                        <% } %>
-                        </select>
-                        <button id="year-filter-btn" class="btn btn-outline-primary">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
+                                    <div class="controls">
+                                        <div class="left">
+                                            <select id="year-filter" class="form-select search-select"
+                                                aria-label="Năm học">
+                                                <option value="">Năm học</option>
+                                                <% if (years && years.length) { %>
+                                                    <% years.forEach(function(y){ %>
+                                                        <option value="<%= y %>" <%=(queryYear==y ? 'selected' : '' ) %>
+                                                            >
+                                                            <%= y %>
+                                                        </option>
+                                                        <% }) %>
+                                                            <% } %>
+                                            </select>
+                                            <button id="year-filter-btn" class="btn btn-outline-primary">
+                                                <i class="fa-solid fa-magnifying-glass"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card card-table mt-3">
+                                        <div class="card-body">
+                                            <% if (trainingPlans && trainingPlans.length) { %>
+                                                <div class="table-responsive">
+                                                    <table class="table align-middle">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Mã kế hoạch đào tạo</th>
+                                                                <th>Năm học</th>
+                                                                <th>Ngày lập</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% trainingPlans.forEach(function(plan){ %>
+                                                                <tr data-year="<%= plan.schoolYear || plan.year %>">
+                                                                    <td>
+                                                                        <%= plan.code || plan.id %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= plan.schoolYear || plan.year %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= plan.createdAt ? (new
+                                                                            Date(plan.createdAt)).toLocaleDateString('en-GB')
+                                                                            : '' %>
+                                                                    </td>
+                                                                    <td class="float-right">
+                                                                        <a href="/teacher/training-plans/<%= plan.id %>"
+                                                                            class="action-btn btn-view" title="Xem">
+                                                                            <i class="fa-solid fa-eye"></i>
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                                <% }) %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div id="no-results" class="alert alert-warning mt-3"
+                                                    style="display:none">
+                                                    Không có kế hoạch đào tạo cho năm học đã chọn.
+                                                </div>
+                                                <% } else { %>
+                                                    <div class="alert alert-info">Chưa có kế hoạch đào tạo nào.</div>
+                                                    <% } %>
+                                        </div>
+                                    </div>
+                                </main>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="card card-table mt-3">
-                    <div class="card-body">
-                        <% if (trainingPlans && trainingPlans.length) { %>
-                            <div class="table-responsive">
-                                <table class="table align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Mã kế hoạch đào tạo</th>
-                                            <th>Năm học</th>
-                                            <th>Ngày lập</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% trainingPlans.forEach(function(plan){ %>
-                                            <tr data-year="<%= plan.schoolYear || plan.year %>">
-                                                <td>
-                                                    <%= plan.code || plan.id %>
-                                                </td>
-                                                <td>
-                                                    <%= plan.schoolYear || plan.year %>
-                                                </td>
-                                                <td>
-                                                    <%= plan.createdAt ? (new
-                                                        Date(plan.createdAt)).toLocaleDateString('en-GB') : '' %>
-                                                </td>
-                                                <td class="float-right">
-                                                    <a href="/teacher/training-plans/<%= plan.id %>" class="action-btn btn-view"
-                                                        title="Xem">
-                                                        <i class="fa-solid fa-eye"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <% }) %>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div id="no-results" class="alert alert-warning mt-3" style="display:none">
-                                Không có kế hoạch đào tạo cho năm học đã chọn.
-                            </div>
-                            <% } else { %>
-                                <div class="alert alert-info">Chưa có kế hoạch đào tạo nào.</div>
-                                <% } %>
-                    </div>
-                </div>
-                </main>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <%- include('../../../views/partials/footer') %>
+            <%- include('../../../views/partials/footer') %>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Filter theo năm học
-        (function () {
-            const yearSelect = document.getElementById('year-filter');
-            const yearBtn = document.getElementById('year-filter-btn');
-            const noResults = document.getElementById('no-results');
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    // Filter theo năm học
+                    (function () {
+                        const yearSelect = document.getElementById('year-filter');
+                        const yearBtn = document.getElementById('year-filter-btn');
+                        const noResults = document.getElementById('no-results');
 
-            function filterByYear(year) {
-                const rows = document.querySelectorAll('table tbody tr[data-year]');
-                let any = false;
-                rows.forEach(r => {
-                    const y = r.getAttribute('data-year') || '';
-                    if (!year || year === '' || y === year) {
-                        r.style.display = '';
-                        any = true;
-                    } else {
-                        r.style.display = 'none';
-                    }
-                });
-                if (noResults) noResults.style.display = any ? 'none' : 'block';
-            }
+                        function filterByYear(year) {
+                            const rows = document.querySelectorAll('table tbody tr[data-year]');
+                            let any = false;
+                            rows.forEach(r => {
+                                const y = r.getAttribute('data-year') || '';
+                                if (!year || year === '' || y === year) {
+                                    r.style.display = '';
+                                    any = true;
+                                } else {
+                                    r.style.display = 'none';
+                                }
+                            });
+                            if (noResults) noResults.style.display = any ? 'none' : 'block';
+                        }
 
-            if (yearBtn) {
-                yearBtn.addEventListener('click', function () {
-                    filterByYear(yearSelect ? yearSelect.value : '');
-                });
-            }
-        })();
-    </script>
+                        if (yearBtn) {
+                            yearBtn.addEventListener('click', function () {
+                                filterByYear(yearSelect ? yearSelect.value : '');
+                            });
+                        }
+                    })();
+                </script>
 </body>
 
 </html>
