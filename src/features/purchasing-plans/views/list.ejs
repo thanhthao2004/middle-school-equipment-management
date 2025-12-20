@@ -73,19 +73,19 @@
                                                     <tbody>
                                                         <% if (plans && plans.length) { %>
                                                             <% plans.forEach(function(plan){ %>
-                                                                <tr data-year="<%= plan.schoolYear %>">
+                                                                <tr data-year="<%= plan.schoolYear || plan.namHoc %>">
                                                                     <td>
-                                                                        <%= plan.code %>
+                                                                        <%= plan.code || plan.maKeHoachMuaSam %>
                                                                     </td>
                                                                     <td>
-                                                                        <%= plan.schoolYear %>
+                                                                        <%= plan.schoolYear || plan.namHoc %>
                                                                     </td>
                                                                     <td>
-                                                                        <% if (plan.status==='approved' ) { %>
+                                                                        <% if (plan.status==='approved' || plan.trangThai==='da_duyet') { %>
                                                                             <span
                                                                                 class="status-badge status-available">Đã
                                                                                 duyệt</span>
-                                                                            <% } else if (plan.status==='pending' ) { %>
+                                                                            <% } else if (plan.status==='pending' || plan.trangThai==='cho_phe_duyet') { %>
                                                                                 <span
                                                                                     class="status-badge status-pending">Đang
                                                                                     chờ
@@ -98,23 +98,23 @@
                                                                                     <% } else { %>
                                                                                         <span
                                                                                             class="status-badge status-borrowed">
-                                                                                            <%= plan.status %>
+                                                                                            <%= plan.status || plan.trangThai %>
                                                                                         </span>
                                                                                         <% } %>
                                                                     </td>
                                                                     <td class="float-right">
-                                                                        <a href="/teacher/purchasing-plans/<%= plan.id %>"
+                                                                        <a href="/teacher/purchasing-plans/<%= plan.maKeHoachMuaSam || plan.code %>/detail"
                                                                             class="action-btn btn-view" title="Xem">
                                                                             <i class="fa-solid fa-eye"></i>
                                                                         </a>
-                                                                        <% if (plan.status==='pending' ) { %>
-                                                                            <a href="/teacher/purchasing-plans/<%= plan.id %>/edit"
+                                                                        <% if (plan.trangThai==='cho_phe_duyet' || plan.status==='pending' ) { %>
+                                                                            <a href="/teacher/purchasing-plans/<%= plan._id || plan.id %>/edit"
                                                                                 class="action-btn btn-edit" title="Sửa">
                                                                                 <i class="fa-solid fa-pen"></i>
                                                                             </a>
 
-                                                                            <a href="#" data-plan-id="<%= plan.id %>"
-                                                                                data-plan-code="<%= plan.code %>"
+                                                                            <a href="#" data-plan-id="<%= plan._id || plan.id %>"
+                                                                                data-plan-code="<%= plan.code || plan.maKeHoachMuaSam %>"
                                                                                 class="action-btn btn-delete"
                                                                                 title="Xóa">
                                                                                 <i class="fa-solid fa-trash-can"></i>
@@ -163,9 +163,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                <form id="deleteForm" method="POST" style="display:inline;">
-                                    <button type="submit" class="btn btn-danger">Xóa</button>
-                                </form>
+                                <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Xóa</button>
                             </div>
                         </div>
                     </div>
@@ -208,20 +206,35 @@
                     (function () {
                         const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
                         const modalPlanCode = document.getElementById('modalPlanCode');
-                        const deleteForm = document.getElementById('deleteForm');
+                        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+                        let currentRow = null;
 
                         document.querySelectorAll('.action-btn.btn-delete').forEach(btn => {
                             btn.addEventListener('click', function (e) {
                                 e.preventDefault();
-                                const planId = btn.dataset.planId;
                                 const planCode = btn.dataset.planCode;
                                 modalPlanCode.textContent = planCode;
-                                // Check if user is principal, use principal route, else teacher route
-                                const userRole = '<%= userObj.role || "to_truong" %>';
-                                const basePath = userRole === 'hieu_truong' ? '/principal/purchasing-plans' : '/teacher/purchasing-plans';
-                                deleteForm.action = basePath + '/' + planId + '?_method=DELETE';
+                                // Store reference to the table row
+                                currentRow = btn.closest('tr');
                                 deleteModal.show();
                             });
+                        });
+
+                        // Handle confirm delete - remove from DOM only, not from database
+                        confirmDeleteBtn.addEventListener('click', function () {
+                            if (currentRow) {
+                                // Remove the row from the table
+                                currentRow.remove();
+                                currentRow = null;
+                                deleteModal.hide();
+                                
+                                // Check if there are any rows left
+                                const rows = document.querySelectorAll('table tbody tr[data-year]');
+                                if (rows.length === 0) {
+                                    const tbody = document.querySelector('table tbody');
+                                    tbody.innerHTML = '<tr style="font-style: italic;"><td colspan="4" class="text-center text-muted py-4">Chưa có kế hoạch mua sắm nào.</td></tr>';
+                                }
+                            }
                         });
                     })();
                 </script>
