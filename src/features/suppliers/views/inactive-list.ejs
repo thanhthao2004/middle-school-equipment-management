@@ -7,8 +7,8 @@
     <title>Quản lý nhà cung cấp</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/stylesheets/suppliers.css">
-    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/public/stylesheets/suppliers.css">
+    <link rel="stylesheet" href="/public/stylesheets/style.css">
 </head>
 
 <body>
@@ -28,17 +28,10 @@
                         <div class="container-fluid py-4">
                             <!-- Page Header -->
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h1 class="h3 mb-0">QUẢN LÝ NHÀ CUNG CẤP</h1>
-
-                                <div class="d-flex gap-2">
-                                    <a href="/manager/suppliers/inactive" class="btn btn-outline-secondary">
-                                        <i class="fas fa-ban"></i> Nhà cung cấp ngừng hợp tác
-                                    </a>
-
-                                    <a href="/manager/suppliers/add" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i> Thêm nhà cung cấp mới
-                                    </a>
-                                </div>
+                                <h1 class="h3 mb-0">NHÀ CUNG CẤP NGỪNG HỢP TÁC</h1>
+                                <a href="/manager/suppliers" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại
+                                </a>
                             </div>
 
                             <!-- Search Box -->
@@ -75,81 +68,68 @@
                                                 <tr>
                                                     <th>Mã NCC</th>
                                                     <th>Tên NCC</th>
-                                                    <th>Địa Chỉ</th>
+                                                    <th>Địa chỉ</th>
                                                     <th>SĐT</th>
                                                     <th>Email</th>
-                                                    <th>Loại Thiết Bị</th>
-                                                    <th>Ngày Hợp Tác</th>
-                                                    <th>Trạng Thái</th>
-                                                    <th>Thao Tác</th>
+                                                    <th>Loại thiết bị</th>
+                                                    <th>Ngày hợp tác</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Khôi phục</th>
                                                 </tr>
                                             </thead>
+
                                             <tbody>
                                                 <% suppliers.forEach(s=> { %>
                                                     <tr>
-                                                        <!-- Mã NCC -->
                                                         <td>
                                                             <span class="badge bg-secondary">
                                                                 <%= s.maNCC %>
                                                             </span>
                                                         </td>
 
-                                                        <!-- Tên NCC -->
                                                         <td>
                                                             <%= s.name %>
                                                         </td>
 
-                                                        <!-- Địa chỉ -->
                                                         <td>
                                                             <%= s.address || '-' %>
                                                         </td>
 
-                                                        <!-- SĐT -->
                                                         <td>
                                                             <%= s.phone || '-' %>
                                                         </td>
 
-                                                        <!-- Email -->
                                                         <td>
                                                             <%= s.email || '-' %>
                                                         </td>
 
-                                                        <!-- Loại thiết bị -->
                                                         <td>
                                                             <%= s.type || '-' %>
                                                         </td>
 
-                                                        <!-- Ngày hợp tác -->
                                                         <td>
                                                             <%= s.contractDate ? new
                                                                 Date(s.contractDate).toLocaleDateString('vi-VN') : '-'
                                                                 %>
                                                         </td>
 
-                                                        <!-- Trạng thái -->
+
                                                         <td>
-                                                            <span
-                                                                class="badge <%= s.status === 'Ngừng hợp tác' ? 'bg-danger' : 'bg-success' %>">
-                                                                <%= s.status %>
-                                                            </span>
+                                                            <span class="badge bg-danger">Ngừng hợp tác</span>
                                                         </td>
 
-                                                        <!-- Thao tác -->
                                                         <td>
-                                                            <div class="btn-group btn-group-sm">
-                                                                <a href="/manager/suppliers/edit/<%= s._id %>"
-                                                                    class="btn btn-warning">
-                                                                    <i class="fas fa-edit"></i> Sửa
-                                                                </a>
-                                                                <a href="#" class="btn btn-danger btn-delete"
-                                                                    data-id="<%= s._id %>" data-name="<%= s.name %>">
-                                                                    <i class="fas fa-trash-alt"></i> Xóa
-                                                                </a>
-                                                            </div>
+                                                            <form action="/manager/suppliers/<%= s._id %>/restore"
+                                                                method="POST">
+                                                                <button class="btn btn-success btn-sm">
+                                                                    <i class="fas fa-rotate-left"></i> Khôi phục
+                                                                </button>
+                                                            </form>
                                                         </td>
                                                     </tr>
                                                     <% }) %>
                                             </tbody>
+
                                         </table>
                                     </div>
                                 </div>
@@ -177,7 +157,7 @@
 
             <!-- Bootstrap JS -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="/javascripts/suppliers.js"></script>
+            <script src="/public/javascripts/suppliers.js"></script>
 </body>
 
 </html>

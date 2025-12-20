@@ -1,3 +1,4 @@
+
 /**
  * Routes Aggregator
  * Tập trung tất cả routes của ứng dụng
@@ -38,6 +39,8 @@ router.use('/manager/suppliers', authenticate, requireRole('ql_thiet_bi'), requi
 router.use('/manager/acceptance', authenticate, requireRole('ql_thiet_bi'), require('../features/acceptance/routes/acceptance.routes'));
 router.use('/manager/periodic-reports', authenticate, requireRole('ql_thiet_bi'), require('../features/periodic-reports/routes/periodic-report.routes'));
 router.use('/manager/disposal', authenticate, requireRole('ql_thiet_bi'), require('../features/disposal/routes/disposal.routes'));
+
+router.use('/manager', require('../features/manager/routes/manager.routes'));
 
 // ==========================
 // TEACHER (Giáo viên bộ môn)
