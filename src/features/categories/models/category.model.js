@@ -1,25 +1,44 @@
-const { Schema, model } = require('mongoose');
-const { getNextCode } = require('../../../core/libs/sequence');
+const mongoose = require("mongoose");
 
-// DanhMucThietBi
-const CategorySchema = new Schema(
+const CategorySchema = new mongoose.Schema(
 	{
-		maDM: { type: String, required: true, unique: true, trim: true },
-		tenDM: { type: String, required: true, trim: true },
-		viTriLuuTru: { type: String, default: '' },
+		id: {           // Mã danh mục, tự sinh DM01, DM02...
+			type: String,
+			unique: true,
+		},
+		name: {         // Tên danh mục
+			type: String,
+			required: true,
+			trim: true,
+		},
+		location: {     // Vị trí lưu trữ
+			type: String,
+			trim: true,
+		},
 	},
 	{ timestamps: true }
 );
 
-
-CategorySchema.pre('validate', async function ensureMaDM(next) {
+// Tự sinh mã danh mục dạng DM01, DM02... 
+CategorySchema.pre("save", async function (next) {
 	try {
-		if (!this.maDM) {
-			this.maDM = await getNextCode('DM', 3); // DM001
+		if (!this.id) {
+			const Category = mongoose.model("Category");
+
+			// Lấy danh mục có id lớn nhất
+			const lastCategory = await Category.findOne().sort({ id: -1 }).exec();
+
+			if (!lastCategory) {
+				this.id = "DM01";
+			} else {
+				const lastNumber = parseInt(lastCategory.id.replace("DM", ""));
+				this.id = "DM" + String(lastNumber + 1).padStart(2, "0");
+			}
 		}
 		next();
-	} catch (e) {
-		next(e);
+	} catch (err) {
+		next(err);
 	}
 });
-module.exports = model('Category', CategorySchema);
+
+module.exports = mongoose.model("Category", CategorySchema);
