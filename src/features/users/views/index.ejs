@@ -32,104 +32,131 @@
                   </a>
                 </div>
 
-                <div class="card">
+                <div class="card mb-3">
                   <div class="card-body">
-                    <div style="overflow-x:auto;">
-                      <table class="table table-hover">
-                        <thead class="table-light">
-                          <tr>
-                            <th>Mã NV</th>
-                            <th>Họ và tên</th>
-                            <th>Tên đăng nhập</th>
-                            <th>Chức vụ</th>
-                            <th>Số điện thoại</th>
-                            <th>Địa chỉ</th>
-                            <th>Kinh nghiệm</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <% if (users && users.length> 0) { %>
-                            <% users.forEach(function(u) { %>
-                              <tr>
-                                <td>
-                                  <strong>
-                                    <%= u.maNV %>
-                                  </strong>
-                                </td>
-                                <td>
-                                  <%= u.hoTen %>
-                                </td>
-                                <td>
-                                  <small class="text-muted">
-                                    <%= u.username %>
-                                  </small>
-                                </td>
-                                <td>
-                                  <% if (u.role==='admin' ) { %>
-                                    <span class="badge bg-danger">Quản trị viên</span>
-                                    <% } else if (u.role==='hieu_truong' ) { %>
-                                      <span class="badge bg-primary">Hiệu trưởng</span>
-                                      <% } else if (u.role==='to_truong' ) { %>
-                                        <span class="badge bg-info text-dark">Tổ trưởng</span>
-                                        <% } else if (u.role==='giao_vien' ) { %>
-                                          <span class="badge bg-success">Giáo viên</span>
-                                          <% } else if (u.role==='ql_thiet_bi' ) { %>
-                                            <span class="badge bg-warning text-dark">QL Thiết bị</span>
-                                            <% } else { %>
-                                              <span class="badge bg-secondary">
-                                                <%= u.role %>
-                                              </span>
-                                              <% } %>
-                                </td>
-                                <td>
-                                  <%= u.soDienThoai %>
-                                </td>
-                                <td>
-                                  <small>
-                                    <%= u.diaChi || '-' %>
-                                  </small>
-                                </td>
-                                <td>
-                                  <%= u.chucVu || '-' %>
-                                </td>
-                                <td>
-                                  <% if (u.trangThai==='active' ) { %>
-                                    <span class="badge bg-success">
-                                      <i class="fas fa-check-circle me-1"></i>Hoạt động
-                                    </span>
-                                    <% } else { %>
-                                      <span class="badge bg-secondary">
-                                        <i class="fas fa-times-circle me-1"></i>Không hoạt động
-                                      </span>
-                                      <% } %>
-                                </td>
-                                <td>
-                                  <a href="/admin/<%= u._id %>/edit" class="btn btn-sm btn-outline-primary me-1"
-                                    title="Chỉnh sửa">
-                                    <i class="fas fa-edit"></i>
-                                  </a>
-                                  <a href="/admin/<%= u._id %>/delete" class="btn btn-sm btn-outline-danger"
-                                    title="Xóa">
-                                    <i class="fas fa-trash"></i>
-                                  </a>
-                                </td>
-                              </tr>
-                              <% }); %>
-                                <% } else { %>
-                                  <tr>
-                                    <td colspan="9" class="text-center text-muted py-4">
-                                      <i class="fas fa-inbox fa-2x mb-2"></i><br>
-                                      Chưa có người dùng nào.
-                                    </td>
-                                  </tr>
-                                  <% } %>
-                        </tbody>
-                      </table>
-                    </div>
+                    <form action="/admin" method="GET" class="row g-3">
+                      <div class="col-md-10">
+                        <div class="input-group">
+                          <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                          <input type="text" class="form-control border-start-0 ps-0" name="q"
+                            placeholder="Tìm kiếm theo tên, mã NV, username..."
+                            value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+                        </div>
+                      </div>
+                      <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                      </div>
+                    </form>
                   </div>
                 </div>
+
+                <% if (typeof success !=='undefined' && success) { %>
+                  <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <%= success %>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                  <% } %>
+
+                    <div class="card">
+                      <div class="card-body">
+                        <div style="overflow-x:auto;">
+                          <table class="table table-hover">
+                            <thead class="table-light">
+                              <tr>
+                                <th>Mã NV</th>
+                                <th>Họ và tên</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Chức vụ</th>
+                                <th>Số điện thoại</th>
+                                <th>Địa chỉ</th>
+                                <th>Kinh nghiệm</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <% if (users && users.length> 0) { %>
+                                <% users.forEach(function(u) { %>
+                                  <tr>
+                                    <td>
+                                      <strong>
+                                        <%= u.maNV %>
+                                      </strong>
+                                    </td>
+                                    <td>
+                                      <%= u.hoTen %>
+                                    </td>
+                                    <td>
+                                      <small class="text-muted">
+                                        <%= u.username %>
+                                      </small>
+                                    </td>
+                                    <td>
+                                      <% if (u.role==='admin' ) { %>
+                                        <span class="badge bg-danger">Quản trị viên</span>
+                                        <% } else if (u.role==='hieu_truong' ) { %>
+                                          <span class="badge bg-primary">Hiệu trưởng</span>
+                                          <% } else if (u.role==='to_truong' ) { %>
+                                            <span class="badge bg-info text-dark">Tổ trưởng</span>
+                                            <% } else if (u.role==='giao_vien' ) { %>
+                                              <span class="badge bg-success">Giáo viên</span>
+                                              <% } else if (u.role==='ql_thiet_bi' ) { %>
+                                                <span class="badge bg-warning text-dark">QL Thiết bị</span>
+                                                <% } else { %>
+                                                  <span class="badge bg-secondary">
+                                                    <%= u.role %>
+                                                  </span>
+                                                  <% } %>
+                                    </td>
+                                    <td>
+                                      <%= u.soDienThoai %>
+                                    </td>
+                                    <td>
+                                      <small>
+                                        <%= u.diaChi || '-' %>
+                                      </small>
+                                    </td>
+                                    <td>
+                                      <%= u.chucVu || '-' %>
+                                    </td>
+                                    <td>
+                                      <% if (u.trangThai==='active' ) { %>
+                                        <span class="badge bg-success">
+                                          <i class="fas fa-check-circle me-1"></i>Hoạt động
+                                        </span>
+                                        <% } else { %>
+                                          <span class="badge bg-secondary">
+                                            <i class="fas fa-times-circle me-1"></i>Không hoạt động
+                                          </span>
+                                          <% } %>
+                                    </td>
+                                    <td>
+                                      <a href="/admin/<%= u._id %>/detail" class="btn btn-sm btn-outline-primary me-1"
+                                        title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                      </a>
+                                      <a href="/admin/<%= u._id %>/delete" class="btn btn-sm btn-outline-danger"
+                                        title="Xóa"
+                                        onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
+                                        <i class="fas fa-trash"></i>
+                                      </a>
+                                    </td>
+                                  </tr>
+                                  <% }); %>
+                                    <% } else { %>
+                                      <tr>
+                                        <td colspan="9" class="text-center text-muted py-4">
+                                          <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                          Chưa có người dùng nào.
+                                        </td>
+                                      </tr>
+                                      <% } %>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
               </div>
             </div>
         </div>
