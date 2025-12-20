@@ -15,9 +15,48 @@
 </head>
 
 <body>
-    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'to_truong' }; %>
-        <!-- Header -->
-        <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans' , user: userObj }) %>
+    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
+    <!-- Header -->
+    <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans', user: userObj }) %>
+
+    <div class="container-fluid p-0">
+      <div class="row g-0">
+        <div class="col-md-3 col-lg-2">
+          <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans', user: userObj }) %>
+        </div>
+
+        <div class="col-md-9 col-lg-10 main-content">
+          <div class="container py-4">
+            <div class="app-shell">
+                <main class="main-content">
+                <div class="page-header">
+                    <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
+                    <div class="page-subtitle">Lập kế hoạch mua sắm mới</div>
+                </div>
+
+                <form action="/teacher/purchasing-plans" method="post">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Mã kế hoạch</label>
+                            <!-- show generated code read-only; submit via hidden input -->
+                            <input id="plan-code-display" class="form-control" readonly
+                                value="<%= (plan && plan.code) ? plan.code : '' %>" />
+                            <input type="hidden" id="plan-code" name="code"
+                                value="<%= (plan && plan.code) ? plan.code : '' %>" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Ngày lập</label>
+                            <!-- show generated date read-only; submit via hidden input -->
+                            <input id="plan-date-display" class="form-control" readonly
+                                value="<%= (plan && plan.date) ? plan.date : '' %>" />
+                            <input type="hidden" id="plan-date" name="date"
+                                value="<%= (plan && plan.date) ? plan.date : '' %>" />
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end justify-content-end">
+                            <button type="button" id="add-row"
+                                class="btn-register btn btn-outline-secondary small-btn me-2">
+                                <i class="fa-solid fa-plus"></i> Thêm nhiều thiết bị
+                            </button>
 
             <div class="container-fluid p-0">
                 <div class="row g-0">
