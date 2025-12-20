@@ -1,0 +1,14 @@
+<% 
+// Xác định role của user để hiển thị sidebar tương ứng
+const userRole = typeof user !== 'undefined' && user.role ? user.role : 'giao_vien';
+%>
+
+<% if (userRole === 'ql_thiet_bi') { %>
+    <%- include('./qltb-sidebar', { currentPage, user }) %>
+<% } else if (userRole === 'admin') { %>
+    <%- include('./admin-sidebar', { currentPage, user }) %>
+<% } else if (userRole === 'hieu_truong') { %>
+    <%- include('./principal-sidebar', { currentPage, user }) %>
+<% } else { %>
+    <%- include('./teacher-sidebar', { currentPage, user }) %>
+<% } %>

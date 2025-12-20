@@ -58,125 +58,428 @@
                                 <i class="fa-solid fa-plus"></i> Thêm nhiều thiết bị
                             </button>
 
-                        </div>
+            <div class="container-fluid p-0">
+                <div class="row g-0">
+                    <div class="col-md-3 col-lg-2">
+                        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans' , user:
+                            userObj }) %>
                     </div>
 
-                    <div class="card card-table mb-3">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead>
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container py-4">
+                            <div class="app-shell">
+                                <main class="main-content">
+                                    <div class="page-header">
+                                        <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
+                                        <div class="page-subtitle">Lập kế hoạch mua sắm mới</div>
+                                    </div>
+
+                                    <form action="/teacher/purchasing-plans" method="post">
+                                        <div class="row mb-3">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Mã kế hoạch</label>
+                                                <!-- show generated code read-only; submit via hidden input -->
+                                                <input id="plan-code-display" class="form-control" readonly
+                                                    value="<%= (plan && plan.code) ? plan.code : '' %>" />
+                                                <input type="hidden" id="plan-code" name="code"
+                                                    value="<%= (plan && plan.code) ? plan.code : '' %>" />
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">Ngày lập</label>
+                                                <!-- show generated date read-only; submit via hidden input -->
+                                                <input id="plan-date-display" class="form-control" readonly
+                                                    value="<%= (plan && plan.date) ? plan.date : '' %>" />
+                                                <input type="hidden" id="plan-date" name="date"
+                                                    value="<%= (plan && plan.date) ? plan.date : '' %>" />
+                                            </div>
+                                            <div class="col-md-6 d-flex align-items-end justify-content-end">
+                                                <button type="button" id="add-row"
+                                                    class="btn-register btn btn-outline-secondary small-btn me-2">
+                                                    <i class="fa-solid fa-plus"></i> Thêm nhiều thiết bị
+                                                </button>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="card card-table mb-3">
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover align-middle">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Tên Danh Mục TB</th>
+                                                                <th>Mã TB</th>
+                                                                <th>Tên TB</th>
+                                                                <th>Số lượng dự kiến</th>
+                                                                <th>ĐVT</th>
+                                                                <th>Đơn giá</th>
+                                                                <th>Nguồn gốc</th>
+                                                                <th>Dự toán kinh phí</th>
+                                                                <th>Thời gian dự kiến mua</th>
+                                                                <th>Lý do</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="items-tbody">
+                                                            <tr>
+                                                                <td><input name="items[0][category]"
+                                                                        class="form-control" /></td>
+                                                                <td><input name="items[0][code]" class="form-control" />
+                                                                </td>
+                                                                <td><input name="items[0][name]" class="form-control" />
+                                                                </td>
+                                                                <td><input name="items[0][quantity]" type="number"
+                                                                        min="0" class="form-control" /></td>
+                                                                <td><input name="items[0][uom]" class="form-control" />
+                                                                </td>
+                                                                <td><input name="items[0][unitPrice]" type="text"
+                                                                        class="form-control price-input"
+                                                                        data-index="0" />
+                                                                </td>
+                                                                <td><input name="items[0][source]"
+                                                                        class="form-control" /></td>
+                                                                <td><input name="items[0][budget]" type="text"
+                                                                        class="form-control budget-input"
+                                                                        data-index="0" /></td>
+                                                                <td><input name="items[0][expectedAt]" type="date"
+                                                                        class="form-control" />
+                                                                </td>
+                                                                <td><input name="items[0][reason]"
+                                                                        class="form-control" /></td>
+                                                                <td class="text-end"><button type="button"
+                                                                        class="btn btn-sm btn-outline-danger remove-row">✖</button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end gap-3">
+                                            <a href="/teacher/purchasing-plans" class="btn btn-secondary">Đóng</a>
+                                            <button type="submit" class="btn btn-danger">Lưu và gửi Phê duyệt</button>
+                                        </div>
+                                    </form>
+
+                                    <template id="row-template">
                                         <tr>
-                                            <th>Tên Danh Mục TB</th>
-                                            <th>Mã TB</th>
-                                            <th>Tên TB</th>
-                                            <th>Số lượng dự kiến</th>
-                                            <th>ĐVT</th>
-                                            <th>Dự toán kinh phí</th>
-                                            <th>Thời gian dự kiến mua</th>
-                                            <th>Lý do</th>
-                                            <th></th>
+                                            <td><input name="__NAME__" class="form-control" /></td>
                                         </tr>
-                                    </thead>
-                                    <tbody id="items-tbody">
-                                        <tr>
-                                            <td><input name="items[0][category]" class="form-control" /></td>
-                                            <td><input name="items[0][code]" class="form-control" /></td>
-                                            <td><input name="items[0][name]" class="form-control" /></td>
-                                            <td><input name="items[0][quantity]" type="number" min="0"
-                                                    class="form-control" /></td>
-                                            <td><input name="items[0][uom]" class="form-control" /></td>
-                                            <td><input name="items[0][budget]" type="number" step="0.01"
-                                                    class="form-control" /></td>
-                                            <td><input name="items[0][expectedAt]" type="date" class="form-control" />
-                                            </td>
-                                            <td><input name="items[0][reason]" class="form-control" /></td>
-                                            <td class="text-end"><button type="button"
-                                                    class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                    </template>
+
+                                </main>
                             </div>
                         </div>
                     </div>
-
-                    <div class="d-flex justify-content-end gap-3">
-                        <a href="/teacher/purchasing-plans" class="btn btn-secondary">Đóng</a>
-                        <button type="submit" class="btn btn-danger">Lưu và gửi Phê duyệt</button>
-                    </div>
-                </form>
-
-                <template id="row-template">
-                    <tr>
-                        <td><input name="__NAME__" class="form-control" /></td>
-                    </tr>
-                </template>
-
-                </main>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <%- include('../../../views/partials/footer') %>
+            <%- include('../../../views/partials/footer') %>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        (function () {
-            // Auto-generate plan code and date on page load when not provided by server
-            const codeInput = document.getElementById('plan-code');
-            const codeDisplay = document.getElementById('plan-code-display');
-            const dateInput = document.getElementById('plan-date');
-            const dateDisplay = document.getElementById('plan-date-display');
+                <!-- Modal chọn thiết bị -->
+                <div class="modal fade" id="selectDeviceModal" tabindex="-1" aria-labelledby="selectDeviceModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="selectDeviceModalLabel">Chọn thiết bị</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Danh mục thiết bị</label>
+                                        <select id="categoryFilter" class="form-select">
+                                            <option value="">Tất cả danh mục</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label">Tìm kiếm</label>
+                                        <div class="input-group">
+                                            <input type="text" id="searchDevice" class="form-control"
+                                                placeholder="Tìm kiếm theo mã hoặc tên thiết bị...">
+                                            <button class="btn btn-outline-primary" type="button" id="searchBtn">
+                                                <i class="fa-solid fa-magnifying-glass"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-sm">
+                                        <thead style="background-color: #e8e8e8;">
+                                            <tr>
+                                                <th style="width: 40px;"></th>
+                                                <th>Mã TB</th>
+                                                <th>Tên TB</th>
+                                                <th style="width: 80px;">Số lượng</th>
+                                                <th style="width: 80px;">ĐVT</th>
+                                                <th style="width: 120px;">Đơn giá</th>
+                                                <th>Nguồn gốc</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="deviceTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="button" id="confirmSelectDevice" class="btn btn-danger">Chọn</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            if (codeInput && dateInput) {
-                if (!codeInput.value) {
-                    // Generate code in format: KHXXX where XXX is a 3-digit number (001-999)
-                    const rand = Math.floor(Math.random() * 999) + 1; // 1..999
-                    const num = String(rand).padStart(3, '0');
-                    const genCode = `KH${num}`;
-                    codeInput.value = genCode;
-                    if (codeDisplay) codeDisplay.value = genCode;
-                }
+                <%- include('../../../views/partials/footer') %>
 
-                if (!dateInput.value) {
-                    const today = new Date();
-                    const iso = today.toISOString().slice(0, 10); // YYYY-MM-DD
-                    dateInput.value = iso;
-                    if (dateDisplay) dateDisplay.value = iso;
-                }
-            }
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                    <script>
+                        (function () {
+                            // Auto-generate plan code and date on page load when not provided by server
+                            const codeInput = document.getElementById('plan-code');
+                            const codeDisplay = document.getElementById('plan-code-display');
+                            const dateInput = document.getElementById('plan-date');
+                            const dateDisplay = document.getElementById('plan-date-display');
 
-            const addBtn = document.getElementById('add-row');
-            const tbody = document.getElementById('items-tbody');
-            let idx = 1; // already have 0
+                            if (codeInput && dateInput) {
+                                if (!codeInput.value) {
+                                    // Fetch next plan code from API
+                                    fetch('/teacher/purchasing-plans/api/next-code')
+                                        .then(response => response.json())
+                                        .then(result => {
+                                            if (result.success) {
+                                                codeInput.value = result.data.code;
+                                                if (codeDisplay) codeDisplay.value = result.data.code;
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error fetching next plan code:', error);
+                                            // Fallback to random code if API fails
+                                            const rand = Math.floor(Math.random() * 999) + 1;
+                                            const num = String(rand).padStart(3, '0');
+                                            const genCode = `KH${num}`;
+                                            codeInput.value = genCode;
+                                            if (codeDisplay) codeDisplay.value = genCode;
+                                        });
+                                }
 
-            addBtn.addEventListener('click', function () {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><input name="items[${idx}][category]" class="form-control" /></td>
-                    <td><input name="items[${idx}][code]" class="form-control" /></td>
-                    <td><input name="items[${idx}][name]" class="form-control" /></td>
-                    <td><input name="items[${idx}][quantity]" type="number" min="0" class="form-control" /></td>
-                    <td><input name="items[${idx}][uom]" class="form-control" /></td>
-                    <td><input name="items[${idx}][budget]" type="number" step="0.01" class="form-control" /></td>
-                    <td><input name="items[${idx}][expectedAt]" type="text" class="form-control" placeholder="Ví dụ: 2026-01" /></td>
-                    <td><input name="items[${idx}][reason]" class="form-control" /></td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
-                `;
-                tbody.appendChild(tr);
-                idx++;
-            });
+                                if (!dateInput.value) {
+                                    const today = new Date();
+                                    const iso = today.toISOString().slice(0, 10); // YYYY-MM-DD
+                                    dateInput.value = iso;
+                                    if (dateDisplay) dateDisplay.value = iso;
+                                }
+                            }
 
-            document.addEventListener('click', function (e) {
-                if (e.target && e.target.classList.contains('remove-row')) {
-                    const tr = e.target.closest('tr');
-                    if (tr) tr.remove();
-                }
-            });
-        })();
-    </script>
+                            const addBtn = document.getElementById('add-row');
+                            const tbody = document.getElementById('items-tbody');
+                            let idx = 1; // already have 0
+                            let allDevices = [];
+                            let selectedDeviceModal = new bootstrap.Modal(document.getElementById('selectDeviceModal'));
+
+                            // Utility: Format currency
+                            function formatCurrency(value) {
+                                if (!value) return '';
+                                return new Intl.NumberFormat('vi-VN').format(Math.round(value));
+                            }
+
+                            // Utility: Parse currency (remove dots)
+                            function parseCurrency(str) {
+                                if (!str) return 0;
+                                return parseInt(str.replace(/\./g, ''), 10);
+                            }
+
+                            // Load devices from API
+                            async function loadDevices() {
+                                try {
+                                    const response = await fetch('/teacher/purchasing-plans/api/devices');
+                                    const result = await response.json();
+                                    if (result.success) {
+                                        allDevices = result.data;
+                                    }
+                                } catch (error) {
+                                    console.error('Error loading devices:', error);
+                                }
+                            }
+
+                            // Render device table in modal
+                            function renderDeviceTable(devices) {
+                                const tbody = document.getElementById('deviceTableBody');
+                                tbody.innerHTML = '';
+                                devices.forEach((device, idx) => {
+                                    const tr = document.createElement('tr');
+                                    tr.innerHTML = `
+                        <td><input type="checkbox" class="form-check-input device-checkbox" value="${device.id}" 
+                            data-code="${device.code}" data-name="${device.name}" data-price="${device.price}" 
+                            data-source="${device.source || ''}"></td>
+                        <td>${device.code}</td>
+                        <td>${device.name}</td>
+                        <td>
+                            <div class="input-group input-group-sm">
+                                <button class="btn btn-outline-secondary qty-decrease" type="button">−</button>
+                                <input type="number" class="form-control text-center device-quantity" min="0" value="1" style="width: 50px;">
+                                <button class="btn btn-outline-secondary qty-increase" type="button">+</button>
+                            </div>
+                        </td>
+                        <td><input type="text" class="form-control form-control-sm device-uom" value="${device.uom || ''}"></td>
+                        <td><input type="text" class="form-control form-control-sm device-unit-price" value="${formatCurrency(device.price || 0)}"></td>
+                        <td><input type="text" class="form-control form-control-sm device-source" value="${device.source || ''}" readonly></td>
+                    `;
+                                    tbody.appendChild(tr);
+                                });
+
+                                // Add quantity adjustment listeners
+                                document.querySelectorAll('.qty-decrease').forEach(btn => {
+                                    btn.addEventListener('click', function () {
+                                        const input = this.nextElementSibling;
+                                        let val = parseInt(input.value) || 0;
+                                        if (val > 0) input.value = val - 1;
+                                    });
+                                });
+
+                                document.querySelectorAll('.qty-increase').forEach(btn => {
+                                    btn.addEventListener('click', function () {
+                                        const input = this.previousElementSibling;
+                                        let val = parseInt(input.value) || 0;
+                                        input.value = val + 1;
+                                    });
+                                });
+                            }
+
+                            // Handle add devices button
+                            addBtn.addEventListener('click', function () {
+                                renderDeviceTable(allDevices);
+                                selectedDeviceModal.show();
+                            });
+
+                            // Handle device search
+                            document.getElementById('searchDevice').addEventListener('keyup', function (e) {
+                                const query = e.target.value.toLowerCase();
+                                const categoryId = document.getElementById('categoryFilter').value;
+                                let filtered = allDevices.filter(device =>
+                                    device.code.toLowerCase().includes(query) ||
+                                    device.name.toLowerCase().includes(query)
+                                );
+                                if (categoryId) {
+                                    filtered = filtered.filter(device => device.category === categoryId);
+                                }
+                                renderDeviceTable(filtered);
+                            });
+
+                            document.getElementById('searchBtn').addEventListener('click', function () {
+                                document.getElementById('searchDevice').dispatchEvent(new Event('keyup'));
+                            });
+
+                            // Handle category filter
+                            document.getElementById('categoryFilter').addEventListener('change', function (e) {
+                                document.getElementById('searchDevice').dispatchEvent(new Event('keyup'));
+                            });
+
+                            // Handle confirm device selection
+                            document.getElementById('confirmSelectDevice').addEventListener('click', function () {
+                                const rows = document.querySelectorAll('#deviceTableBody tr');
+                                let selectedCount = 0;
+
+                                rows.forEach(row => {
+                                    const checkbox = row.querySelector('.device-checkbox:checked');
+                                    if (checkbox) {
+                                        const quantity = parseInt(row.querySelector('.device-quantity').value) || 1;
+                                        const uom = row.querySelector('.device-uom').value || '';
+                                        const unitPrice = parseCurrency(row.querySelector('.device-unit-price').value) || 0;
+                                        const source = checkbox.dataset.source || '';
+                                        const totalBudget = unitPrice * quantity;
+
+                                        const tr = document.createElement('tr');
+                                        tr.innerHTML = `
+                            <td><input name="items[${idx}][category]" class="form-control" /></td>
+                            <td><input name="items[${idx}][code]" class="form-control" value="${checkbox.dataset.code}" readonly /></td>
+                            <td><input name="items[${idx}][name]" class="form-control" value="${checkbox.dataset.name}" readonly /></td>
+                            <td><input name="items[${idx}][quantity]" type="number" min="0" class="form-control quantity-field" value="${quantity}" /></td>
+                            <td><input name="items[${idx}][uom]" class="form-control" value="${uom}" /></td>
+                            <td><input name="items[${idx}][unitPrice]" type="text" class="form-control price-input" 
+                                data-index="${idx}" value="${formatCurrency(unitPrice)}" /></td>
+                            <td><input name="items[${idx}][source]" class="form-control" value="${source}" /></td>
+                            <td><input name="items[${idx}][budget]" type="text" class="form-control budget-output" 
+                                data-index="${idx}" value="${formatCurrency(totalBudget)}" readonly /></td>
+                            <td><input name="items[${idx}][expectedAt]" type="date" class="form-control" /></td>
+                            <td><input name="items[${idx}][reason]" class="form-control" /></td>
+                            <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
+                        `;
+                                        tbody.appendChild(tr);
+                                        idx++;
+                                        selectedCount++;
+                                    }
+                                });
+
+                                // Show notification
+                                if (selectedCount > 0) {
+                                    alert(`Đã thêm ${selectedCount} thiết bị vào bảng.`);
+                                } else {
+                                    alert('Vui lòng chọn ít nhất một thiết bị.');
+                                    return;
+                                }
+
+                                selectedDeviceModal.hide();
+
+                                // Reset search and filter
+                                document.getElementById('searchDevice').value = '';
+                                document.getElementById('categoryFilter').value = '';
+                            });
+
+                            // Handle budget input formatting
+                            // Auto calculate budget when quantity or unit price changes
+                            document.addEventListener('input', function (e) {
+                                if (e.target.classList.contains('quantity-field') || e.target.classList.contains('price-input')) {
+                                    const row = e.target.closest('tr');
+                                    const quantityInput = row.querySelector('.quantity-field');
+                                    const priceInput = row.querySelector('.price-input');
+                                    const budgetOutput = row.querySelector('.budget-output');
+
+                                    if (quantityInput && priceInput && budgetOutput) {
+                                        const quantity = parseInt(quantityInput.value) || 0;
+                                        const unitPrice = parseCurrency(priceInput.value) || 0;
+                                        const total = quantity * unitPrice;
+                                        budgetOutput.value = formatCurrency(total);
+                                    }
+                                }
+
+                                if (e.target.classList.contains('price-input')) {
+                                    let value = e.target.value.replace(/\./g, '');
+                                    if (value) {
+                                        value = formatCurrency(value);
+                                        e.target.value = value;
+                                    }
+                                }
+                            });
+
+                            // Handle remove row
+                            document.addEventListener('click', function (e) {
+                                if (e.target && e.target.classList.contains('remove-row')) {
+                                    const tr = e.target.closest('tr');
+                                    if (tr) tr.remove();
+                                }
+                            });
+
+                            // Handle form submit - convert currency to number
+                            document.querySelector('form').addEventListener('submit', function (e) {
+                                const priceInputs = document.querySelectorAll('.price-input');
+                                const budgetOutputs = document.querySelectorAll('.budget-output');
+                                priceInputs.forEach(input => {
+                                    const value = parseCurrency(input.value);
+                                    input.value = value || '';
+                                });
+                                budgetOutputs.forEach(input => {
+                                    const value = parseCurrency(input.value);
+                                    input.value = value || '';
+                                });
+                            });
+
+                            // Load devices on page load
+                            loadDevices();
+                        })();
+                    </script>
 
 </body>
 

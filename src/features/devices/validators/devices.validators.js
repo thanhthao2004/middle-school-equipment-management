@@ -37,8 +37,16 @@ const validateCreateDevice = [
         .isISO8601()
         .withMessage('Ngày nhập không hợp lệ')
         .custom(value => {
-            if (value && new Date(value) > new Date()) {
-                throw new Error('Ngày nhập không thể là ngày trong tương lai');
+            if (value) {
+                const inputDate = new Date(value);
+                const today = new Date();
+                // Set giờ về 00:00:00 để so sánh chỉ phần ngày
+                inputDate.setHours(0, 0, 0, 0);
+                today.setHours(0, 0, 0, 0);
+                // Chỉ báo lỗi nếu ngày nhập > hôm nay (không bao gồm hôm nay)
+                if (inputDate > today) {
+                    throw new Error('Ngày nhập không thể là ngày trong tương lai');
+                }
             }
             return true;
         }),
@@ -50,7 +58,24 @@ const validateCreateDevice = [
     body('category')
         .optional()
         .isMongoId()
-        .withMessage('Danh mục không hợp lệ')
+        .withMessage('Danh mục không hợp lệ'),
+    body('lop')
+        .optional()
+        .custom(value => {
+            if (Array.isArray(value)) {
+                const validClasses = ['6', '7', '8', '9'];
+                const invalid = value.find(l => !validClasses.includes(String(l)));
+                if (invalid) {
+                    throw new Error(`Lớp không hợp lệ: ${invalid}. Chỉ được chọn lớp 6, 7, 8, 9`);
+                }
+            } else if (value) {
+                const validClasses = ['6', '7', '8', '9'];
+                if (!validClasses.includes(String(value))) {
+                    throw new Error(`Lớp không hợp lệ: ${value}. Chỉ được chọn lớp 6, 7, 8, 9`);
+                }
+            }
+            return true;
+        })
 ];
 
 const validateUpdateDevice = [
@@ -91,8 +116,16 @@ const validateUpdateDevice = [
         .isISO8601()
         .withMessage('Ngày nhập không hợp lệ')
         .custom(value => {
-            if (value && new Date(value) > new Date()) {
-                throw new Error('Ngày nhập không thể là ngày trong tương lai');
+            if (value) {
+                const inputDate = new Date(value);
+                const today = new Date();
+                // Set giờ về 00:00:00 để so sánh chỉ phần ngày
+                inputDate.setHours(0, 0, 0, 0);
+                today.setHours(0, 0, 0, 0);
+                // Chỉ báo lỗi nếu ngày nhập > hôm nay (không bao gồm hôm nay)
+                if (inputDate > today) {
+                    throw new Error('Ngày nhập không thể là ngày trong tương lai');
+                }
             }
             return true;
         }),
@@ -104,7 +137,24 @@ const validateUpdateDevice = [
     body('category')
         .optional()
         .isMongoId()
-        .withMessage('Danh mục không hợp lệ')
+        .withMessage('Danh mục không hợp lệ'),
+    body('lop')
+        .optional()
+        .custom(value => {
+            if (Array.isArray(value)) {
+                const validClasses = ['6', '7', '8', '9'];
+                const invalid = value.find(l => !validClasses.includes(String(l)));
+                if (invalid) {
+                    throw new Error(`Lớp không hợp lệ: ${invalid}. Chỉ được chọn lớp 6, 7, 8, 9`);
+                }
+            } else if (value) {
+                const validClasses = ['6', '7', '8', '9'];
+                if (!validClasses.includes(String(value))) {
+                    throw new Error(`Lớp không hợp lệ: ${value}. Chỉ được chọn lớp 6, 7, 8, 9`);
+                }
+            }
+            return true;
+        })
 ];
 
 module.exports = {

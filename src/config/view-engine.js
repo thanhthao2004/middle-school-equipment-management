@@ -9,7 +9,11 @@ const path = require('path');
  * @param {Express} app - Express application instance
  */
 function configureViewEngine(app) {
-	app.set('views', path.join(__dirname, '../features'));
+	// Set multiple view directories: features first (for feature views), then views (for shared/error views)
+	app.set('views', [
+		path.join(__dirname, '../features'),
+		path.join(__dirname, '../views')
+	]);
 	app.set('view engine', 'ejs');
 }
 

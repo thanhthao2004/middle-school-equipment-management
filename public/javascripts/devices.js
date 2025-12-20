@@ -3,6 +3,11 @@
 ================================ */
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Tính thành tiền ban đầu khi trang load (nếu có giá trị sẵn)
+    if (document.getElementById('tongGia')) {
+        calculateTotalPrice();
+    }
+
     /* -----------------------------
        Delete Modal Handler
     ----------------------------- */
@@ -94,8 +99,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (ngayNhapInput && ngayNhapInput.value) {
                 const selectedDate = new Date(ngayNhapInput.value);
                 const today = new Date();
+                // Set giờ về 00:00:00 để so sánh chỉ phần ngày
+                selectedDate.setHours(0, 0, 0, 0);
                 today.setHours(0, 0, 0, 0);
 
+                // Chỉ báo lỗi nếu ngày nhập > hôm nay (không bao gồm hôm nay)
                 if (selectedDate > today) {
                     hasError = true;
                     errorMessages.push('- Ngày nhập không thể là ngày trong tương lai');
@@ -157,8 +165,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (ngayNhapInput.value) {
                     const selectedDate = new Date(ngayNhapInput.value);
                     const today = new Date();
+                    // Set giờ về 00:00:00 để so sánh chỉ phần ngày
+                    selectedDate.setHours(0, 0, 0, 0);
                     today.setHours(0, 0, 0, 0);
 
+                    // Chỉ báo lỗi nếu ngày nhập > hôm nay (không bao gồm hôm nay)
                     if (selectedDate > today) {
                         ngayNhapInput.classList.add('is-invalid');
                     } else {
@@ -470,4 +481,26 @@ function showLoadingSpinner() {
 
     overlay.appendChild(spinner);
     document.body.appendChild(overlay);
+}
+
+/* -----------------------------
+   Calculate Total Price (Thành tiền)
+   Tự động tính = Giá thành × Số lượng
+----------------------------- */
+function calculateTotalPrice() {
+    const giaThanhInput = document.getElementById('giaThanh');
+    const soLuongInput = document.getElementById('soLuong');
+    const tongGiaInput = document.getElementById('tongGia');
+
+    if (!giaThanhInput || !soLuongInput || !tongGiaInput) {
+        return;
+    }
+
+    const giaThanh = parseFloat(giaThanhInput.value) || 0;
+    const soLuong = parseInt(soLuongInput.value) || 0;
+    const tongGia = giaThanh * soLuong;
+
+    // Format số với dấu phẩy ngăn cách hàng nghìn
+    const formattedPrice = tongGia.toLocaleString('vi-VN');
+    tongGiaInput.value = formattedPrice + ' VNĐ';
 }
