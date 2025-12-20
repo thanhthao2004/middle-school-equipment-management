@@ -29,17 +29,33 @@
                             <%= typeof user !=='undefined' && user.hoTen ? user.hoTen : 'Tổ trưởng chuyên môn' %>
                         </span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/profile">
-                                <i class="fas fa-user me-2"></i>Thông tin cá nhân
-                            </a></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm p-2" style="min-width: 230px;">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2" href="/profile">
+                                <i class="fas fa-user fa-sm text-primary me-2"></i>
+                                <span>Thông tin cá nhân</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2" href="/password/change">
+                                <i class="fas fa-key fa-sm text-warning me-2"></i>
+                                <span>Đổi mật khẩu</span>
+                            </a>
+                        </li>
+
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item text-danger" href="/auth/logout">
-                                <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                            </a></li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="/auth/logout">
+                                <i class="fas fa-sign-out-alt fa-sm me-2"></i>
+                                <span>Đăng xuất</span>
+                            </a>
+                        </li>
                     </ul>
+
                 </li>
             </ul>
         </div>
