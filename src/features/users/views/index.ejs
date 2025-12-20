@@ -13,18 +13,19 @@
 </head>
 
 <body>
-  <!-- Header -->
-  <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'admin' }; %>
-    <%- include('../../../views/partials/header', { currentPage: 'users' , user: userObj }) %>
-
-      <div class="container-fluid p-0">
-        <div class="row g-0">
-          <!-- Sidebar Admin -->
-          <%- include('../../../views/partials/admin-sidebar', { currentPage: 'users' , user: userObj }) %>
-
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 main-content">
-              <div class="container py-4">
+  <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'admin' }; %>
+  
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <%- include('../../../views/partials/borrow-sidebar', { currentPage: 'users', user: userObj }) %>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <%- include('../../../views/partials/header', { currentPage: 'users', user: userObj }) %>
+      
+      <!-- Page Content -->
+      <div class="container-fluid py-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                   <h1 class="h3 mb-0">Danh Sách Người Dùng</h1>
                   <a class="btn btn-primary" href="/admin/create">
@@ -134,8 +135,10 @@
             </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
