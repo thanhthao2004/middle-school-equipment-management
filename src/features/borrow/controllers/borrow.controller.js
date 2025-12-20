@@ -112,7 +112,7 @@ class BorrowController {
         }
     }
 
-    // POST /borrow/register - Xử lý đăng ký mượn (Asynchronous)
+    // POST /borrow/register - Xử lý đăng ký mượn (Synchronous)
     async createBorrowRequest(req, res) {
         try {
             const borrowData = req.body;
@@ -120,8 +120,8 @@ class BorrowController {
 
             const result = await borrowService.createBorrowRequest(userId, borrowData);
 
-            // Return HTTP 202 Accepted for async processing
-            res.status(202).json(result);
+            // Return HTTP 201 Created for sync processing
+            res.status(201).json(result);
         } catch (error) {
             console.error('Error creating borrow request:', error);
             res.status(400).json({
@@ -369,6 +369,66 @@ class BorrowController {
             currentPage: "return-slips",
             user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
         });
+    }
+
+    // ========== NEW RETURN SLIP ENDPOINTS ==========
+
+    /**
+     * API: POST /borrow/api/return-slips - Create a new return slip
+     * Body: { borrowedItemIds: [], returnDate, returnShift, notes, quantities }
+     */
+    async createReturnSlip(req, res) {
+        try {
+            const employeeId = req.user?.id || null;
+
+            if (!employeeId) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Vui lòng đăng nhập để tạo phiếu trả'
+                });
+            }
+
+            const returnSlipData = req.body;
+            const result = await borrowService.createReturnSlip(employeeId, returnSlipData);
+
+            res.status(201).json(result);
+        } catch (error) {
+            console.error('Error creating return slip:', error);
+            res.status(400).json({
+                success: false,
+                message: error.message || 'Lỗi khi tạo phiếu trả',
+                error: process.env.NODE_ENV === 'development' ? error.message : 'Có lỗi xảy ra'
+            });
+        }
+    }
+
+    /**
+     * API: GET /borrow/api/borrowed-items - Get borrowed items for return
+     * Query params: maPhieu, userId, status, maTB
+     */
+    async getBorrowedItems(req, res) {
+        try {
+            const { maPhieu, userId, status, maTB } = req.query;
+
+            const items = await borrowService.getBorrowedItemsForReturn({
+                maPhieu,
+                userId,
+                status,
+                maTB
+            });
+
+            res.json({
+                success: true,
+                data: items
+            });
+        } catch (error) {
+            console.error('Error fetching borrowed items:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Lỗi khi lấy danh sách thiết bị mượn',
+                error: process.env.NODE_ENV === 'development' ? error.message : 'Có lỗi xảy ra'
+            });
+        }
     }
 }
 

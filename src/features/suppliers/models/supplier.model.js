@@ -1,29 +1,65 @@
-const { Schema, model } = require('mongoose');
-const { getNextCode } = require('../../../core/libs/sequence');
+const mongoose = require("mongoose");
 
-// NhaCungCap
-const SupplierSchema = new Schema(
+const SupplierSchema = new mongoose.Schema(
 	{
-		maNCC: { type: String, required: true, unique: true, trim: true },
-		tenNCC: { type: String, required: true, trim: true },
-		diaChi: { type: String, default: '' },
-		soDienThoai: { type: String, default: '' },
-		email: { type: String, default: '' },
-		loaiTBCC: { type: String, default: '' },
-		trangThai: { type: String, default: '' },
+		maNCC: {
+			type: String,
+			unique: true
+		},
+
+		// ✅ Khớp đúng với name trong form <input name="name">
+		name: {
+			type: String,
+			required: true,
+			trim: true
+		},
+
+		address: {
+			type: String,
+			trim: true
+		},
+
+		phone: {
+			type: String,
+			trim: true
+		},
+
+		email: {
+			type: String,
+			trim: true
+		},
+
+		// Loại thiết bị cung cấp
+		type: {
+			type: String,
+			trim: true
+		},
+
+		contractDate: {
+			type: Date
+		},
+
+		status: {
+			type: String,
+			enum: ["Hoạt động", "Ngừng hợp tác"],
+			default: "Hoạt động"
+		}
 	},
 	{ timestamps: true }
 );
 
-
-SupplierSchema.pre('validate', async function ensureMaNCC(next) {
+// ✅ Tự sinh mã NCC dạng NCC001, NCC002...
+SupplierSchema.pre("save", async function (next) {
 	try {
 		if (!this.maNCC) {
-			this.maNCC = await getNextCode('NCC', 3); // NCC001
+			const Supplier = mongoose.model("Supplier");
+			const count = await Supplier.countDocuments();
+			this.maNCC = "NCC" + String(count + 1).padStart(3, "0");
 		}
 		next();
-	} catch (e) {
-		next(e);
+	} catch (err) {
+		next(err);
 	}
 });
-module.exports = model('Supplier', SupplierSchema);
+
+module.exports = mongoose.model("Supplier", SupplierSchema);

@@ -51,8 +51,12 @@ function configureMiddleware(app) {
 	app.use('/css', express.static(path.join(__dirname, '../../node_modules/bootstrap/dist/css')));
 	app.use('/js', express.static(path.join(__dirname, '../../node_modules/bootstrap/dist/js')));
 	app.use('/public', express.static(path.join(__dirname, '../../public')));
+	app.use('/stylesheets', express.static(path.join(__dirname, '../../public/stylesheets')));
 	// Serve uploads directory for uploaded images
 	app.use('/uploads', express.static(path.join(__dirname, '../../public/uploads')));
+	// Serve stylesheets and javascripts at root level
+	app.use('/stylesheets', express.static(path.join(__dirname, '../../public/stylesheets')));
+	app.use('/javascripts', express.static(path.join(__dirname, '../../public/javascripts')));
 }
 
 module.exports = { configureMiddleware };

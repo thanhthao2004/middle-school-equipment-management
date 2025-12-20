@@ -8,8 +8,8 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/public/stylesheets/devices.css">
-    <link rel="stylesheet" href="/public/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/devices.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 
 <body>
@@ -137,12 +137,29 @@
                                                                         </select>
                                                                     </div>
 
+                                                                    <!-- Lớp (multi-select) -->
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="lop" class="form-label">
+                                                                            Lớp <span class="text-muted">(có thể chọn nhiều)</span>
+                                                                        </label>
+                                                                        <select class="form-select" id="lop" name="lop" multiple size="4">
+                                                                            <option value="6" <%= Array.isArray(device.lop) && device.lop.includes('6') ? 'selected' : '' %>>Lớp 6</option>
+                                                                            <option value="7" <%= Array.isArray(device.lop) && device.lop.includes('7') ? 'selected' : '' %>>Lớp 7</option>
+                                                                            <option value="8" <%= Array.isArray(device.lop) && device.lop.includes('8') ? 'selected' : '' %>>Lớp 8</option>
+                                                                            <option value="9" <%= Array.isArray(device.lop) && device.lop.includes('9') ? 'selected' : '' %>>Lớp 9</option>
+                                                                        </select>
+                                                                        <small class="form-text text-muted">
+                                                                            <i class="fas fa-info-circle"></i> Giữ phím Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều lớp
+                                                                        </small>
+                                                                    </div>
+
                                                                     <div class="col-md-6 mb-3">
                                                                         <label for="soLuong" class="form-label">Số
                                                                             lượng</label>
                                                                         <input type="number" class="form-control"
                                                                             id="soLuong" name="soLuong" min="0"
-                                                                            value="<%= device.soLuong || 0 %>">
+                                                                            value="<%= device.soLuong || 0 %>"
+                                                                            oninput="calculateTotalPrice()">
                                                                     </div>
 
                                                                     <!-- Giá thành -->
@@ -153,9 +170,25 @@
                                                                         <input type="number" class="form-control"
                                                                             id="giaThanh" name="giaThanh" min="0"
                                                                             value="<%= device.giaThanh || 0 %>"
-                                                                            placeholder="VNĐ">
+                                                                            placeholder="VNĐ"
+                                                                            oninput="calculateTotalPrice()">
                                                                         <small class="form-text text-muted">
                                                                             Giá mua mỗi đơn vị thiết bị
+                                                                        </small>
+                                                                    </div>
+
+                                                                    <!-- Thành tiền (tự động tính) -->
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="tongGia" class="form-label">
+                                                                            <i class="fas fa-calculator me-1"></i>Thành tiền
+                                                                        </label>
+                                                                        <input type="text" class="form-control" 
+                                                                            id="tongGia" name="tongGia" 
+                                                                            readonly 
+                                                                            style="background-color: #f8f9fa; font-weight: bold; color: #28a745;"
+                                                                            value="0 VNĐ">
+                                                                        <small class="form-text text-muted">
+                                                                            Tự động tính = Giá thành × Số lượng
                                                                         </small>
                                                                     </div>
 
@@ -165,37 +198,33 @@
                                                                         <select class="form-select"
                                                                             id="tinhTrangThietBi"
                                                                             name="tinhTrangThietBi">
-                                                                            <option value="">-- Chọn tình trạng --
-                                                                            </option>
-
-                                                                            <% if (filterOptions &&
-                                                                                filterOptions.statuses) { %>
-                                                                                <% filterOptions.statuses.forEach(function(status)
-                                                                                    { %>
-                                                                                    <option value="<%= status %>"
-                                                                                        <%=(device.tinhTrangThietBi===status)
-                                                                                        ? 'selected' : '' %>><%= status
-                                                                                            %>
-                                                                                    </option>
-                                                                                    <% }); %>
-                                                                                        <% } %>
-
-                                                                                            <option value="Tốt"
-                                                                                                <%=(device.tinhTrangThietBi==='Tốt'
-                                                                                                ) ? 'selected' : '' %>
-                                                                                                >Tốt</option>
-                                                                                            <option value="Khá"
-                                                                                                <%=(device.tinhTrangThietBi==='Khá'
-                                                                                                ) ? 'selected' : '' %>
-                                                                                                >Khá</option>
-                                                                                            <option value="Trung bình"
-                                                                                                <%=(device.tinhTrangThietBi==='Trung bình'
-                                                                                                ) ? 'selected' : '' %>
-                                                                                                >Trung bình</option>
-                                                                                            <option value="Hỏng"
-                                                                                                <%=(device.tinhTrangThietBi==='Hỏng'
-                                                                                                ) ? 'selected' : '' %>
-                                                                                                >Hỏng</option>
+                                                                            <option value="">-- Chọn tình trạng --</option>
+                                                                            <%
+                                                                            // Tạo Set để loại bỏ giá trị trùng lặp
+                                                                            const uniqueStatuses = new Set();
+                                                                            
+                                                                            // Thêm từ filterOptions nếu có
+                                                                            if (filterOptions && filterOptions.statuses) {
+                                                                                filterOptions.statuses.forEach(status => {
+                                                                                    if (status && status.trim()) {
+                                                                                        uniqueStatuses.add(status.trim());
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                            
+                                                                            // Thêm các giá trị mặc định nếu chưa có
+                                                                            const defaultStatuses = ['Tốt', 'Khá', 'Trung bình', 'Hỏng'];
+                                                                            defaultStatuses.forEach(status => {
+                                                                                uniqueStatuses.add(status);
+                                                                            });
+                                                                            
+                                                                            // Render các option duy nhất
+                                                                            const sortedStatuses = Array.from(uniqueStatuses).sort();
+                                                                            sortedStatuses.forEach(status => {
+                                                                                const selected = device.tinhTrangThietBi === status ? 'selected' : '';
+                                                                            %>
+                                                                                <option value="<%= status %>" <%= selected %>><%= status %></option>
+                                                                            <% }); %>
                                                                         </select>
                                                                     </div>
 
@@ -203,33 +232,36 @@
                                                                         <label for="viTriLuuTru" class="form-label">Vị
                                                                             trí lưu trữ</label>
 
-                                                                        <% const isCustomLocation=(device &&
-                                                                            device.viTriLuuTru && filterOptions &&
-                                                                            filterOptions.locations &&
-                                                                            !filterOptions.locations.includes(device.viTriLuuTru));
-                                                                            %>
+                                                                        <%
+                                                                        // Tạo Set để loại bỏ giá trị trùng lặp
+                                                                        const uniqueLocations = new Set();
+                                                                        
+                                                                        // Thêm từ filterOptions nếu có
+                                                                        if (filterOptions && filterOptions.locations) {
+                                                                            filterOptions.locations.forEach(location => {
+                                                                                if (location && location.trim()) {
+                                                                                    uniqueLocations.add(location.trim());
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                        
+                                                                        // Kiểm tra xem giá trị hiện tại có phải là custom không
+                                                                        const isCustomLocation = device && device.viTriLuuTru && 
+                                                                            !uniqueLocations.has(device.viTriLuuTru);
+                                                                        %>
 
                                                                             <select class="form-select" id="viTriLuuTru"
                                                                                 name="viTriLuuTru">
-                                                                                <option value="">-- Chọn vị trí --
-                                                                                </option>
-                                                                                <% if (filterOptions &&
-                                                                                    filterOptions.locations) { %>
-                                                                                    <% filterOptions.locations.forEach(function(location)
-                                                                                        { %>
-                                                                                        <option value="<%= location %>"
-                                                                                            <%=(device.viTriLuuTru===location)
-                                                                                            ? 'selected' : '' %>><%=
-                                                                                                location %>
-                                                                                        </option>
-                                                                                        <% }); %>
-                                                                                            <% } %>
-                                                                                                <option
-                                                                                                    value="__custom__"
-                                                                                                    <%=isCustomLocation
-                                                                                                    ? 'selected' : '' %>
-                                                                                                    >Khác (nhập tự do)
-                                                                                                </option>
+                                                                                <option value="">-- Chọn vị trí --</option>
+                                                                                <%
+                                                                                // Render các option duy nhất
+                                                                                const sortedLocations = Array.from(uniqueLocations).sort();
+                                                                                sortedLocations.forEach(location => {
+                                                                                    const selected = device.viTriLuuTru === location ? 'selected' : '';
+                                                                                %>
+                                                                                    <option value="<%= location %>" <%= selected %>><%= location %></option>
+                                                                                <% }); %>
+                                                                                <option value="__custom__" <%= isCustomLocation ? 'selected' : '' %>>Khác (nhập tự do)</option>
                                                                             </select>
 
                                                                             <input type="text" class="form-control mt-2"
@@ -249,37 +281,33 @@
                                                                             gốc</label>
                                                                         <select class="form-select" id="nguonGoc"
                                                                             name="nguonGoc">
-                                                                            <option value="">-- Chọn nguồn gốc --
-                                                                            </option>
-                                                                            <% if (filterOptions &&
-                                                                                filterOptions.origins) { %>
-                                                                                <% filterOptions.origins.forEach(function(origin)
-                                                                                    { %>
-                                                                                    <option value="<%= origin %>"
-                                                                                        <%=(device.nguonGoc===origin)
-                                                                                        ? 'selected' : '' %>><%= origin
-                                                                                            %>
-                                                                                    </option>
-                                                                                    <% }); %>
-                                                                                        <% } %>
-                                                                                            <option value="Mua mới"
-                                                                                                <%=(device.nguonGoc==='Mua mới'
-                                                                                                ) ? 'selected' : '' %>
-                                                                                                >Mua mới</option>
-                                                                                            <option value="Tài trợ"
-                                                                                                <%=(device.nguonGoc==='Tài trợ'
-                                                                                                ) ? 'selected' : '' %>
-                                                                                                >Tài trợ</option>
-                                                                                            <option value="Hiến tặng"
-                                                                                                <%=(device.nguonGoc==='Hiến tặng'
-                                                                                                ) ? 'selected' : '' %>
-                                                                                                >Hiến tặng</option>
-                                                                                            <option
-                                                                                                value="Giáo viên tự làm"
-                                                                                                <%=(device.nguonGoc==='Giáo viên tự làm'
-                                                                                                ) ? 'selected' : '' %>
-                                                                                                >Giáo viên tự làm
-                                                                                            </option>
+                                                                            <option value="">-- Chọn nguồn gốc --</option>
+                                                                            <%
+                                                                            // Tạo Set để loại bỏ giá trị trùng lặp
+                                                                            const uniqueOrigins = new Set();
+                                                                            
+                                                                            // Thêm từ filterOptions nếu có
+                                                                            if (filterOptions && filterOptions.origins) {
+                                                                                filterOptions.origins.forEach(origin => {
+                                                                                    if (origin && origin.trim()) {
+                                                                                        uniqueOrigins.add(origin.trim());
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                            
+                                                                            // Thêm các giá trị mặc định
+                                                                            const defaultOrigins = ['Mua mới', 'Tài trợ', 'Hiến tặng', 'Giáo viên tự làm'];
+                                                                            defaultOrigins.forEach(origin => {
+                                                                                uniqueOrigins.add(origin);
+                                                                            });
+                                                                            
+                                                                            // Render các option duy nhất
+                                                                            const sortedOrigins = Array.from(uniqueOrigins).sort();
+                                                                            sortedOrigins.forEach(origin => {
+                                                                                const selected = device.nguonGoc === origin ? 'selected' : '';
+                                                                            %>
+                                                                                <option value="<%= origin %>" <%= selected %>><%= origin %></option>
+                                                                            <% }); %>
                                                                         </select>
                                                                         <small class="form-text text-muted">
                                                                             <i class="fas fa-info-circle"></i>
@@ -411,11 +439,17 @@
         <%- include('../../../views/partials/footer') %>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="/public/javascripts/devices.js"></script>
+            <script src="/javascripts/devices.js"></script>
 
             <script>
-                // Ensure modal shows after bootstrap is available
+                // Calculate total price on page load
                 document.addEventListener('DOMContentLoaded', function () {
+                    // Tính thành tiền ban đầu khi trang load
+                    if (document.getElementById('tongGia')) {
+                        calculateTotalPrice();
+                    }
+
+                    // Ensure modal shows after bootstrap is available
                     function showModalWhenReady() {
                         var modalEl = document.getElementById('errorModal');
                         if (window.bootstrap && modalEl) {
@@ -490,29 +524,7 @@
                     /* Image deletion handler moved to devices.js for consistency */
 
                     // Preview selected images
-                    var fileInputPreview = document.getElementById('hinhAnhFile');
-                    var previewContainer = document.getElementById('imagePreviewContainer');
-                    var previewGrid = document.getElementById('imagePreviewGrid');
-                    if (fileInputPreview) {
-                        fileInputPreview.addEventListener('change', function () {
-                            previewGrid.innerHTML = '';
-                            if (fileInputPreview.files.length) {
-                                previewContainer.style.display = 'block';
-                                Array.from(fileInputPreview.files).forEach(function (file, idx) {
-                                    var reader = new FileReader();
-                                    var col = document.createElement('div');
-                                    col.className = 'col-6 col-md-4 col-lg-3';
-                                    reader.onload = function (e) {
-                                        col.innerHTML = '<div class="position-relative" style="border: 2px solid #dee2e6; border-radius: 8px; overflow: hidden; aspect-ratio: 1/1;"><img src="' + e.target.result + '" class="w-100 h-100" style="object-fit:cover;" alt="preview-' + (idx + 1) + '"></div>';
-                                        previewGrid.appendChild(col);
-                                    };
-                                    reader.readAsDataURL(file);
-                                });
-                            } else {
-                                previewContainer.style.display = 'none';
-                            }
-                        });
-                    }
+                    /* Image preview handler moved to devices.js to avoid duplicate event listeners */
 
                 })();
             </script>
