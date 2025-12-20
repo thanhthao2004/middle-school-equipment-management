@@ -52,7 +52,7 @@ async function loadDevicesFromApi() {
         const category = document.getElementById('categoryFilter')?.value;
         const classFilter = document.getElementById('classFilter')?.value;
         const status = document.getElementById('statusFilter')?.value;
-        const condition = document.getElementById('conditionFilter')?.value;
+        // Bỏ filter condition - chỉ hiển thị thiết bị sẵn sàng cho mượn
         const location = document.getElementById('locationFilter')?.value;
         const origin = document.getElementById('originFilter')?.value;
         const search = document.getElementById('searchInput')?.value;
@@ -60,7 +60,7 @@ async function loadDevicesFromApi() {
         if (category) params.append('category', category);
         if (classFilter) params.append('class', classFilter);
         if (status) params.append('status', status);
-        if (condition) params.append('condition', condition);
+        // Không gửi condition filter
         if (location) params.append('location', location);
         if (origin) params.append('origin', origin);
         if (search) params.append('search', search);
@@ -176,7 +176,7 @@ function setupEventListeners() {
     }
 
     // Filter selects
-    const filterIds = ['categoryFilter', 'classFilter', 'statusFilter', 'conditionFilter', 'locationFilter', 'originFilter'];
+    const filterIds = ['categoryFilter', 'classFilter', 'statusFilter', 'locationFilter', 'originFilter'];
     filterIds.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
@@ -327,7 +327,7 @@ function applyFilters() {
     const categoryFilter = document.getElementById('categoryFilter')?.value || '';
     const classFilter = document.getElementById('classFilter')?.value || '';
     const statusFilter = document.getElementById('statusFilter')?.value || '';
-    const conditionFilter = document.getElementById('conditionFilter')?.value || '';
+    // Bỏ conditionFilter - không cần thiết cho đăng ký mượn
     const locationFilter = document.getElementById('locationFilter')?.value || '';
     const originFilter = document.getElementById('originFilter')?.value || '';
     const searchTerm = document.getElementById('searchInput')?.value?.toLowerCase() || '';
@@ -349,10 +349,7 @@ function applyFilters() {
                 return;
             }
 
-            if (conditionFilter && row.dataset.condition !== conditionFilter) {
-                row.style.display = 'none';
-                return;
-            }
+            // Bỏ filter condition - chỉ hiển thị thiết bị sẵn sàng
 
             // Class filter - tối ưu với Set nếu có nhiều classes
             if (classFilter) {
@@ -402,7 +399,7 @@ function applyFilters() {
 }
 
 function resetFilters() {
-    const filterIds = ['categoryFilter', 'classFilter', 'statusFilter', 'conditionFilter', 'locationFilter', 'originFilter', 'searchInput', 'borrowDateFrom', 'borrowDateTo'];
+    const filterIds = ['categoryFilter', 'classFilter', 'statusFilter', 'locationFilter', 'originFilter', 'searchInput', 'borrowDateFrom', 'borrowDateTo'];
 
     filterIds.forEach(id => {
         const element = document.getElementById(id);
@@ -437,7 +434,7 @@ function toggleAdvancedFilters() {
 }
 
 function clearAdvancedFilters() {
-    const advancedFilterIds = ['statusFilter', 'conditionFilter', 'locationFilter', 'originFilter'];
+    const advancedFilterIds = ['statusFilter', 'locationFilter', 'originFilter'];
 
     advancedFilterIds.forEach(id => {
         const element = document.getElementById(id);
@@ -903,10 +900,10 @@ function submitBorrowForm() {
                     showSuccessModal(maPhieu);
                 }
 
-                // Refresh the page after 2s
+                // Refresh the page after 5s to allow user to see success modal
                 setTimeout(() => {
                     window.location.reload();
-                }, 2000);
+                }, 5000);
             } else {
                 // Show actual error message from server
                 const errorMsg = data.message || data.error || 'Có lỗi xảy ra khi đăng ký mượn';

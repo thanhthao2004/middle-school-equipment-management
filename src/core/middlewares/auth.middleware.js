@@ -146,11 +146,32 @@ function handleForbidden(req, res, userRole, requiredRoles) {
 			error: 'Forbidden'
 		});
 	} else {
-		// Render forbidden page or redirect
+		// Render forbidden page
+		const { ROLE_NAMES } = require('../constants/roles.constants');
+		const userRoleName = ROLE_NAMES[userRole] || userRole;
+		const requiredRolesNames = Array.isArray(requiredRoles) 
+			? requiredRoles.map(r => ROLE_NAMES[r] || r).join(', ')
+			: (ROLE_NAMES[requiredRoles] || requiredRoles);
+		
+		// Determine home page based on user role
+		let homeUrl = '/';
+		if (userRole === 'admin') {
+			homeUrl = '/admin';
+		} else if (userRole === 'ql_thiet_bi') {
+			homeUrl = '/manager';
+		} else if (userRole === 'hieu_truong') {
+			homeUrl = '/principal';
+		} else if (userRole === 'giao_vien' || userRole === 'to_truong') {
+			homeUrl = '/teacher/borrow/teacher-home';
+		}
+		
 		return res.status(403).render('errors/403', {
 			title: 'Không có quyền truy cập',
-			message: `Vai trò của bạn (${userRole}) không có quyền truy cập trang này.`,
-			requiredRoles: requiredRoles.join(', ')
+			message: `Bạn không có quyền truy cập vào trang này.`,
+			userRole: userRoleName,
+			userRoleCode: userRole, // Pass role code for logic
+			requiredRoles: requiredRoles,
+			homeUrl: homeUrl
 		});
 	}
 }
