@@ -233,7 +233,7 @@ class DevicesController {
                 }
                 return true; // Giữ lại nếu không phải đường dẫn uploads
             });
-            
+
             // Nếu có ảnh bị loại bỏ do không tồn tại, log để theo dõi
             if (oldImagePaths.length < originalImageCount) {
                 console.log(`[UPDATE] Removed ${originalImageCount - oldImagePaths.length} missing image(s) from database`);
@@ -355,4 +355,32 @@ class DevicesController {
             });
         } catch (error) {
             console.error('Error rendering delete device page:', error);
-            if (!req.session.flash) req.session.flash
+            res.status(500).send(`<h1>Lỗi</h1><p>${error.message}</p>`);
+        }
+    }
+
+    async deleteDevice(req, res) {
+        try {
+            const deviceId = req.params.id;
+
+            // Get device to delete its images
+            const device = await devicesService.getDeviceById(deviceId);
+            if (!device) {
+                req.session.flash = { error: 'Thiết bị không tồn tại' };
+                return res.redirect('/devices');
+            }
+
+            // Delete device and its associated images
+            await devicesService.deleteDevice(deviceId);
+
+            req.session.flash = { success: 'Xóa thiết bị thành công' };
+            res.redirect('/devices');
+        } catch (error) {
+            console.error('Error deleting device:', error);
+            req.session.flash = { error: `Lỗi khi xóa thiết bị: ${error.message}` };
+            res.redirect('/devices');
+        }
+    }
+}
+
+module.exports = new DevicesController();
