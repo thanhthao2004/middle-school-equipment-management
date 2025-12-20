@@ -1,14 +1,15 @@
 const PurchasingService = require('../services/purchasing.service');
 const PurchasingRepository = require('../repositories/purchasing.repo');
-const { getNextCode } = require('../../../core/libs/sequence');
+const { peekNextCode } = require('../../../core/libs/sequence');
 
 class PurchasingController {
     /**
-     * Get next plan code (KH001, KH002, ...)
+     * Get next plan code preview (KH001, KH002, ...)
+     * CHỈ để xem trước - KHÔNG tăng counter
      */
     async getNextPlanCode(req, res) {
         try {
-            const nextCode = await getNextCode('KH', 3);
+            const nextCode = await peekNextCode('KH', 3);
             res.json({
                 success: true,
                 data: { code: nextCode }
@@ -16,7 +17,7 @@ class PurchasingController {
         } catch (error) {
             res.status(500).json({
                 success: false,
-                message: 'Lỗi khi tạo mã kế hoạch',
+                message: 'Lỗi khi lấy mã kế hoạch',
                 error: error.message
             });
         }
@@ -167,10 +168,10 @@ class PurchasingController {
      */
     async createPlan(req, res) {
         try {
-            const { code, namHoc, items } = req.body;
+            const { namHoc, items } = req.body;
             
+            // Mã kế hoạch sẽ tự động tạo trong repository - không cần truyền từ client
             const plan = await PurchasingRepository.createPlan({
-                code,
                 namHoc,
                 trangThai: 'cho_phe_duyet',
                 items: items || []

@@ -5,7 +5,7 @@ class PurchasingRepository {
 	/**
 	 * Tạo kế hoạch mua sắm mới cùng chi tiết thiết bị
 	 * @param {Object} payload
-	 * @param {string} [payload.code]            Mã kế hoạch (nếu không truyền sẽ tự sinh KHxxx)
+	 * @param {string} [payload.code]            Mã kế hoạch (LUÔN tự động tạo - bỏ qua tham số này)
 	 * @param {string} [payload.namHoc]          Năm học
 	 * @param {string} [payload.trangThai]       Trạng thái
 	 * @param {string} [payload.tenFile]         Tên file đính kèm
@@ -17,7 +17,9 @@ class PurchasingRepository {
 		session.startTransaction();
 
 		try {
-			const maKeHoachMuaSam = payload.code || await getNextCode('KH', 3);
+			// Tự động tạo mã kế hoạch mới: KH001, KH002, KH003...
+			// Mã chỉ tăng khi lưu thành công (commit transaction)
+			const maKeHoachMuaSam = await getNextCode('KH', 3);
 
 			const [plan] = await PurchasingPlan.create([
 				{

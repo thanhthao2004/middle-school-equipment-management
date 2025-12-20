@@ -38,19 +38,20 @@
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label class="form-label">Mã kế hoạch</label>
-                                        <!-- show generated code read-only; submit via hidden input -->
-                                        <input id="plan-code-display" class="form-control" readonly
-                                            value="<%= (plan && plan.code) ? plan.code : '' %>" />
-                                        <input type="hidden" id="plan-code" name="code"
-                                            value="<%= (plan && plan.code) ? plan.code : '' %>" />
+                                        <!-- Mã hiển thị preview, mã thực sẽ tạo mới khi lưu -->
+                                        <input id="plan-code-display" class="form-control" readonly />
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label">Ngày lập</label>
-                                        <!-- show generated date read-only; submit via hidden input -->
-                                        <input id="plan-date-display" class="form-control" readonly
-                                            value="<%= (plan && plan.date) ? plan.date : '' %>" />
-                                        <input type="hidden" id="plan-date" name="date"
-                                            value="<%= (plan && plan.date) ? plan.date : '' %>" />
+                                        <label class="form-label">Năm học <span class="text-danger">*</span></label>
+                                        <select id="namHoc" name="namHoc" class="form-select" required>
+                                            <option value="">-- Chọn năm học --</option>
+                                            <option value="2025-2026" selected>2025-2026</option>
+                                            <option value="2026-2027" disabled>2026-2027 (Chưa được phép)</option>
+                                            <option value="2027-2028" disabled>2027-2028 (Chưa được phép)</option>
+                                            <option value="2028-2029" disabled>2028-2029 (Chưa được phép)</option>
+                                            <option value="2029-2030" disabled>2029-2030 (Chưa được phép)</option>
+                                        </select>
+                                        <small id="namHocHelp" class="form-text text-muted"></small>
                                     </div>
                                     <div class="col-md-6 d-flex align-items-end justify-content-end">
                                         <button type="button" id="add-row"
@@ -188,40 +189,59 @@
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
             <script>
                 (function () {
-                    // Auto-generate plan code and date on page load when not provided by server
-                    const codeInput = document.getElementById('plan-code');
+                    // Hiển thị preview mã kế hoạch tiếp theo (VD: KH001, KH002...)
+                    // LƯU Ý: Đây chỉ là preview, mã thực sẽ được tạo khi nhấn "Lưu và gửi Phê duyệt"
+                    // Mã chỉ tăng trong database khi lưu thành công
                     const codeDisplay = document.getElementById('plan-code-display');
-                    const dateInput = document.getElementById('plan-date');
-                    const dateDisplay = document.getElementById('plan-date-display');
+                                        // Validation năm học
+                                        const namHocSelect = document.getElementById('namHoc');
+                                        const namHocHelp = document.getElementById('namHocHelp');
+                                        const allowedYears = ['2025-2026']; // Các năm học được phép
 
-                    if (codeInput && dateInput) {
-                        if (!codeInput.value) {
-                            // Fetch next plan code from API
-                            fetch('/teacher/purchasing-plans/api/next-code')
-                                .then(response => response.json())
-                                .then(result => {
-                                    if (result.success) {
-                                        codeInput.value = result.data.code;
-                                        if (codeDisplay) codeDisplay.value = result.data.code;
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error fetching next plan code:', error);
-                                    // Fallback to random code if API fails
-                                    const rand = Math.floor(Math.random() * 999) + 1;
-                                    const num = String(rand).padStart(3, '0');
-                                    const genCode = `KH${num}`;
-                                    codeInput.value = genCode;
-                                    if (codeDisplay) codeDisplay.value = genCode;
-                                });
-                        }
+                                        if (namHocSelect) {
+                                            namHocSelect.addEventListener('change', function(e) {
+                                                const selectedYear = e.target.value;
+                                                if (selectedYear && !allowedYears.includes(selectedYear)) {
+                                                    namHocHelp.textContent = 'Năm học này chưa được phép tạo kế hoạch';
+                                                    namHocHelp.classList.add('text-danger');
+                                                    namHocHelp.classList.remove('text-muted');
+                                                } else {
+                                                    namHocHelp.textContent = '';
+                                                    namHocHelp.classList.remove('text-danger');
+                                                    namHocHelp.classList.add('text-muted');
+                                                }
+                                            });
+                                        }
 
-                        if (!dateInput.value) {
-                            const today = new Date();
-                            const iso = today.toISOString().slice(0, 10); // YYYY-MM-DD
-                            dateInput.value = iso;
-                            if (dateDisplay) dateDisplay.value = iso;
-                        }
+                                        // Validate trước khi submit
+                                        const formElement = document.querySelector('form');
+                                        const originalSubmit = formElement.onsubmit;
+                                        formElement.addEventListener('submit', function(e) {
+                                            const selectedYear = namHocSelect.value;
+                                            if (!selectedYear) {
+                                                e.preventDefault();
+                                                alert('Vui lòng chọn năm học!');
+                                                return false;
+                                            }
+                                            if (!allowedYears.includes(selectedYear)) {
+                                                e.preventDefault();
+                                                alert('Năm học này chưa được phép tạo kế hoạch. Vui lòng chọn năm học 2025-2026.');
+                                                return false;
+                                            }
+                                        });
+
+                    if (codeDisplay && !codeDisplay.value) {
+                        fetch('/teacher/purchasing-plans/api/next-code')
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.success) {
+                                    codeDisplay.value = result.data.code;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching next plan code:', error);
+                                codeDisplay.value = 'KH???';
+                            });
                     }
 
                     const addBtn = document.getElementById('add-row');
