@@ -148,51 +148,26 @@ class BorrowService {
                 requestedAt: new Date().toISOString()
             };
 
-            // Generate temporary ticket ID
-            const tempMaPhieu = 'PM_' + Date.now().toString().slice(-8);
-
+            // Direct DB creation - SYNC MODE (RabbitMQ disabled for reliability)
             try {
-                // Try to publish message to RabbitMQ
-                await publishMessage(messagePayload);
-                console.log(`Published borrow request message for user ${userId}`);
+                const ticket = await borrowRepo.createBorrowRequest(userId, borrowData);
 
-                // Return pending status immediately
+                // Clear cache to refresh device availability
+                cache.clear();
+
                 return {
                     success: true,
-                    message: 'Đăng ký mượn thành công! Yêu cầu đang được xử lý.',
+                    message: 'Đăng ký mượn thành công!',
                     data: {
-                        maPhieu: tempMaPhieu,
-                        trangThai: 'pending',
-                        tempTicket: {
-                            maPhieu: tempMaPhieu,
-                            ngayMuon: borrowData.borrowDate,
-                            ngayDuKienTra: borrowData.returnDate,
-                            trangThai: 'pending',
-                            createdAt: new Date()
-                        }
+                        maPhieu: ticket.maPhieu,
+                        trangThai: ticket.trangThai || 'cho_duyet',
+                        ticket: ticket
                     }
                 };
-            } catch (mqError) {
-                // If RabbitMQ fails, fallback to direct DB creation
-                console.warn('RabbitMQ not available, falling back to direct DB creation:', mqError.message);
-
-                try {
-                    const ticket = await borrowRepo.createBorrowRequest(userId, borrowData);
-                    return {
-                        success: true,
-                        message: 'Đăng ký mượn thành công!',
-                        data: {
-                            maPhieu: ticket.maPhieu || tempMaPhieu,
-                            trangThai: ticket.trangThai || 'dang_muon',
-                            ticket: ticket
-                        }
-                    };
-                } catch (dbError) {
-                    console.error('Both RabbitMQ and direct DB creation failed:', dbError.message);
-                    throw new Error('Không thể xử lý yêu cầu mượn. Vui lòng thử lại sau.');
-                }
+            } catch (dbError) {
+                console.error('Error creating borrow request:', dbError.message);
+                throw new Error(dbError.message || 'Không thể xử lý yêu cầu mượn. Vui lòng thử lại sau.');
             }
-
         } catch (error) {
             console.error('Error in createBorrowRequest service:', error);
             throw error;
@@ -290,10 +265,8 @@ class BorrowService {
     // Lấy danh sách phiếu chờ duyệt của user
     async getPendingApprovals(userId, filters = {}) {
         try {
-            // Force status filter to 'dang_muon' (pending) if not specified?
-            // Or just pass filters.
-            const pendingFilters = { ...filters, status: 'dang_muon' };
-            const list = await borrowRepo.getPendingApprovals(userId, pendingFilters);
+            // Repository đã có logic mặc định status='cho_duyet'
+            const list = await borrowRepo.getPendingApprovals(userId, filters);
             return list;
         } catch (error) {
             console.error('Error in getPendingApprovals service:', error);
@@ -334,22 +307,91 @@ class BorrowService {
 
     // API cho QLTB: Duyệt phiếu mượn (Mock)
     async approveBorrow(slipId, approvedBy) {
-        console.log(`✅ QLTB approved borrow ${slipId} by ${approvedBy}`);
+        console.log(`QLTB approved borrow ${slipId} by ${approvedBy}`);
         return { id: slipId, status: 'approved' };
     }
 
     // API cho QLTB: Từ chối phiếu mượn (Mock)
     async rejectBorrow(slipId, reason) {
-        console.log(`❌ QLTB rejected borrow ${slipId} because: ${reason}`);
+        console.log(`QLTB rejected borrow ${slipId} because: ${reason}`);
         return { id: slipId, status: 'rejected' };
     }
 
     // API cho QLTB: Xác nhận trả phiếu (Mock)
     async approveReturn(slipId, confirmedBy) {
-        console.log(`✅ QLTB confirmed return ${slipId} by ${confirmedBy}`);
+        console.log(`QLTB confirmed return ${slipId} by ${confirmedBy}`);
         return { id: slipId, status: 'confirmed' };
     }
 
+    /**
+     * Create a return slip for selected borrowed items
+     * @param {string} employeeId - ID of the employee processing the return
+     * @param {Object} returnSlipData - Return slip data
+     * @returns {Promise<Object>} - Created return slip
+     */
+    async createReturnSlip(employeeId, returnSlipData) {
+        try {
+            // Validate input
+            if (!returnSlipData.borrowedItemIds || returnSlipData.borrowedItemIds.length === 0) {
+                throw new Error('Vui lòng chọn ít nhất một thiết bị để trả');
+            }
+
+            if (!returnSlipData.returnDate) {
+                throw new Error('Vui lòng chọn ngày trả');
+            }
+
+            // Normalize return date
+            const returnDate = new Date(returnSlipData.returnDate);
+            returnDate.setHours(0, 0, 0, 0);
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (returnDate > today) {
+                throw new Error('Ngày trả không được là ngày tương lai');
+            }
+
+            // Call repository to create return slip
+            const result = await borrowRepo.createReturnSlip(
+                employeeId,
+                returnSlipData.borrowedItemIds,
+                {
+                    returnDate: returnDate,
+                    returnShift: returnSlipData.returnShift || 'sang',
+                    notes: returnSlipData.notes || '',
+                    quantities: returnSlipData.quantities || {}
+                }
+            );
+
+            // Invalidate relevant caches (clear all since we don't support wildcard delete)
+            cache.clear(); // Clear all cache as inventory changed
+
+            return {
+                success: true,
+                message: 'Tạo phiếu trả thành công!',
+                data: result
+            };
+
+        } catch (error) {
+            console.error('Error in createReturnSlip service:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get borrowed items that can be returned
+     * @param {Object} filters - Filter options
+     * @returns {Promise<Array>} - List of borrowed items
+     */
+    async getBorrowedItemsForReturn(filters = {}) {
+        try {
+            const items = await borrowRepo.getBorrowedItemsForReturn(filters);
+            return items;
+        } catch (error) {
+            console.error('Error in getBorrowedItemsForReturn service:', error);
+            throw error;
+        }
+    }
 
 }
 

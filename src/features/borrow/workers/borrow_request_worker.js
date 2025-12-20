@@ -1,7 +1,9 @@
 // Worker này chạy riêng biệt với app.js
+const mongoose = require('mongoose');
 const { connectRabbitMQ } = require('../../../config/rabbitmq');
 const logger = require('../../../config/logger');
 const borrowRepo = require('../repositories/borrow.repo');
+const config = require('../../../config/env');
 
 /**
  * Helper: Generate all time slots between borrow and return dates
@@ -139,6 +141,11 @@ async function processBorrowRequest(msgPayload) {
 // Hàm chính để khởi động worker
 async function startWorker() {
     try {
+        // CRITICAL: Connect to MongoDB first before consuming messages
+        logger.info('🔌 Connecting to MongoDB...');
+        await mongoose.connect(config.mongodb.uri);
+        logger.info('✅ MongoDB connected for worker');
+
         const { channel, queueName } = await connectRabbitMQ();
 
         logger.info(`🚀 Worker is waiting for messages in queue: ${queueName}`);
