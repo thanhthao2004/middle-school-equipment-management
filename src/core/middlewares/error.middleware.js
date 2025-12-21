@@ -39,7 +39,7 @@ const notFoundHandler = (req, res) => {
 	// Tải module tại runtime (khi hàm được gọi)
 	const { ERROR_CODES, getErrorMessage } = require('../constants/error-codes');
 	const { sendError } = require('../utils/response');
-	
+
 	sendError(res, getErrorMessage(ERROR_CODES.NOT_FOUND), 404);
 };
 
