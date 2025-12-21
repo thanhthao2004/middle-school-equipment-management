@@ -1,6 +1,9 @@
 const PurchasingService = require('../services/purchasing.service');
 const PurchasingRepository = require('../repositories/purchasing.repo');
 const { peekNextCode } = require('../../../core/libs/sequence');
+const Device = require('../../devices/models/device.model');
+const Category = require('../../categories/models/category.model');
+const NotificationService = require('../../notifications/services/notification.service');
 
 class PurchasingController {
     /**
@@ -31,7 +34,7 @@ class PurchasingController {
             const plans = await PurchasingRepository.getAllPlans();
             // Extract unique years from plans
             const years = [...new Set(plans.map(p => p.namHoc).filter(y => y))];
-            
+
             res.render('purchasing-plans/views/list', {
                 title: 'Quản lý kế hoạch mua sắm',
                 plans,
@@ -56,9 +59,64 @@ class PurchasingController {
                 return res.status(404).send('Kế hoạch không tồn tại');
             }
 
+            // Bổ sung dữ liệu thiếu cho các bản ghi cũ (tenTB, tenDanhMuc, donGia, nguonGoc)
+            const details = planData.details || [];
+            const codesNeedingEnrich = details
+                .filter(d => (
+                    !d ||
+                    !d.maTB ||
+                    !(d.tenTB && d.tenTB.trim()) ||
+                    typeof d.donGia !== 'number' ||
+                    !(d.nguonGoc && d.nguonGoc.trim()) ||
+                    !(d.tenDanhMuc && d.tenDanhMuc.trim())
+                ))
+                .map(d => d.maTB)
+                .filter((v, idx, arr) => v && arr.indexOf(v) === idx);
+
+            let deviceMap = {};
+            let categoryMap = {};
+
+            if (codesNeedingEnrich.length > 0) {
+                const devices = await Device.find({ maTB: { $in: codesNeedingEnrich } }).lean();
+                deviceMap = devices.reduce((acc, cur) => {
+                    acc[cur.maTB] = cur;
+                    return acc;
+                }, {});
+
+                const categoryIds = devices
+                    .map(d => d.category)
+                    .filter(Boolean)
+                    .map(id => id.toString())
+                    .filter((v, idx, arr) => arr.indexOf(v) === idx);
+
+                if (categoryIds.length > 0) {
+                    const categories = await Category.find({ _id: { $in: categoryIds } }).lean();
+                    categoryMap = categories.reduce((acc, cur) => {
+                        acc[cur._id.toString()] = cur.name;
+                        return acc;
+                    }, {});
+                }
+            }
+
+            const enrichedDetails = details.map(detail => {
+                const device = deviceMap[detail.maTB];
+                const categoryName = detail.tenDanhMuc || (device && device.category ? categoryMap[device.category?.toString()] : '') || '';
+                const tenTB = detail.tenTB || device?.tenTB || '';
+                const nguonGoc = detail.nguonGoc || device?.nguonGoc || '';
+                const donGia = typeof detail.donGia === 'number' ? detail.donGia : (device?.giaThanh || 0);
+
+                return {
+                    ...detail,
+                    tenDanhMuc: categoryName,
+                    tenTB,
+                    nguonGoc,
+                    donGia,
+                };
+            });
+
             res.render('purchasing-plans/views/detail', {
                 title: `Chi tiết kế hoạch ${code}`,
-                plan: planData,
+                plan: { ...planData, details: enrichedDetails },
                 user: req.user || { role: 'to_truong' }
             });
         } catch (error) {
@@ -79,9 +137,64 @@ class PurchasingController {
                 return res.status(404).send('Kế hoạch không tồn tại');
             }
 
+            // Bổ sung dữ liệu thiếu cho các bản ghi cũ (tenTB, tenDanhMuc, donGia, nguonGoc)
+            const details = planData.details || [];
+            const codesNeedingEnrich = details
+                .filter(d => (
+                    !d ||
+                    !d.maTB ||
+                    !(d.tenTB && d.tenTB.trim()) ||
+                    typeof d.donGia !== 'number' ||
+                    !(d.nguonGoc && d.nguonGoc.trim()) ||
+                    !(d.tenDanhMuc && d.tenDanhMuc.trim())
+                ))
+                .map(d => d.maTB)
+                .filter((v, idx, arr) => v && arr.indexOf(v) === idx);
+
+            let deviceMap = {};
+            let categoryMap = {};
+
+            if (codesNeedingEnrich.length > 0) {
+                const devices = await Device.find({ maTB: { $in: codesNeedingEnrich } }).lean();
+                deviceMap = devices.reduce((acc, cur) => {
+                    acc[cur.maTB] = cur;
+                    return acc;
+                }, {});
+
+                const categoryIds = devices
+                    .map(d => d.category)
+                    .filter(Boolean)
+                    .map(id => id.toString())
+                    .filter((v, idx, arr) => arr.indexOf(v) === idx);
+
+                if (categoryIds.length > 0) {
+                    const categories = await Category.find({ _id: { $in: categoryIds } }).lean();
+                    categoryMap = categories.reduce((acc, cur) => {
+                        acc[cur._id.toString()] = cur.name;
+                        return acc;
+                    }, {});
+                }
+            }
+
+            const enrichedDetails = details.map(detail => {
+                const device = deviceMap[detail.maTB];
+                const categoryName = detail.tenDanhMuc || (device && device.category ? categoryMap[device.category?.toString()] : '') || '';
+                const tenTB = detail.tenTB || device?.tenTB || '';
+                const nguonGoc = detail.nguonGoc || device?.nguonGoc || '';
+                const donGia = typeof detail.donGia === 'number' ? detail.donGia : (device?.giaThanh || 0);
+
+                return {
+                    ...detail,
+                    tenDanhMuc: categoryName,
+                    tenTB,
+                    nguonGoc,
+                    donGia,
+                };
+            });
+
             res.render('purchasing-plans/views/edit', {
                 title: 'Sửa kế hoạch mua sắm',
-                plan: planData,
+                plan: { ...planData, details: enrichedDetails },
                 user: req.user || { role: 'to_truong' }
             });
         } catch (error) {
@@ -113,6 +226,25 @@ class PurchasingController {
             res.status(500).json({
                 success: false,
                 message: 'Lỗi khi lấy chi tiết kế hoạch',
+                error: error.message
+            });
+        }
+    }
+
+    /**
+     * Get all categories for filter dropdown
+     */
+    async getCategories(req, res) {
+        try {
+            const categories = await PurchasingService.getAllCategories();
+            res.json({
+                success: true,
+                data: categories
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Lỗi khi lấy danh sách danh mục',
                 error: error.message
             });
         }
@@ -169,13 +301,17 @@ class PurchasingController {
     async createPlan(req, res) {
         try {
             const { namHoc, items } = req.body;
-            
+
             // Mã kế hoạch sẽ tự động tạo trong repository - không cần truyền từ client
             const plan = await PurchasingRepository.createPlan({
                 namHoc,
                 trangThai: 'cho_phe_duyet',
                 items: items || []
             });
+
+            // Gửi thông báo đến principal khi tạo kế hoạch
+            const teacherName = req.user?.hoTen || 'Giáo viên';
+            await NotificationService.notifyPrincipalNewPlan(plan, teacherName);
 
             const userRole = req.user?.role || 'to_truong';
             if (userRole === 'hieu_truong') {
@@ -196,11 +332,24 @@ class PurchasingController {
             const { id } = req.params;
             const { namHoc, items, trangThai } = req.body;
 
-            await PurchasingRepository.updatePlan(id, {
+            console.log('=== UPDATE PLAN DEBUG ===');
+            console.log('ID:', id);
+            console.log('namHoc:', namHoc);
+            console.log('trangThai:', trangThai);
+            console.log('items:', JSON.stringify(items, null, 2));
+            console.log('========================');
+
+            const updatedPlan = await PurchasingRepository.updatePlan(id, {
                 namHoc,
                 trangThai,
                 items
             });
+
+            // Gửi thông báo đến principal khi status là 'cho_phe_duyet'
+            if (trangThai === 'cho_phe_duyet' && updatedPlan) {
+                const teacherName = req.user?.hoTen || 'Giáo viên';
+                await NotificationService.notifyPrincipalNewPlan(updatedPlan, teacherName);
+            }
 
             const userRole = req.user?.role || 'to_truong';
             if (userRole === 'hieu_truong') {

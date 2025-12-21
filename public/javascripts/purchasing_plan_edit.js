@@ -1,13 +1,14 @@
 (function () {
     const addBtn = document.getElementById('add-row');
     const tbody = document.getElementById('items-tbody');
-    
+
     // Get initial row count from data attribute
     const itemsTbody = document.getElementById('items-tbody');
     const initialRows = itemsTbody ? itemsTbody.querySelectorAll('tr').length : 1;
     let rowCount = initialRows;
     let idx = rowCount;
     let allDevices = [];
+    let allCategories = [];
     let selectedDeviceModal = new bootstrap.Modal(document.getElementById('selectDeviceModal'));
 
     // Utility: Format currency
@@ -20,6 +21,30 @@
     function parseCurrency(str) {
         if (!str) return 0;
         return parseInt(str.replace(/\./g, ''), 10);
+    }
+
+    // Load categories
+    async function loadCategories() {
+        try {
+            const res = await fetch('/teacher/purchasing-plans/api/categories');
+            const result = await res.json();
+            if (result.success) {
+                allCategories = result.data || [];
+                const select = document.getElementById('categoryFilter');
+                if (select) {
+                    // reset options except first
+                    select.innerHTML = '<option value="">Tất cả danh mục</option>';
+                    allCategories.forEach(cat => {
+                        const opt = document.createElement('option');
+                        opt.value = cat._id || cat.id;
+                        opt.textContent = cat.name;
+                        select.appendChild(opt);
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error loading categories:', error);
+        }
     }
 
     // Load devices from API
@@ -39,12 +64,20 @@
     function renderDeviceTable(devices) {
         const tbody = document.getElementById('deviceTableBody');
         tbody.innerHTML = '';
+        if (!devices || devices.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="7" class="text-center text-muted py-3">Không có thiết bị</td>`;
+            tbody.appendChild(tr);
+            return;
+        }
+
         devices.forEach((device, idx) => {
+            const categoryName = device.category ? (allCategories.find(c => (c._id === device.category || c.id === device.category))?.name || '') : '';
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><input type="checkbox" class="form-check-input device-checkbox" value="${device.id}" 
                     data-code="${device.code}" data-name="${device.name}" data-price="${device.price}" 
-                    data-source="${device.source || ''}"></td>
+                    data-source="${device.source || ''}" data-category="${categoryName}"></td>
                 <td>${device.code}</td>
                 <td>${device.name}</td>
                 <td>
@@ -67,6 +100,7 @@
                 const input = this.nextElementSibling;
                 let val = parseInt(input.value) || 0;
                 if (val > 0) input.value = val - 1;
+                updateCheckboxCount();
             });
         });
 
@@ -75,8 +109,34 @@
                 const input = this.previousElementSibling;
                 let val = parseInt(input.value) || 0;
                 input.value = val + 1;
+                updateCheckboxCount();
             });
         });
+
+        // Add checkbox change listeners for count badge
+        document.querySelectorAll('.device-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateCheckboxCount);
+        });
+
+        // Handle select all checkbox
+        const selectAllCheckbox = document.getElementById('selectAllDevices');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function () {
+                document.querySelectorAll('.device-checkbox').forEach(cb => {
+                    cb.checked = this.checked;
+                });
+                updateCheckboxCount();
+            });
+        }
+    }
+
+    // Update the count badge
+    function updateCheckboxCount() {
+        const checked = document.querySelectorAll('.device-checkbox:checked').length;
+        const badge = document.getElementById('selectedCountBadge');
+        const confirmBtn = document.getElementById('confirmSelectDevice');
+        if (badge) badge.textContent = `Đã chọn: ${checked}`;
+        if (confirmBtn) confirmBtn.textContent = `Chọn (${checked})`;
     }
 
     // Handle add devices button
@@ -94,7 +154,7 @@
             device.name.toLowerCase().includes(query)
         );
         if (categoryId) {
-            filtered = filtered.filter(device => device.category === categoryId);
+            filtered = filtered.filter(device => (device.category === categoryId || device.category === (categoryId)));
         }
         renderDeviceTable(filtered);
     });
@@ -120,22 +180,31 @@
                 const uom = row.querySelector('.device-uom').value || '';
                 const unitPrice = parseCurrency(row.querySelector('.device-unit-price').value) || 0;
                 const source = checkbox.dataset.source || '';
+                const categoryName = checkbox.dataset.category || '';
                 const totalBudget = unitPrice * quantity;
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><input name="items[${idx}][category]" class="form-control" /></td>
-                    <td><input name="items[${idx}][code]" class="form-control" value="${checkbox.dataset.code}" readonly /></td>
-                    <td><input name="items[${idx}][name]" class="form-control" value="${checkbox.dataset.name}" readonly /></td>
-                    <td><input name="items[${idx}][quantity]" type="number" min="0" class="form-control quantity-field" value="${quantity}" /></td>
-                    <td><input name="items[${idx}][uom]" class="form-control" value="${uom}" /></td>
-                    <td><input name="items[${idx}][unitPrice]" type="text" class="form-control price-input" 
+                    <td>
+                        <input type="text" class="form-control text-center" value="${categoryName}" readonly />
+                        <input type="hidden" name="items[${idx}][category]" value="${categoryName}" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control text-center" value="${checkbox.dataset.code}" readonly />
+                        <input type="hidden" name="items[${idx}][code]" value="${checkbox.dataset.code}" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control text-center" value="${checkbox.dataset.name}" readonly />
+                        <input type="hidden" name="items[${idx}][name]" value="${checkbox.dataset.name}" />
+                    </td>
+                    <td><input name="items[${idx}][quantity]" type="number" min="0" class="form-control quantity-field text-center" value="${quantity}" /></td>
+                    <td><input name="items[${idx}][uom]" class="form-control text-center" value="${uom}" /></td>
+                    <td><input name="items[${idx}][unitPrice]" type="text" class="form-control price-input text-end" 
                         data-index="${idx}" value="${formatCurrency(unitPrice)}" /></td>
-                    <td><input name="items[${idx}][source]" class="form-control" value="${source}" /></td>
-                    <td><input name="items[${idx}][budget]" type="text" class="form-control budget-output" 
+                    <td><input name="items[${idx}][source]" class="form-control text-center" value="${source}" /></td>
+                    <td><input name="items[${idx}][budget]" type="text" class="form-control budget-output text-end" 
                         data-index="${idx}" value="${formatCurrency(totalBudget)}" readonly /></td>
-                    <td><input name="items[${idx}][expectedAt]" type="date" class="form-control" /></td>
-                    <td><input name="items[${idx}][reason]" class="form-control" /></td>
+                    <td><input name="items[${idx}][expectedAt]" type="date" class="form-control text-center" /></td>
                     <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
                 `;
                 tbody.appendChild(tr);
@@ -157,6 +226,12 @@
         // Reset search and filter
         document.getElementById('searchDevice').value = '';
         document.getElementById('categoryFilter').value = '';
+
+        // Reset badge and button
+        const badge = document.getElementById('selectedCountBadge');
+        const confirmBtn = document.getElementById('confirmSelectDevice');
+        if (badge) badge.textContent = 'Đã chọn: 0';
+        if (confirmBtn) confirmBtn.textContent = 'Chọn (0)';
     });
 
     // Handle budget input formatting
@@ -199,14 +274,14 @@
         const budgetOutputs = document.querySelectorAll('.budget-output');
         priceInputs.forEach(input => {
             const value = parseCurrency(input.value);
-            input.value = value || '';
+            input.value = value || 0;
         });
         budgetOutputs.forEach(input => {
             const value = parseCurrency(input.value);
-            input.value = value || '';
+            input.value = value || 0;
         });
     });
 
-    // Load devices on page load
-    loadDevices();
+    // Load devices and categories on page load
+    Promise.all([loadDevices(), loadCategories()]).then(() => renderDeviceTable(allDevices));
 })();

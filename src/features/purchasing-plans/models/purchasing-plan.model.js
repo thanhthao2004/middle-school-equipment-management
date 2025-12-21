@@ -17,8 +17,12 @@ const PurchasingPlanDetailSchema = new Schema(
 	{
 		maKeHoachMuaSam: { type: String, required: true, index: true },
 		maTB: { type: String, required: true },
+		tenTB: { type: String, default: '' },           // Tên thiết bị
+		tenDanhMuc: { type: String, default: '' },     // Tên danh mục
 		soLuongDuKienMua: { type: Number, default: 0 },
 		donViTinh: { type: String, trim: true },
+		donGia: { type: Number, default: 0 },           // Thêm cột đơn giá
+		nguonGoc: { type: String, default: '' },        // Nguồn gốc
 		thoiGianDuKienMua: { type: Date },
 		duToanKinhPhi: { type: Number, default: 0 },
 		lyDoMua: { type: String, default: '' },

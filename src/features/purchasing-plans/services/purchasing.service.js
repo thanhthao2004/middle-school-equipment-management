@@ -1,6 +1,19 @@
 const Device = require('../../devices/models/device.model');
+const Category = require('../../categories/models/category.model');
 
 class PurchasingService {
+    /**
+     * Get all categories for filter dropdown
+     */
+    async getAllCategories() {
+        try {
+            const categories = await Category.find({}).select('_id id name').sort({ name: 1 }).lean();
+            return categories;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     /**
      * Get all devices for selection
      */
