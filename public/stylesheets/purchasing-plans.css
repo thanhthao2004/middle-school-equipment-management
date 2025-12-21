@@ -14,44 +14,110 @@ body.page-exit {
 }
 
 /* action buttons */
-.action-btn {
-    min-width: 40px;
-    text-align: center;
-    width: 40px;
-    height: 40px;
+.purchasing-plans-page .action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
-    padding: 0;
-    font-size: 16px;
-    line-height: 1;
-    cursor: pointer;
-    transition: transform .08s ease, box-shadow .12s ease, color .2s, background-color .2s;
-    border: 1px solid #dee2e6;
+    width: 40px;
+    height: 40px;
+    margin: 0 0.2rem;
+    border-radius: 12px;
+    border: 1px solid #e6e9ef;
     background: #fff;
-    color: #495057;
-    box-shadow: 0 2px 6px rgba(2, 6, 23, 0.04);
-    margin-left: 6px;
+    color: #4a5568;
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    text-align: center;
 }
 
-.action-btn i {
-    font-size: 18px;
+.purchasing-plans-page .action-btn i {
+    font-size: 0.95rem;
 }
 
-.btn-view:hover {
-    background-color: #0d6efd20;
-    color: #0d6efd !important;
+.purchasing-plans-page .action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
 }
 
-.btn-edit:hover {
-    background-color: #ffc10720;
-    color: #ffc107 !important;
+.purchasing-plans-page .action-btn.btn-view {
+    color: #0d6efd;
+    border-color: #dbe7ff;
+    background: #f4f8ff;
 }
 
-.btn-delete:hover {
-    background-color: #dc354520;
-    color: #dc3545 !important;
+.purchasing-plans-page .action-btn.btn-edit {
+    color: #0f6b3d;
+    border-color: #cdecdc;
+    background: #f4fbf7;
+}
+
+.purchasing-plans-page .action-btn.btn-delete {
+    color: #b42318;
+    border-color: #f5d0ce;
+    background: #fff6f5;
+}
+
+/* status badges */
+.purchasing-plans-page .status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+}
+
+.purchasing-plans-page .status-available {
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+
+.purchasing-plans-page .status-pending {
+    background: #fff4e5;
+    color: #b76e00;
+}
+
+.purchasing-plans-page .status-rejected {
+    background: #fdecea;
+    color: #b71c1c;
+}
+
+.purchasing-plans-page .status-borrowed {
+    background: #e8eaf6;
+    color: #1a237e;
+}
+
+/* purchasing plans table layout */
+.purchasing-plans-page .table th,
+.purchasing-plans-page .table td {
+    vertical-align: middle;
+}
+
+.purchasing-plans-page .table th:nth-child(1),
+.purchasing-plans-page .table td:nth-child(1) {
+    width: 20%;
+    text-align: center;
+}
+
+.purchasing-plans-page .table th:nth-child(2),
+.purchasing-plans-page .table td:nth-child(2) {
+    width: 20%;
+    text-align: center;
+}
+
+.purchasing-plans-page .table th:nth-child(3),
+.purchasing-plans-page .table td:nth-child(3) {
+    width: 30%;
+    text-align: center;
+}
+
+.purchasing-plans-page .table th:nth-child(4),
+.purchasing-plans-page .table td:nth-child(4) {
+    width: 30%;
+    text-align: center;
+}
+
+.purchasing-plans-page .float-right {
+    text-align: center;
 }
 
 /* modal custom */
