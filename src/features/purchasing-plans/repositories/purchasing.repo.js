@@ -57,6 +57,162 @@ class PurchasingRepository {
 			throw error;
 		}
 	}
+
+	/**
+	 * Lấy chi tiết kế hoạch mua sắm theo mã
+	 * @param {string} maKeHoachMuaSam Mã kế hoạch
+	 */
+	async getPlanByCode(maKeHoachMuaSam) {
+		try {
+			const plan = await PurchasingPlan.findOne({ maKeHoachMuaSam }).lean();
+			if (!plan) return null;
+
+			const details = await PurchasingPlanDetail.find({ maKeHoachMuaSam }).lean();
+
+			return {
+				...plan,
+				details
+			};
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Lấy chi tiết kế hoạch mua sắm theo id
+	 * @param {string} id ID kế hoạch
+	 */
+	async getPlanById(id) {
+		try {
+			const plan = await PurchasingPlan.findById(id).lean();
+			if (!plan) return null;
+
+			const details = await PurchasingPlanDetail.find({ maKeHoachMuaSam: plan.maKeHoachMuaSam }).lean();
+
+			return {
+				...plan,
+				details
+			};
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Lấy danh sách tất cả kế hoạch
+	 */
+	async getAllPlans() {
+		try {
+			const plans = await PurchasingPlan.find({}).sort({ createdAt: -1 }).lean();
+			return plans;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Lấy danh sách kế hoạch theo trạng thái
+	 */
+	async getPlansByStatus(trangThai) {
+		try {
+			const plans = await PurchasingPlan.find({ trangThai }).sort({ createdAt: -1 }).lean();
+			return plans;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Cập nhật kế hoạch mua sắm
+	 * @param {string} id ID kế hoạch
+	 * @param {Object} payload Dữ liệu cần cập nhật
+	 */
+	async updatePlan(id, payload) {
+		const session = await PurchasingPlan.startSession();
+		session.startTransaction();
+
+		try {
+			const plan = await PurchasingPlan.findByIdAndUpdate(
+				id,
+				{
+					namHoc: payload.namHoc,
+					trangThai: payload.trangThai
+				},
+				{ new: true, session }
+			);
+
+			if (!plan) {
+				throw new Error('Kế hoạch không tồn tại');
+			}
+
+			// Update plan details
+			const items = Array.isArray(payload.items) ? payload.items : [];
+			
+			// Delete old details
+			await PurchasingPlanDetail.deleteMany(
+				{ maKeHoachMuaSam: plan.maKeHoachMuaSam },
+				{ session }
+			);
+
+			// Insert new details
+			if (items.length > 0) {
+				const details = items.map(item => ({
+					maKeHoachMuaSam: plan.maKeHoachMuaSam,
+					maTB: item.code,
+					soLuongDuKienMua: item.quantity || 0,
+					donViTinh: item.uom || '',
+					thoiGianDuKienMua: item.expectedAt ? new Date(item.expectedAt) : undefined,
+					duToanKinhPhi: typeof item.budget === 'number'
+						? item.budget
+						: (item.quantity || 0) * (item.unitPrice || 0),
+					lyDoMua: item.reason || ''
+				}));
+
+				await PurchasingPlanDetail.insertMany(details, { session });
+			}
+
+			await session.commitTransaction();
+			session.endSession();
+
+			return plan;
+		} catch (error) {
+			await session.abortTransaction();
+			session.endSession();
+			throw error;
+		}
+	}
+
+	/**
+	 * Xóa kế hoạch mua sắm
+	 * @param {string} id ID kế hoạch
+	 */
+	async deletePlan(id) {
+		const session = await PurchasingPlan.startSession();
+		session.startTransaction();
+
+		try {
+			const plan = await PurchasingPlan.findByIdAndDelete(id, { session });
+
+			if (!plan) {
+				throw new Error('Kế hoạch không tồn tại');
+			}
+
+			// Delete associated details
+			await PurchasingPlanDetail.deleteMany(
+				{ maKeHoachMuaSam: plan.maKeHoachMuaSam },
+				{ session }
+			);
+
+			await session.commitTransaction();
+			session.endSession();
+
+			return plan;
+		} catch (error) {
+			await session.abortTransaction();
+			session.endSession();
+			throw error;
+		}
+	}
 }
 
 module.exports = new PurchasingRepository();
