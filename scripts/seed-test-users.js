@@ -5,7 +5,7 @@
  * Usage: node scripts/seed-test-users.js
  */
 
-require('dotenv').config();
+require('dotenv').config({ path: '.env' });
 const mongoose = require('mongoose');
 const config = require('../src/config/env');
 const User = require('../src/features/users/models/user.model');
@@ -62,9 +62,8 @@ const TEST_USERS = [
 async function seedTestUsers() {
     try {
         // Connect to MongoDB
-        await mongoose.connect(config.mongodb.uri, {
-            dbName: config.mongodb.dbName,
-        });
+        await mongoose.connect(config.mongodb.uri);
+
 
         console.log('✅ Connected to MongoDB');
         console.log('🌱 Seeding test users...\n');

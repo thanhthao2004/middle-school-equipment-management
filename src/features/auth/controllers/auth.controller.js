@@ -82,6 +82,7 @@ class AuthController {
                 token,
                 user,
                 error: null,
+                query: req.query,
             });
 
         } catch (error) {
@@ -203,8 +204,31 @@ class AuthController {
      * POST /auth/password/forgot - Handle forgot password
      */
     async handleForgotPassword(req, res) {
-        // TODO: Implement email sending logic
-        res.redirect('/auth/login?success=' + encodeURIComponent('Vui lòng liên hệ quản trị viên để đặt lại mật khẩu'));
+        try {
+            const { username } = req.body;
+
+            if (!username) {
+                return res.render('auth/views/forgot-password', {
+                    title: 'Quên mật khẩu',
+                    error: 'Vui lòng nhập tên đăng nhập',
+                    success: null
+                });
+            }
+
+            // Generate reset token
+            const token = await authService.createPasswordResetToken(username);
+
+            // Redirect to set password page
+            res.redirect(`/auth/register/${token}`);
+
+        } catch (error) {
+            console.error('Forgot password error:', error);
+            res.render('auth/views/forgot-password', {
+                title: 'Quên mật khẩu',
+                error: error.message,
+                success: null
+            });
+        }
     }
 
     /**
