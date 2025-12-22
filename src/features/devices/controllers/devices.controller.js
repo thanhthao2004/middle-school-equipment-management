@@ -336,6 +336,28 @@ class DevicesController {
         }
     }
 
+    async deleteDevice(req, res) {
+    try {
+        const deviceId = req.params.id;
+        await devicesService.deleteDevice(deviceId);
+
+        if (!req.session.flash) {
+            req.session.flash = {};
+        }
+
+        req.session.flash.success = 'Xóa thiết bị thành công';
+        res.redirect('/devices');
+    } catch (error) {
+        console.error('Error deleting device:', error);
+
+        if (!req.session.flash) {
+            req.session.flash = {};
+        }
+
+        req.session.flash.error = 'Xóa thiết bị thất bại';
+        res.redirect('/devices');
+    }
+}
     // GET /devices/delete/:id - Trang xác nhận xóa
     async getDeletePage(req, res) {
         try {
@@ -353,6 +375,16 @@ class DevicesController {
                     error: req.session?.flash?.error || null
                 }
             });
-        } catch (error) {
-            console.error('Error rendering delete device page:', error);
-            if (!req.session.flash) req.session.flash
+            } catch (error) {
+                console.error('Error rendering delete device page:', error);
+
+                if (!req.session.flash) {
+                    req.session.flash = {};
+                }
+            
+                req.session.flash.error = 'Không thể tải trang xóa thiết bị';
+                res.redirect('/devices');
+            }       
+        }
+    }
+module.exports = new DevicesController();
