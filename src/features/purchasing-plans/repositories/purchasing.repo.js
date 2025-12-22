@@ -1,11 +1,22 @@
 const { PurchasingPlan, PurchasingPlanDetail } = require('../models/purchasing-plan.model');
 const { getNextCode } = require('../../../core/libs/sequence');
 
+// Parse currency-like strings to number (handles comma/dot thousand separators)
+function toNumber(value) {
+	if (typeof value === 'number') return value;
+	if (typeof value === 'string') {
+		const cleaned = value.replace(/[^0-9.-]/g, '');
+		const num = Number(cleaned);
+		return Number.isFinite(num) ? num : 0;
+	}
+	return 0;
+}
+
 class PurchasingRepository {
 	/**
 	 * Tạo kế hoạch mua sắm mới cùng chi tiết thiết bị
 	 * @param {Object} payload
-	 * @param {string} [payload.code]            Mã kế hoạch (nếu không truyền sẽ tự sinh KHxxx)
+	 * @param {string} [payload.code]            Mã kế hoạch (LUÔN tự động tạo - bỏ qua tham số này)
 	 * @param {string} [payload.namHoc]          Năm học
 	 * @param {string} [payload.trangThai]       Trạng thái
 	 * @param {string} [payload.tenFile]         Tên file đính kèm
@@ -13,47 +24,40 @@ class PurchasingRepository {
 	 * @param {Array}  payload.items             Danh sách thiết bị
 	 */
 	async createPlan(payload) {
-		const session = await PurchasingPlan.startSession();
-		session.startTransaction();
-
 		try {
-			const maKeHoachMuaSam = payload.code || await getNextCode('KH', 3);
+			// Tự động tạo mã kế hoạch mới: KH001, KH002, KH003...
+			const maKeHoachMuaSam = await getNextCode('KH', 3);
 
-			const [plan] = await PurchasingPlan.create([
-				{
-					maKeHoachMuaSam,
-					namHoc: payload.namHoc || '',
-					trangThai: payload.trangThai || 'cho_phe_duyet',
-					tenFile: payload.tenFile || '',
-					duongDanFile: payload.duongDanFile || ''
-				}
-			], { session });
+			const plan = await PurchasingPlan.create({
+				maKeHoachMuaSam,
+				namHoc: payload.namHoc || '',
+				trangThai: payload.trangThai || 'cho_phe_duyet',
+				tenFile: payload.tenFile || '',
+				duongDanFile: payload.duongDanFile || ''
+			});
 
 			const items = Array.isArray(payload.items) ? payload.items : [];
 
 			if (items.length > 0) {
+
 				const details = items.map(item => ({
 					maKeHoachMuaSam,
 					maTB: item.code,
+					tenTB: item.name || '',
+					tenDanhMuc: item.category || '',
 					soLuongDuKienMua: item.quantity || 0,
 					donViTinh: item.uom || '',
+					donGia: toNumber(item.unitPrice),
+					nguonGoc: item.source || '',
 					thoiGianDuKienMua: item.expectedAt ? new Date(item.expectedAt) : undefined,
-					duToanKinhPhi: typeof item.budget === 'number'
-						? item.budget
-						: (item.quantity || 0) * (item.unitPrice || 0),
+					duToanKinhPhi: toNumber(item.budget) || (item.quantity || 0) * toNumber(item.unitPrice),
 					lyDoMua: item.reason || ''
 				}));
-
-				await PurchasingPlanDetail.insertMany(details, { session });
+				await PurchasingPlanDetail.insertMany(details);
 			}
-
-			await session.commitTransaction();
-			session.endSession();
 
 			return plan;
 		} catch (error) {
-			await session.abortTransaction();
-			session.endSession();
 			throw error;
 		}
 	}
@@ -128,9 +132,6 @@ class PurchasingRepository {
 	 * @param {Object} payload Dữ liệu cần cập nhật
 	 */
 	async updatePlan(id, payload) {
-		const session = await PurchasingPlan.startSession();
-		session.startTransaction();
-
 		try {
 			const plan = await PurchasingPlan.findByIdAndUpdate(
 				id,
@@ -138,7 +139,7 @@ class PurchasingRepository {
 					namHoc: payload.namHoc,
 					trangThai: payload.trangThai
 				},
-				{ new: true, session }
+				{ new: true }
 			);
 
 			if (!plan) {
@@ -147,37 +148,33 @@ class PurchasingRepository {
 
 			// Update plan details
 			const items = Array.isArray(payload.items) ? payload.items : [];
-			
+
 			// Delete old details
-			await PurchasingPlanDetail.deleteMany(
-				{ maKeHoachMuaSam: plan.maKeHoachMuaSam },
-				{ session }
-			);
+			await PurchasingPlanDetail.deleteMany({
+				maKeHoachMuaSam: plan.maKeHoachMuaSam
+			});
 
 			// Insert new details
 			if (items.length > 0) {
 				const details = items.map(item => ({
 					maKeHoachMuaSam: plan.maKeHoachMuaSam,
 					maTB: item.code,
+					tenTB: item.name,
+					tenDanhMuc: item.category,
 					soLuongDuKienMua: item.quantity || 0,
 					donViTinh: item.uom || '',
+					donGia: toNumber(item.unitPrice),
+					nguonGoc: item.source || '',
 					thoiGianDuKienMua: item.expectedAt ? new Date(item.expectedAt) : undefined,
-					duToanKinhPhi: typeof item.budget === 'number'
-						? item.budget
-						: (item.quantity || 0) * (item.unitPrice || 0),
+					duToanKinhPhi: toNumber(item.budget) || (item.quantity || 0) * toNumber(item.unitPrice),
 					lyDoMua: item.reason || ''
 				}));
 
-				await PurchasingPlanDetail.insertMany(details, { session });
+				await PurchasingPlanDetail.insertMany(details);
 			}
-
-			await session.commitTransaction();
-			session.endSession();
 
 			return plan;
 		} catch (error) {
-			await session.abortTransaction();
-			session.endSession();
 			throw error;
 		}
 	}
@@ -187,29 +184,20 @@ class PurchasingRepository {
 	 * @param {string} id ID kế hoạch
 	 */
 	async deletePlan(id) {
-		const session = await PurchasingPlan.startSession();
-		session.startTransaction();
-
 		try {
-			const plan = await PurchasingPlan.findByIdAndDelete(id, { session });
+			const plan = await PurchasingPlan.findByIdAndDelete(id);
 
 			if (!plan) {
 				throw new Error('Kế hoạch không tồn tại');
 			}
 
 			// Delete associated details
-			await PurchasingPlanDetail.deleteMany(
-				{ maKeHoachMuaSam: plan.maKeHoachMuaSam },
-				{ session }
-			);
+			await PurchasingPlanDetail.deleteMany({
+				maKeHoachMuaSam: plan.maKeHoachMuaSam
+			});
 
-			await session.commitTransaction();
-			session.endSession();
-
-			return plan;
+			return true;
 		} catch (error) {
-			await session.abortTransaction();
-			session.endSession();
 			throw error;
 		}
 	}

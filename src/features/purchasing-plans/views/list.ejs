@@ -13,157 +13,127 @@
     <link href="/stylesheets/purchasing-plans.css" rel="stylesheet">
 </head>
 
-<body>
-    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
-    
-    <div class="app-shell">
-        <!-- Sidebar -->
-        <%- include('../../../views/partials/borrow-sidebar', { currentPage: 'purchasing-plans', user: userObj }) %>
-        
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans', user: userObj }) %>
-            
-            <!-- Page Content -->
-            <div class="container-fluid py-4">
-                <div class="page-header">
-                    <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
+<body class="purchasing-plans-page">
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'to_truong' }; %>
+
+        <!-- Header -->
+        <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans' , user: userObj }) %>
+
+            <div class="app-shell">
+                <div class="sidebar-column">
+                    <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans' , user:
+                        userObj }) %>
                 </div>
 
-                <div class="controls">
-                    <div class="left">
-                        <select id="year-filter" class="form-select search-select" aria-label="Năm học">
-                            <option value="">Năm học</option>
-                            <% if (years && years.length) { %>
-                                <% years.forEach(function(y){ %>
-                                    <option value="<%= y %>">
-                                        <%= y %>
-                                    </option>
-                                    <% }); %>
-                                        <% } %>
-                        </select>
-                        <button id="year-filter-btn" class="btn btn-outline-primary">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </div>
-
-                    <div class="col-md-9 col-lg-10 main-content">
-                        <div class="container py-4">
-                            <div class="app-shell">
-                                <main class="main-content">
-                                    <div class="page-header">
-                                        <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
-                                    </div>
-
-                                    <div class="controls">
-                                        <div class="left">
-                                            <select id="year-filter" class="form-select search-select"
-                                                aria-label="Năm học">
-                                                <option value="">Năm học</option>
-                                                <% if (years && years.length) { %>
-                                                    <% years.forEach(function(y){ %>
-                                                        <option value="<%= y %>">
-                                                            <%= y %>
-                                                        </option>
-                                                        <% }); %>
-                                                            <% } %>
-                                            </select>
-                                            <button id="year-filter-btn" class="btn btn-outline-primary">
-                                                <i class="fa-solid fa-magnifying-glass"></i>
-                                            </button>
-                                        </div>
-
-                                        <div>
-                                            <a href="/teacher/purchasing-plans/create" class="btn-register">
-                                                <i class="fa-solid fa-plus"></i> Lập kế hoạch mua sắm mới
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div class="card card-table">
-                                        <div class="card-body">
-                                            <div class="table-responsive">
-                                                <table class="table align-middle">
-                                                    <thead style="font-weight: bold">
-                                                        <tr>
-                                                            <th>Mã kế hoạch</th>
-                                                            <th>Năm học</th>
-                                                            <th>Trạng thái</th>
-                                                            <th>Lựa chọn</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <% if (plans && plans.length) { %>
-                                                            <% plans.forEach(function(plan){ %>
-                                                                <tr data-year="<%= plan.schoolYear || plan.namHoc %>">
-                                                                    <td>
-                                                                        <%= plan.code || plan.maKeHoachMuaSam %>
-                                                                    </td>
-                                                                    <td>
-                                                                        <%= plan.schoolYear || plan.namHoc %>
-                                                                    </td>
-                                                                    <td>
-                                                                        <% if (plan.status==='approved' || plan.trangThai==='da_duyet') { %>
-                                                                            <span
-                                                                                class="status-badge status-available">Đã
-                                                                                duyệt</span>
-                                                                            <% } else if (plan.status==='pending' || plan.trangThai==='cho_phe_duyet') { %>
-                                                                                <span
-                                                                                    class="status-badge status-pending">Đang
-                                                                                    chờ
-                                                                                    duyệt</span>
-                                                                                <% } else if (plan.status==='rejected' )
-                                                                                    { %>
-                                                                                    <span
-                                                                                        class="status-badge status-rejected">Từ
-                                                                                        chối</span>
-                                                                                    <% } else { %>
-                                                                                        <span
-                                                                                            class="status-badge status-borrowed">
-                                                                                            <%= plan.status || plan.trangThai %>
-                                                                                        </span>
-                                                                                        <% } %>
-                                                                    </td>
-                                                                    <td class="float-right">
-                                                                        <a href="/teacher/purchasing-plans/<%= plan.maKeHoachMuaSam || plan.code %>/detail"
-                                                                            class="action-btn btn-view" title="Xem">
-                                                                            <i class="fa-solid fa-eye"></i>
-                                                                        </a>
-                                                                        <% if (plan.trangThai==='cho_phe_duyet' || plan.status==='pending' ) { %>
-                                                                            <a href="/teacher/purchasing-plans/<%= plan._id || plan.id %>/edit"
-                                                                                class="action-btn btn-edit" title="Sửa">
-                                                                                <i class="fa-solid fa-pen"></i>
-                                                                            </a>
-
-                                                                            <a href="#" data-plan-id="<%= plan._id || plan.id %>"
-                                                                                data-plan-code="<%= plan.code || plan.maKeHoachMuaSam %>"
-                                                                                class="action-btn btn-delete"
-                                                                                title="Xóa">
-                                                                                <i class="fa-solid fa-trash-can"></i>
-                                                                            </a>
-                                                                            <% } %>
-                                                                    </td>
-                                                                </tr>
-                                                                <% }); %>
-                                                                    <% } else { %>
-                                                                        <tr style="font-style: italic;">
-                                                                            <td colspan="4"
-                                                                                class="text-center text-muted py-4">Chưa
-                                                                                có kế hoạch mua sắm nào.</td>
-                                                                        </tr>
-                                                                        <% } %>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div id="no-results" class="alert alert-warning mt-3" style="display:none">
-                                                Không có kế hoạch
-                                                mua sắm cho năm học đã chọn.</div>
-                                        </div>
-                                    </div>
-                                </main>
+                <div class="main-content">
+                    <div class="container py-4">
+                        <main class="page-main">
+                            <div class="page-header">
+                                <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
                             </div>
-                        </div>
+
+                            <div class="controls">
+                                <div class="left">
+                                    <select id="year-filter" class="form-select search-select" aria-label="Năm học">
+                                        <option value="">Năm học</option>
+                                        <% if (years && years.length) { %>
+                                            <% years.forEach(function(y){ %>
+                                                <option value="<%= y %>">
+                                                    <%= y %>
+                                                </option>
+                                                <% }); %>
+                                                    <% } %>
+                                    </select>
+                                    <button id="year-filter-btn" class="btn btn-outline-primary">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <a href="/teacher/purchasing-plans/create" class="btn-register">
+                                        <i class="fa-solid fa-plus"></i> Lập kế hoạch mua sắm mới
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="card card-table">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle">
+                                            <thead style="font-weight: bold; background-color: #f8f9fa;">
+                                                <tr>
+                                                    <th class="text-center">Mã kế hoạch</th>
+                                                    <th class="text-center">Năm học</th>
+                                                    <th class="text-center">Trạng thái</th>
+                                                    <th class="text-center">Lựa chọn</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (plans && plans.length) { %>
+                                                    <% plans.forEach(function(plan){ %>
+                                                        <tr data-year="<%= plan.schoolYear || plan.namHoc %>">
+                                                            <td class="text-center fw-semibold">
+                                                                <%= plan.code || plan.maKeHoachMuaSam %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <%= plan.schoolYear || plan.namHoc %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <% if (plan.status==='approved' ||
+                                                                    plan.trangThai==='da_duyet' ) { %>
+                                                                    <span class="status-badge status-available">Đã
+                                                                        duyệt</span>
+                                                                    <% } else if (plan.status==='pending' ||
+                                                                        plan.trangThai==='cho_phe_duyet' ) { %>
+                                                                        <span class="status-badge status-pending">Đang
+                                                                            chờ duyệt</span>
+                                                                        <% } else if (plan.status==='rejected' ) { %>
+                                                                            <span
+                                                                                class="status-badge status-rejected">Từ
+                                                                                chối</span>
+                                                                            <% } else { %>
+                                                                                <span
+                                                                                    class="status-badge status-borrowed">
+                                                                                    <%= plan.status || plan.trangThai %>
+                                                                                </span>
+                                                                                <% } %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a href="/teacher/purchasing-plans/<%= plan.maKeHoachMuaSam || plan.code %>/detail"
+                                                                    class="action-btn btn-view" title="Xem chi tiết">
+                                                                    <i class="fa-solid fa-eye"></i>
+                                                                </a>
+                                                                <% if (plan.trangThai==='cho_phe_duyet' ||
+                                                                    plan.status==='pending' ) { %>
+                                                                    <a href="/teacher/purchasing-plans/<%= plan._id || plan.id %>/edit"
+                                                                        class="action-btn btn-edit" title="Chỉnh sửa">
+                                                                        <i class="fa-solid fa-pen"></i>
+                                                                    </a>
+                                                                    <a href="#"
+                                                                        data-plan-id="<%= plan._id || plan.id %>"
+                                                                        data-plan-code="<%= plan.code || plan.maKeHoachMuaSam %>"
+                                                                        class="action-btn btn-delete"
+                                                                        title="Xóa kế hoạch">
+                                                                        <i class="fa-solid fa-trash-can"></i>
+                                                                    </a>
+                                                                    <% } %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }); %>
+                                                            <% } else { %>
+                                                                <tr style="font-style: italic;">
+                                                                    <td colspan="4" class="text-center text-muted py-4">
+                                                                        Chưa có kế hoạch mua sắm nào.</td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div id="no-results" class="alert alert-warning mt-3" style="display:none">Không có
+                                        kế hoạch mua sắm cho năm học đã chọn.</div>
+                                </div>
+                            </div>
+                        </main>
                     </div>
                 </div>
             </div>
@@ -250,7 +220,7 @@
                                 currentRow.remove();
                                 currentRow = null;
                                 deleteModal.hide();
-                                
+
                                 // Check if there are any rows left
                                 const rows = document.querySelectorAll('table tbody tr[data-year]');
                                 if (rows.length === 0) {

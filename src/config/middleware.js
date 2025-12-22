@@ -9,6 +9,7 @@ const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const logger = require('morgan');
+const methodOverride = require('method-override');
 const config = require('./env');
 
 /**
@@ -35,6 +36,9 @@ function configureMiddleware(app) {
 	app.use(express.json({ limit: '10mb' }));
 	app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 	app.use(cookieParser());
+
+	// Method Override for PUT and DELETE requests
+	app.use(methodOverride('_method'));
 
 	// Session middleware (FIX for req.session.flash)
 	app.use(session({

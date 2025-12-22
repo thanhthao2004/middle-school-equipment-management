@@ -17,14 +17,18 @@ router.get('/create', (req, res) => {
 // API: Get next plan code
 router.get('/api/next-code', PurchasingController.getNextPlanCode);
 
-// API: Get plan detail
-router.get('/api/:code', PurchasingController.getPlanDetailJson);
+// IMPORTANT: Define specific device APIs BEFORE dynamic `/api/:code` to avoid conflicts
+// API: Get all categories for filter dropdown
+router.get('/api/categories', PurchasingController.getCategories);
 
 // API: Get all devices for selection modal
 router.get('/api/devices', PurchasingController.getDevices);
 
 // API: Get devices by category
 router.get('/api/devices/category/:categoryId', PurchasingController.getDevicesByCategory);
+
+// API: Get plan detail (must be after device APIs)
+router.get('/api/:code', PurchasingController.getPlanDetailJson);
 
 // View plan detail (by code)
 router.get('/:code/detail', PurchasingController.getPlanDetail);
