@@ -40,10 +40,10 @@ class AuthController {
             // Generate JWT token
             const token = authService.generateToken(user);
 
-            // Set HTTP-only cookie (7 days)
+            // Set HTTP-only cookie (7 days). Use runtime check so dev over HTTP still works.
             res.cookie('token', token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+                secure: this._isSecure(req),
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
                 sameSite: 'strict',
             });
@@ -120,7 +120,7 @@ class AuthController {
 
             res.cookie('token', jwtToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                secure: this._isSecure(req),
                 maxAge: 7 * 24 * 60 * 60 * 1000,
                 sameSite: 'strict',
             });
@@ -179,7 +179,9 @@ class AuthController {
             // Change password
             await authService.changePassword(req.user.id, currentPassword, newPassword);
 
-            res.redirect('/auth/password/change?success=' + encodeURIComponent('Đổi mật khẩu thành công'));
+            // Clear old session and force re-login with new password
+            res.clearCookie('token');
+            res.redirect('/auth/login?success=' + encodeURIComponent('Đổi mật khẩu thành công, vui lòng đăng nhập lại'));
 
         } catch (error) {
             console.error('Change password error:', error);
@@ -243,6 +245,18 @@ class AuthController {
         };
 
         return roleRedirects[role] || '/teacher/borrow/teacher-home';
+    }
+
+    /**
+     * Determine if cookie should be marked secure
+     * - HTTPS (req.secure or x-forwarded-proto)
+     * - or explicit override via COOKIE_SECURE=true
+     */
+    _isSecure(req) {
+        const forwardedProto = req.get && req.get('x-forwarded-proto');
+        const isForwardedHttps = forwardedProto && forwardedProto.toLowerCase() === 'https';
+        const envForceSecure = process.env.COOKIE_SECURE === 'true';
+        return req.secure === true || isForwardedHttps || envForceSecure;
     }
 
     // Bind methods in constructor
