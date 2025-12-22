@@ -87,46 +87,60 @@
                                                                                             <div class="row mb-4">
                                                                                                 <div
                                                                                                     class="col-md-3 text-center mb-3">
-                                                                                                    <% if (userDetail &&
-                                                                                                        userDetail.profile
-                                                                                                        &&
-                                                                                                        userDetail.profile.avatarUrl)
-                                                                                                        { %>
-                                                                                                        <img id="avatar-preview"
-                                                                                                            src="<%= userDetail.profile.avatarUrl %>"
-                                                                                                            alt="Avatar"
-                                                                                                            class="img-fluid rounded"
-                                                                                                            style="max-width: 200px; max-height: 200px; object-fit: cover;">
-                                                                                                        <% } else { %>
-                                                                                                            <div id="avatar-preview"
-                                                                                                                class="bg-light rounded d-flex align-items-center justify-content-center"
-                                                                                                                style="width: 200px; height: 200px;">
-                                                                                                                <i class="fas fa-user"
-                                                                                                                    style="font-size: 4rem; color: #ccc;"></i>
-                                                                                                            </div>
-                                                                                                            <% } %>
-                                                                                                                <div
-                                                                                                                    class="mt-2">
-                                                                                                                    <label
-                                                                                                                        for="avatar"
-                                                                                                                        class="btn btn-outline-primary btn-sm w-100">Chọn
-                                                                                                                        ảnh...</label>
-                                                                                                                    <input
-                                                                                                                        type="file"
-                                                                                                                        id="avatar"
-                                                                                                                        name="avatar"
-                                                                                                                        accept="image/*"
-                                                                                                                        class="d-none">
-                                                                                                                    <div
-                                                                                                                        class="text-muted small mt-2">
-                                                                                                                        JPG,
-                                                                                                                        PNG,
-                                                                                                                        GIF
-                                                                                                                        (tối
-                                                                                                                        đa
-                                                                                                                        5MB)
-                                                                                                                    </div>
+                                                                                                    <div
+                                                                                                        class="avatar-container position-relative d-inline-block">
+                                                                                                        <% if
+                                                                                                            (userDetail
+                                                                                                            &&
+                                                                                                            userDetail.profile
+                                                                                                            &&
+                                                                                                            userDetail.profile.avatarUrl)
+                                                                                                            { %>
+                                                                                                            <img id="avatar-preview"
+                                                                                                                src="<%= userDetail.profile.avatarUrl %>"
+                                                                                                                alt="Avatar"
+                                                                                                                class="img-fluid rounded"
+                                                                                                                style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                                                                                            <button
+                                                                                                                type="button"
+                                                                                                                id="remove-avatar-btn"
+                                                                                                                class="btn btn-danger btn-sm rounded-circle position-absolute"
+                                                                                                                style="top: -10px; right: -10px; width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; opacity: 0.9;"
+                                                                                                                title="Gỡ ảnh đại diện">
+                                                                                                                <i class="fas fa-times"
+                                                                                                                    style="font-size: 1.2rem;"></i>
+                                                                                                            </button>
+                                                                                                            <% } else {
+                                                                                                                %>
+                                                                                                                <div id="avatar-preview"
+                                                                                                                    class="bg-light rounded d-flex align-items-center justify-content-center"
+                                                                                                                    style="width: 200px; height: 200px;">
+                                                                                                                    <i class="fas fa-user"
+                                                                                                                        style="font-size: 4rem; color: #ccc;"></i>
                                                                                                                 </div>
+                                                                                                                <% } %>
+                                                                                                    </div>
+                                                                                                    <div class="mt-2">
+                                                                                                        <label
+                                                                                                            for="avatar"
+                                                                                                            class="btn btn-outline-primary btn-sm w-100">Chọn
+                                                                                                            ảnh...</label>
+                                                                                                        <input
+                                                                                                            type="file"
+                                                                                                            id="avatar"
+                                                                                                            name="avatar"
+                                                                                                            accept="image/*"
+                                                                                                            class="d-none">
+                                                                                                        <div
+                                                                                                            class="text-muted small mt-2">
+                                                                                                            JPG,
+                                                                                                            PNG,
+                                                                                                            GIF
+                                                                                                            (tối
+                                                                                                            đa
+                                                                                                            5MB)
+                                                                                                        </div>
+                                                                                                    </div>
                                                                                                 </div>
                                                                                                 <div class="col-md-9">
                                                                                                     <div
