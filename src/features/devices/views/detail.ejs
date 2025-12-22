@@ -203,6 +203,17 @@
                                                             images = [device.hinhAnh];
                                                         }
                                                     }
+                                                    
+                                                    // Loại bỏ ảnh trùng lặp và ảnh rỗng
+                                                    const uniqueImages = [];
+                                                    const seenImages = new Set();
+                                                    images.forEach(img => {
+                                                        if (img && img.trim() && !seenImages.has(img)) {
+                                                            seenImages.add(img);
+                                                            uniqueImages.push(img);
+                                                        }
+                                                    });
+                                                    images = uniqueImages;
                                                     %>
 
                                                     <% if (images.length > 0) { %>

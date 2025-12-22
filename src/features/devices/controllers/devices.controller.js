@@ -3,6 +3,32 @@ const path = require('path');
 const fs = require('fs');
 const { deleteOldFile, deleteMultipleFiles } = require('../../../config/upload');
 
+/**
+ * Helper: Lọc và làm sạch danh sách ảnh (loại bỏ duplicate, null, empty)
+ * @param {Array} imagePaths - Mảng các đường dẫn ảnh
+ * @returns {Array} - Mảng ảnh đã được lọc
+ */
+function cleanImagePaths(imagePaths) {
+    if (!imagePaths) return [];
+    
+    // Normalize to array
+    let images = Array.isArray(imagePaths) ? imagePaths : (imagePaths ? [imagePaths] : []);
+    
+    // Loại bỏ duplicate và giá trị rỗng
+    const seen = new Set();
+    return images.filter(imgPath => {
+        if (!imgPath || typeof imgPath !== 'string' || !imgPath.trim()) {
+            return false;
+        }
+        const normalized = imgPath.trim();
+        if (seen.has(normalized)) {
+            return false; // Duplicate
+        }
+        seen.add(normalized);
+        return true;
+    });
+}
+
 // Devices Controller
 class DevicesController {
     // GET /devices - Danh sách thiết bị
@@ -146,6 +172,11 @@ class DevicesController {
             const deviceId = req.params.id;
             const device = await devicesService.getDeviceById(deviceId);
 
+            // Lọc ảnh trùng lặp trước khi hiển thị
+            if (device.hinhAnh) {
+                device.hinhAnh = cleanImagePaths(device.hinhAnh);
+            }
+
             res.render('devices/views/detail', {
                 title: `Chi tiết thiết bị - ${device.maTB}`,
                 currentPage: 'devices',
@@ -174,6 +205,11 @@ class DevicesController {
                 devicesService.getCategories(),
                 devicesService.getFilterOptions()
             ]);
+
+            // Lọc ảnh trùng lặp trước khi hiển thị
+            if (device.hinhAnh) {
+                device.hinhAnh = cleanImagePaths(device.hinhAnh);
+            }
 
             // Lấy formData từ session nếu có (sau validation fail)
             const formData = req.session?.flash?.formData || {};
@@ -214,8 +250,8 @@ class DevicesController {
 
             // Lấy device cũ để xử lý ảnh
             const oldDevice = await devicesService.getDeviceById(deviceId);
-            let oldImagePaths = Array.isArray(oldDevice.hinhAnh) ? oldDevice.hinhAnh :
-                (oldDevice.hinhAnh ? [oldDevice.hinhAnh] : []);
+            // Lọc ảnh trùng lặp trước khi xử lý
+            let oldImagePaths = cleanImagePaths(oldDevice.hinhAnh);
 
             // KIỂM TRA VÀ LOẠI BỎ ẢNH KHÔNG TỒN TẠI TRÊN DISK
             // Điều này xử lý trường hợp ảnh đã bị xóa khỏi disk nhưng vẫn còn trong database
@@ -377,30 +413,41 @@ class DevicesController {
             });
         } catch (error) {
             console.error('Error rendering delete device page:', error);
-            res.status(500).send(`<h1>Lỗi</h1><p>${error.message}</p>`);
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.error = error.message;
+            res.redirect('/manager/devices');
         }
     }
 
+    // POST /devices/delete/:id - Xóa thiết bị
     async deleteDevice(req, res) {
         try {
             const deviceId = req.params.id;
 
-            // Get device to delete its images
+            // Lấy thông tin device để xóa TẤT CẢ ảnh
             const device = await devicesService.getDeviceById(deviceId);
-            if (!device) {
-                req.session.flash = { error: 'Thiết bị không tồn tại' };
-                return res.redirect('/devices');
-            }
+            const imagePaths = device.hinhAnh; // Array of image paths
 
-            // Delete device and its associated images
             await devicesService.deleteDevice(deviceId);
 
-            req.session.flash = { success: 'Xóa thiết bị thành công' };
-            res.redirect('/devices');
+            // Xóa TẤT CẢ ảnh sau khi xóa device thành công
+            if (imagePaths && imagePaths.length > 0) {
+                deleteMultipleFiles(imagePaths);
+            }
+
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.success = 'Xóa thiết bị thành công';
+
+            // Clear formData
+            delete req.session.flash.formData;
+            delete req.session.flash.validationErrors;
+
+            res.redirect('/manager/devices');
         } catch (error) {
             console.error('Error deleting device:', error);
-            req.session.flash = { error: `Lỗi khi xóa thiết bị: ${error.message}` };
-            res.redirect('/devices');
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.error = error.message;
+            res.redirect(`/manager/devices/delete/${req.params.id}`);
         }
     }
 }
