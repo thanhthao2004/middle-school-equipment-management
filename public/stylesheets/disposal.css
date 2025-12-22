@@ -52,19 +52,19 @@ body {
     align-items: center;
     gap: 6px;
 
-    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
     transition: all 0.2s ease;
 }
 
 .main-content .btn-primary:hover {
     background: #1e40af;
-    box-shadow: 0 6px 16px rgba(37,99,235,0.45);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
     transform: translateY(-1px);
 }
 
 .main-content .btn-primary:active {
     transform: translateY(0);
-    box-shadow: 0 3px 8px rgba(37,99,235,0.3);
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
 }
 
 /* ---------- Search Box (Suppliers-style) ---------- */
@@ -86,7 +86,7 @@ body {
 
 .search-box input:focus {
     border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
     outline: none;
 }
 
@@ -104,13 +104,13 @@ body {
     align-items: center;
     gap: 6px;
 
-    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
     transition: all 0.2s ease;
 }
 
 .search-box .search-btn:hover {
     background: #1e40af;
-    box-shadow: 0 6px 16px rgba(37,99,235,0.45);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
     transform: translateY(-1px);
 }
 
@@ -125,6 +125,24 @@ body {
         border-radius: 8px;
         border: 1px solid #e2e8f0;
     }
+}
+
+/* ===== FILTER BADGE ===== */
+.filter-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.filter-badge i {
+    font-size: 12px;
 }
 
 

@@ -80,67 +80,60 @@
                                 </div>
                             </div>
 
-                            <!-- ===== TABLE ===== -->
+                            <!-- ===== DEVICES TABLE ===== -->
                             <div class="card">
-                                <div class="card-body">
+                                <div class="card-body p-0">
                                     <div class="table-responsive">
-                                        <table class="table table-hover align-middle">
+                                        <table class="table table-hover align-middle mb-0">
                                             <thead>
                                                 <tr>
+                                                    <th>Mã thiết bị</th>
                                                     <th>Tên thiết bị</th>
-                                                    <th>Loại thiết bị</th>
-                                                    <th>Bộ môn quản lý</th>
-                                                    <th>Ngày phát hiện</th>
-                                                    <th>Mức độ hỏng</th>
-                                                    <th>Lý do</th>
-                                                    <th>Giá bán</th>
+                                                    <th>Danh mục</th>
+                                                    <th>Tình trạng</th>
+                                                    <th>Vị trí</th>
                                                 </tr>
                                             </thead>
+
+
                                             <tbody>
-                                                <% if (devices && devices.length> 0) { %>
-                                                    <% devices.forEach(d=> { %>
+                                                <% if (items && items.length> 0) { %>
+                                                    <% items.forEach(item=> { %>
                                                         <tr>
                                                             <td>
-                                                                <%= d.name %>
+                                                                <span class="code-box">
+                                                                    <%= item.device?.maTB || '-' %>
+                                                                </span>
                                                             </td>
+
                                                             <td>
-                                                                <%= d.type %>
+                                                                <%= item.device?.tenTB || '-' %>
                                                             </td>
+
                                                             <td>
-                                                                <%= d.department %>
+                                                                <%= item.device?.category?.tenDM || '-' %>
                                                             </td>
+
                                                             <td>
-                                                                <%= d.broken_date || '' %>
+                                                                <span class="status-badge status-danger">
+                                                                    <%= item.device?.tinhTrangThietBi || '-' %>
+                                                                </span>
                                                             </td>
+
                                                             <td>
-                                                                <% if (d.level==='Hỏng nặng' ) { %>
-                                                                    <span class="level-badge level-severe">Hỏng
-                                                                        nặng</span>
-                                                                    <% } else if (d.level==='Hỏng nhẹ' ) { %>
-                                                                        <span class="level-badge level-low">Hỏng
-                                                                            nhẹ</span>
-                                                                        <% } else { %>
-                                                                            <span class="level-badge">
-                                                                                <%= d.level || '' %>
-                                                                            </span>
-                                                                            <% } %>
-                                                            </td>
-                                                            <td>
-                                                                <%= d.reason || '' %>
-                                                            </td>
-                                                            <td>
-                                                                <%= d.price ? d.price.toLocaleString() : '' %>
+                                                                <%= item.device?.viTriLuuTru || '-' %>
                                                             </td>
                                                         </tr>
                                                         <% }) %>
                                                             <% } else { %>
                                                                 <tr>
-                                                                    <td colspan="7" class="text-center text-muted">
+                                                                    <td colspan="9" class="text-center text-muted py-4">
                                                                         Chưa có thiết bị nào được thêm
                                                                     </td>
                                                                 </tr>
                                                                 <% } %>
                                             </tbody>
+
                                         </table>
                                     </div>
                                 </div>
@@ -148,13 +141,20 @@
 
                             <!-- ===== ACTION BUTTONS ===== -->
                             <div class="d-flex justify-content-end gap-2 mt-4">
-                                <a href="/manager/disposal/create?code=<%= code %>&year=<%= year %>&created_at=<%= created_at %>"
-                                    class="btn btn-primary">
-                                    <i></i> Tạo báo cáo
-                                </a>
-                                <a href="/manager/disposal" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Hủy
-                                </a>
+                                <form method="POST" action="/manager/disposal">
+                                    <input type="hidden" name="code" value="<%= code %>">
+                                    <input type="hidden" name="year" value="<%= year %>">
+                                    <input type="hidden" name="created_at" value="<%= created_at %>">
+
+                                    <div class="d-flex justify-content-end gap-2 mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Tạo báo cáo
+                                        </button>
+                                        <a href="/manager/disposal" class="btn btn-secondary">
+                                            <i class="fas fa-times"></i> Hủy
+                                        </a>
+                                    </div>
+                                </form>
                             </div>
 
                         </div>
