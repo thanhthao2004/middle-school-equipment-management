@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh Sửa Thông Tin Cá Nhân</title>
+    <!-- Bootstrap 5.3.0 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6.4.0 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'giao_vien' }; %>
+        <%- include('../../../views/partials/header', { currentPage: 'profile' , user: userObj }) %>
+
+            <div class="container-fluid p-0">
+                <div class="row g-0">
+                    <!-- Sidebar theo vai trò -->
+                    <% if (userObj.role==='admin' ) { %>
+                        <%- include('../../../views/partials/admin-sidebar', { currentPage: 'profile' , user: userObj })
+                            %>
+                            <% } else if (userObj.role==='ql_thiet_bi' ) { %>
+                                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'profile' , user:
+                                    userObj }) %>
+                                    <% } else if (userObj.role==='hieu_truong' ) { %>
+                                        <%- include('../../../views/partials/principal-sidebar', {
+                                            currentPage: 'profile' , user: userObj }) %>
+                                            <% } else { %>
+                                                <%- include('../../../views/partials/teacher-sidebar', {
+                                                    currentPage: 'profile' , user: userObj }) %>
+                                                    <% } %>
+
+                                                        <!-- Main Content -->
+                                                        <div class="col-md-9 col-lg-10 main-content">
+                                                            <div class="container py-4">
+                                                                <div
+                                                                    class="d-flex justify-content-between align-items-center mb-4">
+                                                                    <h1 class="h3 mb-0">Chỉnh Sửa Thông Tin Cá Nhân</h1>
+                                                                    <a class="btn btn-secondary" href="/profile">
+                                                                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                                                    </a>
+                                                                </div>
+
+                                                                <div class="card">
+                                                                    <div class="card-header bg-primary text-white">
+                                                                        <h5 class="card-title mb-0">Chỉnh sửa thông tin
+                                                                        </h5>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <% if (success) { %>
+                                                                            <div class="alert alert-success alert-dismissible fade show"
+                                                                                role="alert">
+                                                                                <%= success %>
+                                                                                    <button type="button"
+                                                                                        class="btn-close"
+                                                                                        data-bs-dismiss="alert"
+                                                                                        aria-label="Close"></button>
+                                                                            </div>
+                                                                            <% } %>
+
+                                                                                <% if (error) { %>
+                                                                                    <div class="alert alert-danger alert-dismissible fade show"
+                                                                                        role="alert">
+                                                                                        <%= error %>
+                                                                                            <button type="button"
+                                                                                                class="btn-close"
+                                                                                                data-bs-dismiss="alert"
+                                                                                                aria-label="Close"></button>
+                                                                                    </div>
+                                                                                    <% } %>
+
+                                                                                        <form action="/profile/edit"
+                                                                                            method="POST"
+                                                                                            enctype="multipart/form-data">
+
+                                                                                            <!-- Avatar Upload Section -->
+                                                                                            <h6
+                                                                                                class="text-primary mb-3">
+                                                                                                <i
+                                                                                                    class="fas fa-image me-2"></i>Ảnh
+                                                                                                đại diện
+                                                                                            </h6>
+                                                                                            <div class="row mb-4">
+                                                                                                <div
+                                                                                                    class="col-md-3 text-center mb-3">
+                                                                                                    <% if (userDetail &&
+                                                                                                        userDetail.profile
+                                                                                                        &&
+                                                                                                        userDetail.profile.avatarUrl)
+                                                                                                        { %>
+                                                                                                        <img id="avatar-preview"
+                                                                                                            src="<%= userDetail.profile.avatarUrl %>"
+                                                                                                            alt="Avatar"
+                                                                                                            class="img-fluid rounded"
+                                                                                                            style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                                                                                        <% } else { %>
+                                                                                                            <div id="avatar-preview"
+                                                                                                                class="bg-light rounded d-flex align-items-center justify-content-center"
+                                                                                                                style="width: 200px; height: 200px;">
+                                                                                                                <i class="fas fa-user"
+                                                                                                                    style="font-size: 4rem; color: #ccc;"></i>
+                                                                                                            </div>
+                                                                                                            <% } %>
+                                                                                                                <div
+                                                                                                                    class="mt-2">
+                                                                                                                    <label
+                                                                                                                        for="avatar"
+                                                                                                                        class="btn btn-outline-primary btn-sm w-100">Chọn
+                                                                                                                        ảnh...</label>
+                                                                                                                    <input
+                                                                                                                        type="file"
+                                                                                                                        id="avatar"
+                                                                                                                        name="avatar"
+                                                                                                                        accept="image/*"
+                                                                                                                        class="d-none">
+                                                                                                                    <div
+                                                                                                                        class="text-muted small mt-2">
+                                                                                                                        JPG,
+                                                                                                                        PNG,
+                                                                                                                        GIF
+                                                                                                                        (tối
+                                                                                                                        đa
+                                                                                                                        5MB)
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                </div>
+                                                                                                <div class="col-md-9">
+                                                                                                    <div
+                                                                                                        class="alert alert-info">
+                                                                                                        <i
+                                                                                                            class="fas fa-info-circle me-2"></i>
+                                                                                                        <strong>Hướng
+                                                                                                            dẫn:</strong>
+                                                                                                        <ul
+                                                                                                            class="mb-0 ms-3">
+                                                                                                            <li>Định
+                                                                                                                dạng:
+                                                                                                                JPG,
+                                                                                                                PNG, GIF
+                                                                                                            </li>
+                                                                                                            <li>Kích
+                                                                                                                thước
+                                                                                                                tối đa:
+                                                                                                                5MB</li>
+                                                                                                            <li>Ảnh sẽ
+                                                                                                                được cắt
+                                                                                                                tỉ lệ
+                                                                                                                1:1</li>
+                                                                                                        </ul>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <hr>
+
+                                                                                            <!-- Editable Fields -->
+                                                                                            <h6
+                                                                                                class="text-primary mb-3">
+                                                                                                <i
+                                                                                                    class="fas fa-user me-2"></i>Thông
+                                                                                                tin có thể chỉnh sửa
+                                                                                            </h6>
+                                                                                            <div class="row">
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label
+                                                                                                        for="fullname"
+                                                                                                        class="form-label fw-bold">Họ
+                                                                                                        và tên <span
+                                                                                                            class="text-danger">*</span></label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        id="fullname"
+                                                                                                        name="fullname"
+                                                                                                        value="<%= userDetail && userDetail.hoTen %>"
+                                                                                                        required>
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label for="phone"
+                                                                                                        class="form-label fw-bold">Số
+                                                                                                        điện
+                                                                                                        thoại</label>
+                                                                                                    <input type="tel"
+                                                                                                        class="form-control"
+                                                                                                        id="phone"
+                                                                                                        name="phone"
+                                                                                                        value="<%= (userDetail && userDetail.soDienThoai) || '' %>">
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="row">
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label for="address"
+                                                                                                        class="form-label fw-bold">Địa
+                                                                                                        chỉ</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        id="address"
+                                                                                                        name="address"
+                                                                                                        value="<%= (userDetail && userDetail.diaChi) || '' %>">
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label for="dob"
+                                                                                                        class="form-label fw-bold">Ngày
+                                                                                                        sinh</label>
+                                                                                                    <input type="date"
+                                                                                                        class="form-control"
+                                                                                                        id="dob"
+                                                                                                        name="dob"
+                                                                                                        value="<%= (userDetail && userDetail.ngaySinh) ? new Date(userDetail.ngaySinh).toISOString().split('T')[0] : '' %>">
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <hr>
+
+                                                                                            <!-- Read-only Fields -->
+                                                                                            <h6
+                                                                                                class="text-primary mb-3">
+                                                                                                <i
+                                                                                                    class="fas fa-lock me-2"></i>Thông
+                                                                                                tin chỉ xem (không thể
+                                                                                                chỉnh sửa)
+                                                                                            </h6>
+                                                                                            <div class="row">
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label for="maNV"
+                                                                                                        class="form-label fw-bold">Mã
+                                                                                                        nhân
+                                                                                                        viên</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        id="maNV"
+                                                                                                        value="<%= (userDetail && userDetail.maNV) || '' %>"
+                                                                                                        disabled
+                                                                                                        readonly>
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label
+                                                                                                        for="username"
+                                                                                                        class="form-label fw-bold">Tên
+                                                                                                        đăng
+                                                                                                        nhập</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        id="username"
+                                                                                                        value="<%= (userDetail && userDetail.username) || '' %>"
+                                                                                                        disabled
+                                                                                                        readonly>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="row">
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label for="email"
+                                                                                                        class="form-label fw-bold">Email</label>
+                                                                                                    <input type="email"
+                                                                                                        class="form-control"
+                                                                                                        id="email"
+                                                                                                        value="<%= (userDetail && userDetail.email) || '' %>"
+                                                                                                        disabled
+                                                                                                        readonly>
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label
+                                                                                                        class="form-label fw-bold">Giới
+                                                                                                        tính</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        value="<%= (userDetail && userDetail.gioiTinh) || 'Nam' %>"
+                                                                                                        disabled
+                                                                                                        readonly>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="row">
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label for="role"
+                                                                                                        class="form-label fw-bold">Vai
+                                                                                                        trò</label>
+                                                                                                    <% let
+                                                                                                        roleDisplay='Giáo viên'
+                                                                                                        ; %>
+                                                                                                        <% if
+                                                                                                            (userDetail
+                                                                                                            &&
+                                                                                                            userDetail.role==='admin'
+                                                                                                            )
+                                                                                                            roleDisplay='Quản trị viên'
+                                                                                                            ; %>
+                                                                                                            <% if
+                                                                                                                (userDetail
+                                                                                                                &&
+                                                                                                                userDetail.role==='hieu_truong'
+                                                                                                                )
+                                                                                                                roleDisplay='Hiệu trưởng'
+                                                                                                                ; %>
+                                                                                                                <% if
+                                                                                                                    (userDetail
+                                                                                                                    &&
+                                                                                                                    userDetail.role==='to_truong'
+                                                                                                                    )
+                                                                                                                    roleDisplay='Tổ trưởng'
+                                                                                                                    ; %>
+                                                                                                                    <% if
+                                                                                                                        (userDetail
+                                                                                                                        &&
+                                                                                                                        userDetail.role==='ql_thiet_bi'
+                                                                                                                        )
+                                                                                                                        roleDisplay='QL Thiết bị'
+                                                                                                                        ;
+                                                                                                                        %>
+                                                                                                                        <input
+                                                                                                                            type="text"
+                                                                                                                            class="form-control"
+                                                                                                                            id="role"
+                                                                                                                            value="<%= roleDisplay %>"
+                                                                                                                            disabled
+                                                                                                                            readonly>
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label
+                                                                                                        for="experience"
+                                                                                                        class="form-label fw-bold">Năm
+                                                                                                        kinh
+                                                                                                        nghiệm</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        value="<%= (userDetail && userDetail.chucVu) || 'Chưa cập nhật' %>"
+                                                                                                        disabled
+                                                                                                        readonly>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="row">
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label for="subject"
+                                                                                                        class="form-label fw-bold">Bộ
+                                                                                                        môn</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        value="<%= (userDetail && userDetail.boMon) || 'Chưa cập nhật' %>"
+                                                                                                        disabled
+                                                                                                        readonly>
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="col-md-6 mb-3">
+                                                                                                    <label
+                                                                                                        for="specialization"
+                                                                                                        class="form-label fw-bold">Trình
+                                                                                                        độ chuyên
+                                                                                                        môn</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        value="<%= (userDetail && userDetail.trinhDo) || 'Chưa cập nhật' %>"
+                                                                                                        disabled
+                                                                                                        readonly>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <hr>
+
+                                                                                            <div class="text-end">
+                                                                                                <a href="/profile"
+                                                                                                    class="btn btn-secondary me-2">
+                                                                                                    <i
+                                                                                                        class="fas fa-times me-2"></i>Hủy
+                                                                                                    bỏ
+                                                                                                </a>
+                                                                                                <button type="submit"
+                                                                                                    class="btn btn-primary">
+                                                                                                    <i
+                                                                                                        class="fas fa-save me-2"></i>Lưu
+                                                                                                    thay đổi
+                                                                                                </button>
+                                                                                            </div>
+                                                                                        </form>
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                </div>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/javascripts/edit-profile.js"></script>
+</body>
+
+</html>
