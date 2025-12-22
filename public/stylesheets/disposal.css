@@ -203,7 +203,7 @@ body {
     word-break: break-word;
 }
 
-/* ===== MÀU RIÊNG TỪNG BOX (GIỮ TINH THẦN CŨ) ===== */
+/* ===== MÀU RIÊNG TỪNG BOX ===== */
 .info-code {
     background: #eef2ff;
     color: #1e40af;
@@ -372,26 +372,59 @@ body {
     padding: 28px 24px;
     border-radius: 12px;
     max-width: 400px;
+    width: 90%;
     text-align: center;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    transform: scale(0.95);
+    opacity: 0;
+    transition: all 0.25s ease-in-out;
+}
+
+#deleteModal.active .modal-box {
+    transform: scale(1);
+    opacity: 1;
 }
 
 #deleteModal h3 {
     color: #dc2626;
-    font-size: 18px;
+    font-size: 20px;
     margin-bottom: 16px;
 }
 
 #deleteModal p {
-    margin-bottom: 22px;
+    margin-bottom: 24px;
     color: #475569;
+    font-size: 16px;
 }
 
 #deleteModal .btn-danger {
     background: #dc2626;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    color: #fff;
+    transition: background 0.2s;
+}
+
+#deleteModal .btn-danger:hover {
+    background: #b91c1c;
 }
 
 #deleteModal .btn-secondary {
     background: #e5e7eb;
     color: #1e293b;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+#deleteModal .btn-secondary:hover {
+    background: #d1d5db;
+}
+
+#deleteModal .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
 }

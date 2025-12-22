@@ -6,13 +6,24 @@ const Device = require("../../devices/models/device.model");
 ====================== */
 exports.index = async (req, res) => {
     try {
-        const reports = await DisposalReport
-            .find()
-            .sort({ createdAt: -1 });
+        const { q } = req.query; // query search từ input
+        let filter = {};
+
+        if (q && q.trim() !== "") {
+            // tìm theo mã biên bản hoặc năm học
+            filter = {
+                $or: [
+                    { code: { $regex: q, $options: "i" } },
+                    { year: { $regex: q, $options: "i" } }
+                ]
+            };
+        }
+
+        const reports = await DisposalReport.find(filter).sort({ createdAt: -1 });
 
         res.render("disposal/views/list", {
             disposal: reports,
-            created: req.query.created || null, // ⭐ THÊM DÒNG NÀY
+            created: req.query.created || null,
             currentPage: "disposal",
             user: req.user
         });
@@ -21,6 +32,7 @@ exports.index = async (req, res) => {
         res.redirect("/manager");
     }
 };
+
 
 
 /* ======================
@@ -79,7 +91,7 @@ exports.addDevices = async (req, res) => {
         // 2️⃣ Lấy thiết bị hỏng nhưng CHƯA được thêm
         const devices = await Device.find({
             tinhTrangThietBi: { $regex: /hỏng/i },
-            _id: { $nin: selectedIds } // ⭐ CHỐT
+            _id: { $nin: selectedIds }
         })
             .populate("category", "tenDM")
             .lean();
@@ -156,7 +168,7 @@ exports.addDevicesPost = async (req, res) => {
 ====================== */
 exports.store = async (req, res) => {
     try {
-        const { code, year } = req.body;
+        const { code, year, levels, reasons } = req.body;
 
         const items = req.session.disposalItems || [];
 
@@ -164,6 +176,12 @@ exports.store = async (req, res) => {
         if (!items.length) {
             return res.redirect(`/manager/disposal/add?code=${code}&year=${year}`);
         }
+
+        // ✅ CẬP NHẬT level + reason từ form
+        items.forEach((item, index) => {
+            item.level = (levels && levels[index]) || "";
+            item.reason = (reasons && reasons[index]) || "";
+        });
 
         // ✅ TẠO BÁO CÁO
         await DisposalReport.create({
@@ -184,6 +202,7 @@ exports.store = async (req, res) => {
         res.redirect("/manager/disposal?created=fail");
     }
 };
+
 
 
 
@@ -216,7 +235,9 @@ exports.view = async (req, res) => {
 ====================== */
 exports.edit = async (req, res) => {
     try {
-        const disposal = await DisposalReport.findById(req.params.id);
+        const disposal = await DisposalReport.findById(req.params.id)
+            .populate("items.device")               // populate thông tin thiết bị
+            .populate("items.device.category");     // nếu category là ref
 
         if (!disposal) {
             return res.redirect("/manager/disposal");
@@ -232,6 +253,35 @@ exports.edit = async (req, res) => {
         res.redirect("/manager/disposal");
     }
 };
+
+/* ======================
+   UPDATE
+====================== */
+exports.update = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { levels, reasons } = req.body;
+
+        const report = await DisposalReport.findById(id).populate("items.device");
+        if (!report) {
+            return res.status(404).json({ success: false, message: "Không tìm thấy" });
+        }
+
+        // Cập nhật level + reason
+        report.items.forEach((item, index) => {
+            item.level = (levels && levels[index]) || "";
+            item.reason = (reasons && reasons[index]) || "";
+        });
+
+        await report.save();
+
+        res.redirect("/manager/disposal");
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Lỗi server" });
+    }
+};
+
 
 /* ======================
    DELETE

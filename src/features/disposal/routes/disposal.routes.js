@@ -23,6 +23,9 @@ router.get("/view/:id", disposalController.view);
 // EDIT
 router.get("/edit/:id", disposalController.edit);
 
+// UPDATE REPORT
+router.post("/edit/:id", disposalController.update);
+
 // DELETE
 router.post("/delete/:id", disposalController.delete);
 

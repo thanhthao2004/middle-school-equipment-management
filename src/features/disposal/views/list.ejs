@@ -44,13 +44,13 @@
                             <!-- Search Box -->
                             <div class="card mb-4">
                                 <div class="card-body">
-                                    <form class="row g-2">
+                                    <form class="row g-2" method="GET" action="/manager/disposal">
                                         <div class="col-md-10">
-                                            <input type="text" class="form-control"
-                                                placeholder="Tìm theo mã biên bản, năm học...">
+                                            <input type="text" name="q" class="form-control"
+                                                placeholder="Tìm theo mã biên bản hoặc năm học...">
                                         </div>
                                         <div class="col-md-2">
-                                            <button class="btn btn-primary w-100">
+                                            <button class="btn btn-primary w-100" type="submit">
                                                 <i class="fas fa-search"></i> Tìm kiếm
                                             </button>
                                         </div>
@@ -83,7 +83,7 @@
                                                             <%= r.year %>
                                                         </td>
                                                         <td>
-                                                            <%= r.created_at %>
+                                                            <%= new Date(r.created_at).toLocaleDateString("vi-VN") %>
                                                         </td>
                                                         <td class="text-center">
                                                             <div class="d-flex justify-content-center gap-2">
