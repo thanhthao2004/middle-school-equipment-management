@@ -23,6 +23,20 @@ const authenticate = async (req, res, next) => {
 		// Verify and decode JWT
 		const decoded = authService.verifyToken(token);
 
+		// Check if user is still active in DB
+		const User = require('../../features/users/models/user.model');
+		const user = await User.findById(decoded.id).select('trangThai');
+
+		if (!user || user.trangThai !== 'active') {
+			res.clearCookie('token');
+			const errorMsg = !user ? 'Tài khoản không tồn tại' : 'Tài khoản đã bị khóa';
+			const isApiRequest = req.get('Content-Type')?.includes('application/json') || req.path.includes('/api/');
+			if (isApiRequest) {
+				return res.status(401).json({ success: false, message: errorMsg });
+			}
+			return res.redirect(`/auth/login?error=${encodeURIComponent(errorMsg)}`);
+		}
+
 		// Attach user data to request
 		req.user = {
 			id: decoded.id,
@@ -149,10 +163,10 @@ function handleForbidden(req, res, userRole, requiredRoles) {
 		// Render forbidden page
 		const { ROLE_NAMES } = require('../constants/roles.constants');
 		const userRoleName = ROLE_NAMES[userRole] || userRole;
-		const requiredRolesNames = Array.isArray(requiredRoles) 
+		const requiredRolesNames = Array.isArray(requiredRoles)
 			? requiredRoles.map(r => ROLE_NAMES[r] || r).join(', ')
 			: (ROLE_NAMES[requiredRoles] || requiredRoles);
-		
+
 		// Determine home page based on user role
 		let homeUrl = '/';
 		if (userRole === 'admin') {
@@ -164,7 +178,7 @@ function handleForbidden(req, res, userRole, requiredRoles) {
 		} else if (userRole === 'giao_vien' || userRole === 'to_truong') {
 			homeUrl = '/teacher/borrow/teacher-home';
 		}
-		
+
 		return res.status(403).render('errors/403', {
 			title: 'Không có quyền truy cập',
 			message: `Bạn không có quyền truy cập vào trang này.`,

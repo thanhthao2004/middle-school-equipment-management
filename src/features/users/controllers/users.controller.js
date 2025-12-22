@@ -143,3 +143,13 @@ exports.deleteUser = async (req, res) => {
     res.redirect('/admin');
   }
 };
+
+exports.toggleStatus = async (req, res) => {
+  try {
+    await usersService.toggleStatus(req.params.id);
+    res.redirect('/admin');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin');
+  }
+};
