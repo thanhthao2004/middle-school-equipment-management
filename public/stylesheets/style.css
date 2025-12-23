@@ -382,4 +382,126 @@ a {
 }
 
 .table tbody td {
-  padding: 14px
+  padding: 14px 18px;
+  vertical-align: middle;
+  color: var(--dark-gray);
+}
+
+.table.table-hover tbody tr:hover {
+  background: #f1f6fb;
+}
+
+/* --- Status Badges (Global) --- */
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 18px;
+  font-weight: 600
+}
+
+.status-available {
+  background: rgba(40, 167, 69, 0.12);
+  color: var(--success-green);
+}
+
+.status-borrowed {
+  background: rgba(220, 53, 69, 0.12);
+  color: var(--error-red);
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404
+}
+
+.status-rejected {
+  background: rgba(220, 53, 69, 0.12);
+  color: var(--error-red)
+}
+
+/* Condition-specific text colors */
+.condition-good {
+  color: var(--success-green);
+  font-weight: 600
+}
+
+.condition-damaged {
+  color: var(--error-red);
+  font-weight: 600
+}
+
+.action-btn {
+  border-radius: 8px;
+  padding: 8px 10px;
+  border: none;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(10, 10, 10, 0.06);
+  margin-left: 6px
+}
+
+/* Text color utilities from spec */
+.slip-title {
+  color: var(--dark-gray);
+  font-weight: 700
+}
+
+.slip-id {
+  color: var(--text-gray)
+}
+
+.search-icon {
+  color: var(--text-gray)
+}
+
+/* Small utilities */
+.float-right {
+  display: flex;
+  align-items: center;
+  gap: 8px
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 18px
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch
+  }
+
+  .controls .left {
+    width: 100%
+  }
+}
+
+/* Teacher Home cards (Specific to borrow) */
+.feature-card {
+  border: 1px solid var(--border-gray);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background-color: var(--light-gray);
+  color: var(--primary-blue-light);
+}
+
+.feature-link {
+  color: var(--primary-blue-light);
+  font-weight: 600;
+}
+
+.feature-link:hover {
+  color: var(--primary-blue-hover);
+}
