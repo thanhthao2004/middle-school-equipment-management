@@ -1,86 +1,62 @@
-const periodicReportRepo = require('../repositories/periodic.repo');
-const { formatDate } = require('../../../core/utils/date');
-
-const mapDbStatusToUi = (dbStatus) => {
-  if (dbStatus === 'completed') return 'completed';
-  if (dbStatus === 'rejected') return 'rejected';
-  return 'pending';
-};
-
-const mapUiStatusToDb = (uiStatus) => {
-  if (uiStatus === 'completed') return 'completed';
-  if (uiStatus === 'rejected') return 'rejected';
-  return 'pending';
-};
+// src/features/periodic-reports/services/periodic.service.js
+const PeriodicReport = require("../models/periodic-report.model");
+const { formatDate } = require("../../../core/utils/date");
 
 class PeriodicReportService {
   async getReports(filters = {}) {
-    const reports = await periodicReportRepo.find(filters);
+    const docs = await PeriodicReport.find(filters).sort({ createdAt: -1 }).lean();
 
-    return reports.map((r) => ({
-      id: r._id.toString(),
-      code: r.maBaoCao,
-      period: r.kyBaoCao,
-      date: formatDate(r.ngayLap, 'DD/MM/YYYY'),
-      status: mapDbStatusToUi(r.trangThaiBaoCao),
-      fileName: r.tenFile,
-      fileUrl: r.duongDanFile
+    return docs.map(d => ({
+      id: d._id.toString(),
+      code: d.maBaoCao,
+      period: d.kyBaoCao,
+      date: d.ngayLap ? formatDate(d.ngayLap, "DD/MM/YYYY") : "",
+      status: d.trangThaiBaoCao || "pending",
+      fileName: d.tenFile || "Không có file",
+      fileUrl: d.duongDanFile || ""
     }));
   }
 
   async getReportById(id) {
-    const r = await periodicReportRepo.findById(id);
-    if (!r) return null;
+    const d = await PeriodicReport.findById(id).lean();
+    if (!d) return null;
 
     return {
-      id: r._id.toString(),
-      code: r.maBaoCao,
-      period: r.kyBaoCao,
-      date: formatDate(r.ngayLap, 'DD/MM/YYYY'),
-      status: mapDbStatusToUi(r.trangThaiBaoCao),
-      fileName: r.tenFile,
-      fileUrl: r.duongDanFile
+      id: d._id.toString(),
+      code: d.maBaoCao,
+      period: d.kyBaoCao,
+      date: d.ngayLap ? formatDate(d.ngayLap, "DD/MM/YYYY") : "",
+      status: d.trangThaiBaoCao || "pending",
+      fileName: d.tenFile || "Không có file",
+      fileUrl: d.duongDanFile || ""
     };
   }
 
-  async createReport(data) {
-    if (!data.kyBaoCao || !data.ngayLap) {
-      throw new Error('Thiếu kỳ báo cáo hoặc ngày lập');
-    }
-
-    const ngayLapParsed = new Date(data.ngayLap);
-    if (isNaN(ngayLapParsed.getTime())) {
-      throw new Error('Ngày lập không hợp lệ');
-    }
-
-    const maBaoCao = `BC-${Date.now()}`;
-
-    return periodicReportRepo.create({
-      maBaoCao,
-      kyBaoCao: data.kyBaoCao,
-      ngayLap: ngayLapParsed,
-      trangThaiBaoCao: 'pending',
-      tenFile: data.tenFile || '',
-      duongDanFile: data.duongDanFile || ''
+  async createReport(body, file) {
+    const doc = new PeriodicReport({
+      maBaoCao: body.code,
+      kyBaoCao: body.period,
+      ngayLap: body.date ? new Date(body.date) : new Date(),
+      trangThaiBaoCao: "pending",
+      tenFile: file ? body.originalName || file.originalname : "Untitled.pdf",
+      duongDanFile: file ? file.filename : ""
     });
+
+    await doc.save();
+    return doc;
   }
 
   async updateReport(id, data) {
-    return periodicReportRepo.update(id, {
-      kyBaoCao: data.kyBaoCao,
-      trangThaiBaoCao: mapUiStatusToDb(data.trangThaiBaoCao)
+    await PeriodicReport.findByIdAndUpdate(id, {
+      kyBaoCao: data.period,
+      trangThaiBaoCao: data.trangThaiBaoCao     // lấy từ dropdown/hidden
     });
+    return { success: true };
   }
 
   async deleteReport(id) {
-    return periodicReportRepo.delete(id);
-  }
-
-  async exportReport(type = 'pdf') {
-    return {
-      fileName: `BaoCaoDinhKy.${type}`,
-      buffer: Buffer.from('MOCK FILE')
-    };
+    await PeriodicReport.findByIdAndDelete(id);
+    return { success: true };
   }
 }
 

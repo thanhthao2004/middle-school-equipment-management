@@ -37,4 +37,19 @@ const PeriodicReportSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('PeriodicReport', PeriodicReportSchema);
+
+PeriodicReportSchema.pre('validate', async function ensureMaBC(next) {
+	try {
+		if (!this.maBaoCao) {
+			this.maBaoCao = await getNextCode('BC', 3); // BC001
+		}
+		next();
+	} catch (e) {
+		next(e);
+	}
+});
+module.exports = model('PeriodicReport', PeriodicReportSchema);
+
+
+
+//test
