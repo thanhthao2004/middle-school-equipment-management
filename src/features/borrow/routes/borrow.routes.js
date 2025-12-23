@@ -2,173 +2,82 @@
 const express = require('express');
 const router = express.Router();
 const borrowController = require('../controllers/borrow.controller');
-const { authenticate,requireRole } = require('../../../core/middlewares/auth.middleware');
+const { authenticate, requireRole } = require('../../../core/middlewares/auth.middleware');
 const { validate } = require('../../../core/middlewares/validation.middleware');
 const borrowValidators = require('../validators/borrow.validators');
 
 // Apply auth middleware to all routes
 router.use(authenticate);
-// GET Routes - Pages
-router.get('/register', borrowController.getRegisterPage);
-router.get('/history', borrowController.getHistoryPage);
-router.get('/status', borrowController.getStatusPage);
-router.get('/pending-approvals', borrowController.getPendingApprovalsPage);
-router.get('/teacher-home', borrowController.getTeacherHomePage);
-router.get('/slip/:id', borrowController.getBorrowSlip);
 
-// POST Routes - Actions
-router.post('/register', 
+// =============================================
+// TEACHER ROUTES (Giáo viên bộ môn)
+// =============================================
+// GET /borrow - Đăng ký mượn thiết bị (register)
+router.get('/', borrowController.getRegisterPage);
+router.get('/register', borrowController.getRegisterPage); // Legacy
+
+// POST /borrow - Xử lý đăng ký mượn
+router.post('/',
     validate(borrowValidators.createBorrowRequest),
     borrowController.createBorrowRequest
 );
-/**
- * Authentication middleware
- */
+router.post('/register',
+    validate(borrowValidators.createBorrowRequest),
+    borrowController.createBorrowRequest
+); // Legacy
 
+// GET /borrow/pending - Xem chờ duyệt
+router.get('/pending', borrowController.getPendingApprovalsPage);
+router.get('/pending-approvals', borrowController.getPendingApprovalsPage); // Legacy
 
-router.get(
-    '/manager/manager-home',
-    requireRole('ql_thiet_bi'),
-    borrowController.getManagerHomePage
-);
+// GET /borrow/history - Lịch sử mượn/trả
+router.get('/history', borrowController.getHistoryPage);
 
-// LIST Borrow Slips Pending
-router.get(
-    '/manager/approvals',
-    requireRole('ql_thiet_bi'),
-    borrowController.getApprovalsPage
-);
+// GET /borrow/teacher-home - Trang chủ giáo viên (PHẢI ĐẶT TRƯỚC /:id)
+router.get('/teacher-home', borrowController.getTeacherHomePage);
 
-// RETURN SLIPS LIST
-router.get(
-    '/manager/return-slips',
-    requireRole('ql_thiet_bi'),
-    borrowController.getReturnSlipsListPage
-);
+// GET /borrow/return/:id - Xem chi tiết phiếu trả (cho giáo viên)
+router.get('/return/:id', borrowController.getReturnSlipForTeacher);
 
-// BORROW DETAIL
-router.get(
-    '/manager/borrow/:id',
-    requireRole('ql_thiet_bi'),
-    borrowController.getBorrowDetailPage
-);
+// GET /borrow/:id - Xem chi tiết phiếu mượn (PHẢI ĐẶT SAU các route cụ thể)
+router.get('/:id', borrowController.getBorrowSlip);
+router.get('/slip/:id', borrowController.getBorrowSlip); // Legacy
 
-// RETURN DETAIL
-router.get(
-    '/manager/return/:id',
-    requireRole('ql_thiet_bi'),
-    borrowController.getReturnSlipDetailPage
-);
+// POST /borrow/:id/cancel - Hủy phiếu phiếu mượn
+router.post('/:id/cancel', borrowController.cancelBorrow);
 
 // =============================================
-// MANAGER API
+// QLTB ROUTES (Duyệt mượn/trả)
 // =============================================
+// POST /borrow/approve/:id - Duyệt phiếu mượn
+//router.post('/approve/:id', borrowController.approveBorrowSlip);
 
-// API Borrow Slips Pending
-router.get(
-    '/manager/api/borrow/pending',
-    requireRole('ql_thiet_bi'),
-    borrowController.getPendingBorrowSlips
-);
+// POST /borrow/return/:id - Duyệt trả thiết bị
+//router.post('/return/:id', borrowController.approveReturnSlip);
 
-// API Return Slips Pending
-router.get(
-    '/manager/api/return/pending',
-    requireRole('ql_thiet_bi'),
-    borrowController.getPendingReturnSlips
-);
+// =============================================
+// API ROUTES
+// =============================================
+// API: GET /borrow/api/devices - Lấy danh sách thiết bị
+router.get('/api/devices', borrowController.getDevices);
 
-// APPROVE / REJECT
-router.post(
-    '/manager/api/borrow/approve/:id',
-    requireRole('ql_thiet_bi'),
-    borrowController.approveBorrowSlip
-);
-router.post(
-    '/manager/api/borrow/reject/:id',
-    requireRole('ql_thiet_bi'),
-    borrowController.rejectBorrowSlip
-);
+// API: GET /borrow/api/history - Lấy lịch sử mượn/trả
+router.get('/api/history', borrowController.getHistoryApi);
 
-router.post(
-    '/manager/api/return/approve/:id',
-    requireRole('ql_thiet_bi'),
-    borrowController.approveReturnSlip
-);
-router.post(
-    '/manager/api/return/reject/:id',
-    requireRole('ql_thiet_bi'),
-    borrowController.rejectReturnSlip
-);
+// API: GET /borrow/api/pending - Lấy danh sách phiếu chờ duyệt
+router.get('/api/pending', borrowController.getPendingApprovals);
+router.get('/api/pending-approvals', borrowController.getPendingApprovals); // Legacy
+
+// API: POST /borrow/api/cancel/:id - Hủy phiếu mượn (API)
+router.post('/api/cancel/:id', borrowController.cancelBorrow);
+
+// =============================================
+// NEW RETURN SLIP API ROUTES
+// =============================================
+// API: POST /borrow/api/return-slips - Create a new return slip
+router.post('/api/return-slips', borrowController.createReturnSlip);
+
+// API: GET /borrow/api/borrowed-items - Get borrowed items for return
+router.get('/api/borrowed-items', borrowController.getBorrowedItems);
 
 module.exports = router;
-// KHÔNG require 'error-codes' và 'response' ở đây. 
-// Chúng sẽ được require bên trong các hàm xử lý để tránh vòng lặp phụ thuộc.
-
-// Placeholder - implement with your auth strategy (JWT, session, etc.)
-const authenticate = async (req, res, next) => {
-    // Tải module tại runtime (khi hàm được gọi)
-    const { ERROR_CODES, getErrorMessage } = require('../constants/error-codes');
-    const { sendError } = require('../utils/response');
-    
-	try {
-		// TODO: Implement authentication logic
-		// Example: Check session, JWT token, etc.
-		// const token = req.headers.authorization?.split(' ')[1];
-		// const user = await verifyToken(token);
-		// req.user = user;
-
-        // MOCK AUTH: Gán user mock nếu chưa có để đảm bảo requireRole có thể kiểm tra
-        if (!req.user) {
-            req.user = { id: 1, role: 'ql_thiet_bi', name: 'Quản lý Mock' };
-        }
-
-		// For now, skip auth check
-		next();
-	} catch (error) {
-		// Dùng sendError đã được require bên trong
-		return sendError(res, getErrorMessage(ERROR_CODES.UNAUTHORIZED), 401);
-	}
-};
-
-// Check if user has required role
-const requireRole = (...allowedRoles) => {
-	return (req, res, next) => {
-        // Tải module tại runtime (khi hàm được gọi)
-        const { ERROR_CODES, getErrorMessage } = require('../constants/error-codes');
-        const { sendError } = require('../utils/response');
-
-		// TODO: Get user from req.user (set by authenticate middleware)
-		const userRole = req.user?.role;
-		
-		// Logic kiểm tra vai trò
-		if (!userRole || !allowedRoles.includes(userRole)) {
-            console.warn(`Attempted access by user with role ${userRole} to restricted route.`);
-            // Dùng sendError đã được require bên trong
-		    return sendError(res, getErrorMessage(ERROR_CODES.FORBIDDEN), 403);
-		}
-		next();
-	};
-};
-
-// Check if user has required permission
-const requirePermission = (permission) => {
-    // Tải module tại runtime (khi hàm được gọi)
-    const { ERROR_CODES, getErrorMessage } = require('../constants/error-codes');
-    const { sendError } = require('../utils/response');
-
-	return (req, res, next) => {
-		// TODO: Get user from req.user and check permission
-		// const userRole = req.user?.role;
-		// if (!hasPermission(userRole, permission)) {
-        //     return sendError(res, getErrorMessage(ERROR_CODES.FORBIDDEN), 403);
-		// }
-		next();
-	};
-};
-
-module.exports = {
-	authenticate,
-	requireRole,
-	requirePermission,
-};

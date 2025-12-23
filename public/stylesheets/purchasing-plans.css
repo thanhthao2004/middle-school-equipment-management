@@ -1,0 +1,302 @@
+/* page transitions */
+body {
+    transition: opacity .22s ease, transform .22s ease;
+}
+
+:root {
+    --header-height: 60px;
+    --footer-height: 0px;
+}
+
+body.page-exit {
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+/* action buttons */
+.purchasing-plans-page .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin: 0 0.2rem;
+    border-radius: 12px;
+    border: 1px solid #e6e9ef;
+    background: #fff;
+    color: #4a5568;
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.purchasing-plans-page .action-btn i {
+    font-size: 0.95rem;
+}
+
+.purchasing-plans-page .action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+}
+
+.purchasing-plans-page .action-btn.btn-view {
+    color: #0d6efd;
+    border-color: #dbe7ff;
+    background: #f4f8ff;
+}
+
+.purchasing-plans-page .action-btn.btn-edit {
+    color: #0f6b3d;
+    border-color: #cdecdc;
+    background: #f4fbf7;
+}
+
+.purchasing-plans-page .action-btn.btn-delete {
+    color: #b42318;
+    border-color: #f5d0ce;
+    background: #fff6f5;
+}
+
+/* status badges */
+.purchasing-plans-page .status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+}
+
+.purchasing-plans-page .status-available {
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+
+.purchasing-plans-page .status-pending {
+    background: #fff4e5;
+    color: #b76e00;
+}
+
+.purchasing-plans-page .status-rejected {
+    background: #fdecea;
+    color: #b71c1c;
+}
+
+.purchasing-plans-page .status-borrowed {
+    background: #e8eaf6;
+    color: #1a237e;
+}
+
+/* purchasing plans table layout */
+.purchasing-plans-page .table th,
+.purchasing-plans-page .table td {
+    vertical-align: middle;
+}
+
+.purchasing-plans-page .table th:nth-child(1),
+.purchasing-plans-page .table td:nth-child(1) {
+    width: 20%;
+    text-align: center;
+}
+
+.purchasing-plans-page .table th:nth-child(2),
+.purchasing-plans-page .table td:nth-child(2) {
+    width: 20%;
+    text-align: center;
+}
+
+.purchasing-plans-page .table th:nth-child(3),
+.purchasing-plans-page .table td:nth-child(3) {
+    width: 30%;
+    text-align: center;
+}
+
+.purchasing-plans-page .table th:nth-child(4),
+.purchasing-plans-page .table td:nth-child(4) {
+    width: 30%;
+    text-align: center;
+}
+
+.purchasing-plans-page .float-right {
+    text-align: center;
+}
+
+/* modal custom */
+.modal {
+    z-index: 2000 !important;
+}
+
+.modal-backdrop {
+    z-index: 1999 !important;
+}
+
+.confirm-code {
+    font-weight: 700;
+}
+
+.form-label {
+    font-weight: 600
+}
+
+.table thead th {
+    text-align: center
+}
+
+.table tbody td input {
+    width: 100%
+}
+
+.small-btn {
+    padding: 6px 10px;
+    font-size: 13px
+}
+
+.page-header {
+    margin-bottom: 20px;
+}
+
+.page-subtitle {
+    font-size: 18px;
+    /* lớn hơn bình thường */
+    font-weight: 600;
+    /* in đậm vừa phải */
+    color: #0d6efd;
+    /* màu xanh Bootstrap */
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+    /* khoảng cách chữ */
+}
+
+/* Fix sidebar layout for purchasing-plans */
+.app-shell {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.app-shell .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1000;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.app-shell .main-content {
+    margin-left: 260px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 260px);
+    padding-top: 24px;
+    padding-bottom: 32px;
+    min-height: 100vh;
+}
+
+/* Responsive: on small screens, sidebar can be hidden/toggled */
+@media (max-width: 768px) {
+    .app-shell {
+        flex-direction: column;
+    }
+
+    .app-shell .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        min-height: 60px;
+        top: 0;
+        bottom: auto;
+    }
+
+    .app-shell .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding-top: 16px;
+        padding-bottom: 24px;
+    }
+}
+
+.controls .btn-register {
+    margin-left: 0;
+}
+
+/* Align header with sidebar for purchasing plans page */
+.purchasing-plans-page nav.navbar {
+    position: fixed;
+    top: 0;
+    left: 260px;
+    right: 0;
+    width: calc(100% - 260px);
+    z-index: 1100;
+}
+
+@media (max-width: 768px) {
+    .purchasing-plans-page nav.navbar {
+        position: relative;
+        left: 0;
+        right: 0;
+        width: 100%;
+    }
+}
+
+/* Align header with sidebar for reports page */
+.reports-page nav.navbar {
+    position: fixed;
+    top: 0;
+    left: 260px;
+    right: 0;
+    width: calc(100% - 260px);
+    z-index: 1100;
+}
+
+@media (max-width: 768px) {
+    .reports-page nav.navbar {
+        position: relative;
+        left: 0;
+        right: 0;
+        width: 100%;
+    }
+}
+
+/* Align header with sidebar for training plans page */
+.training-plans-page nav.navbar {
+    position: fixed;
+    top: 0;
+    left: 260px;
+    right: 0;
+    width: calc(100% - 260px);
+    z-index: 1100;
+}
+
+@media (max-width: 768px) {
+    .training-plans-page nav.navbar {
+        position: relative;
+        left: 0;
+        right: 0;
+        width: 100%;
+    }
+}
+
+/* Align footer with sidebar for all pages */
+.purchasing-plans-page footer,
+.reports-page footer,
+.training-plans-page footer {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+}
+
+@media (max-width: 768px) {
+
+    .purchasing-plans-page footer,
+    .reports-page footer,
+    .training-plans-page footer {
+        margin-left: 0;
+        width: 100%;
+    }
+}

@@ -8,210 +8,229 @@
         <%= title %>
     </title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/public/stylesheets/style.css" rel="stylesheet">
-    <style>
-        /* local small overrides if needed */
-        .action-btn {
-            min-width: 40px;
-            text-align: center
-        }
-    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/purchasing-plans.css" rel="stylesheet">
 </head>
 
-<body>
-    <div class="app-shell">
-        <%- include('../../../views/partials/sidebar', { active: 'purchasing' }) %>
+<body class="purchasing-plans-page">
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'to_truong' }; %>
 
-            <main class="main-content">
-                <div class="page-header">
-                    <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
+        <!-- Header -->
+        <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans' , user: userObj }) %>
+
+            <div class="app-shell">
+                <div class="sidebar-column">
+                    <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans' , user:
+                        userObj }) %>
                 </div>
 
-                <div class="controls">
-                    <div class="left">
-                        <select id="year-filter" class="form-select search-select" aria-label="Năm học">
-                            <option value="">Năm học</option>
-                            <% if (years && years.length) { %>
-                                <% years.forEach(function(y){ %>
-                                    <option value="<%= y %>">
-                                        <%= y %>
-                                    </option>
-                                    <% }); %>
-                                        <% } %>
-                        </select>
-                        <button id="year-filter-btn" class="btn btn-outline-primary"><span
-                                class="search-icon">🔍</span></button>
-                    </div>
-
-                    <div>
-                        <a href="/purchasing-plans/create" class="btn-register">+ Lập kế hoạch mua sắm mới</a>
-                    </div>
-                </div>
-
-                <div class="card card-table">
-                    <div class="card-body">
-                        <% if (plans && plans.length) { %>
-                            <div class="table-responsive">
-                                <table class="table align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Mã kế hoạch</th>
-                                            <th>Năm học</th>
-                                            <th>Trạng thái</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% plans.forEach(function(plan){ %>
-                                            <tr data-year="<%= plan.schoolYear %>">
-                                                <td>
-                                                    <%= plan.code %>
-                                                </td>
-                                                <td>
-                                                    <%= plan.schoolYear %>
-                                                </td>
-                                                <td>
-                                                    <% if (plan.status==='approved' ) { %>
-                                                        <span class="status-badge status-available">Đã duyệt</span>
-                                                        <% } else if (plan.status==='pending' ) { %>
-                                                            <span class="status-badge status-pending">Đang chờ
-                                                                duyệt</span>
-                                                            <% } else if (plan.status==='rejected' ) { %>
-                                                                <span class="status-badge status-rejected">Từ
-                                                                    chối</span>
-                                                                <% } else { %>
-                                                                    <span class="status-badge status-borrowed">
-                                                                        <%= plan.status %>
-                                                                    </span>
-                                                                    <% } %>
-                                                </td>
-                                                <td class="float-right">
-                                                    <a href="/purchasing-plans/<%= plan.id %>" class="action-btn"
-                                                        title="Xem">👁️</a>
-                                                    <% if (plan.status==='pending' ) { %>
-                                                        <a href="/purchasing-plans/<%= plan.id %>/edit"
-                                                            class="action-btn" title="Sửa">✏️</a>
-                                                        <form action="/purchasing-plans/<%= plan.id %>?_method=DELETE"
-                                                            method="post" style="display:inline-block"
-                                                            class="delete-form">
-                                                            <!-- use a button that triggers the confirmation modal -->
-                                                            <button type="button" class="btn-cancel delete-btn"
-                                                                data-plan-code="<%= plan.code %>"
-                                                                title="Xóa">🗑️</button>
-                                                        </form>
-                                                        <% } %>
-                                                </td>
-                                            </tr>
-                                            <% }); %>
-                                    </tbody>
-                                </table>
+                <div class="main-content">
+                    <div class="container py-4">
+                        <main class="page-main">
+                            <div class="page-header">
+                                <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
                             </div>
-                            <div id="no-results" class="alert alert-warning mt-3" style="display:none">Không có kế hoạch
-                                mua
-                                sắm cho năm học đã chọn.</div>
-                            <% } else { %>
-                                <div class="alert alert-info">Chưa có kế hoạch mua sắm nào.</div>
-                                <% } %>
-                    </div>
-                </div>
-            </main>
-    </div>
 
-    <script src="/js/bootstrap.bundle.min.js"></script>
-    <!-- Confirmation modal for delete actions -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteLabel">Xác nhận xóa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa Kế hoạch mua sắm này không?
-                    <div id="modal-plan-code" class="mt-2 fw-bold"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" id="confirm-delete" class="btn btn-danger">Xóa</button>
+                            <div class="controls">
+                                <div class="left">
+                                    <select id="year-filter" class="form-select search-select" aria-label="Năm học">
+                                        <option value="">Năm học</option>
+                                        <% if (years && years.length) { %>
+                                            <% years.forEach(function(y){ %>
+                                                <option value="<%= y %>">
+                                                    <%= y %>
+                                                </option>
+                                                <% }); %>
+                                                    <% } %>
+                                    </select>
+                                    <button id="year-filter-btn" class="btn btn-outline-primary">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <a href="/teacher/purchasing-plans/create" class="btn-register">
+                                        <i class="fa-solid fa-plus"></i> Lập kế hoạch mua sắm mới
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="card card-table">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle">
+                                            <thead style="font-weight: bold; background-color: #f8f9fa;">
+                                                <tr>
+                                                    <th class="text-center">Mã kế hoạch</th>
+                                                    <th class="text-center">Năm học</th>
+                                                    <th class="text-center">Trạng thái</th>
+                                                    <th class="text-center">Lựa chọn</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (plans && plans.length) { %>
+                                                    <% plans.forEach(function(plan){ %>
+                                                        <tr data-year="<%= plan.schoolYear || plan.namHoc %>">
+                                                            <td class="text-center fw-semibold">
+                                                                <%= plan.code || plan.maKeHoachMuaSam %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <%= plan.schoolYear || plan.namHoc %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <% if (plan.status==='approved' ||
+                                                                    plan.trangThai==='da_duyet' ) { %>
+                                                                    <span class="status-badge status-available">Đã
+                                                                        duyệt</span>
+                                                                    <% } else if (plan.status==='pending' ||
+                                                                        plan.trangThai==='cho_phe_duyet' ) { %>
+                                                                        <span class="status-badge status-pending">Đang
+                                                                            chờ duyệt</span>
+                                                                        <% } else if (plan.status==='rejected' ) { %>
+                                                                            <span
+                                                                                class="status-badge status-rejected">Từ
+                                                                                chối</span>
+                                                                            <% } else { %>
+                                                                                <span
+                                                                                    class="status-badge status-borrowed">
+                                                                                    <%= plan.status || plan.trangThai %>
+                                                                                </span>
+                                                                                <% } %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a href="/teacher/purchasing-plans/<%= plan.maKeHoachMuaSam || plan.code %>/detail"
+                                                                    class="action-btn btn-view" title="Xem chi tiết">
+                                                                    <i class="fa-solid fa-eye"></i>
+                                                                </a>
+                                                                <% if (plan.trangThai==='cho_phe_duyet' ||
+                                                                    plan.status==='pending' ) { %>
+                                                                    <a href="/teacher/purchasing-plans/<%= plan._id || plan.id %>/edit"
+                                                                        class="action-btn btn-edit" title="Chỉnh sửa">
+                                                                        <i class="fa-solid fa-pen"></i>
+                                                                    </a>
+                                                                    <a href="#"
+                                                                        data-plan-id="<%= plan._id || plan.id %>"
+                                                                        data-plan-code="<%= plan.code || plan.maKeHoachMuaSam %>"
+                                                                        class="action-btn btn-delete"
+                                                                        title="Xóa kế hoạch">
+                                                                        <i class="fa-solid fa-trash-can"></i>
+                                                                    </a>
+                                                                    <% } %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }); %>
+                                                            <% } else { %>
+                                                                <tr style="font-style: italic;">
+                                                                    <td colspan="4" class="text-center text-muted py-4">
+                                                                        Chưa có kế hoạch mua sắm nào.</td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div id="no-results" class="alert alert-warning mt-3" style="display:none">Không có
+                                        kế hoạch mua sắm cho năm học đã chọn.</div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <script>
-        (function () {
-            const deleteModalEl = document.getElementById('confirmDeleteModal');
-            let deleteModal = null;
-            try {
-                deleteModal = new bootstrap.Modal(deleteModalEl);
-            } catch (e) {
-                // bootstrap not available or error; fallback to native confirm later
-                deleteModal = null;
-            }
+            <%- include('../../../views/partials/footer') %>
 
-            let formToSubmit = null;
+                <!-- Delete confirmation modal -->
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5>Xác nhận xóa kế hoạch</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Bạn có chắc chắn muốn xóa kế hoạch sau không?</p>
+                                <p class="confirm-code">Mã kế hoạch: <span id="modalPlanCode"></span></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Xóa</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            document.addEventListener('click', function (e) {
-                const target = e.target;
-                if (target && target.classList.contains('delete-btn')) {
-                    // find the parent form
-                    const form = target.closest('form');
-                    const planCode = target.getAttribute('data-plan-code') || '';
-                    if (deleteModal) {
-                        formToSubmit = form;
-                        const codeEl = document.getElementById('modal-plan-code');
-                        codeEl.textContent = planCode ? `Mã kế hoạch: ${planCode}` : '';
-                        deleteModal.show();
-                    } else {
-                        // fallback to native confirm
-                        const ok = confirm('Bạn có chắc chắn muốn xóa Kế hoạch mua sắm này không?');
-                        if (ok && form) form.submit();
-                    }
-                }
-            });
+                <script src="/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    // Year filter
+                    (function () {
+                        const yearSelect = document.getElementById('year-filter');
+                        const yearBtn = document.getElementById('year-filter-btn');
+                        const noResults = document.getElementById('no-results');
 
-            const confirmBtn = document.getElementById('confirm-delete');
-            if (confirmBtn) {
-                confirmBtn.addEventListener('click', function () {
-                    if (formToSubmit) formToSubmit.submit();
-                });
-            }
-        })();
-    </script>
-    <script>
-        // Year filter: show only rows that match selected year
-        (function () {
-            const yearSelect = document.getElementById('year-filter');
-            const yearBtn = document.getElementById('year-filter-btn');
-            const noResults = document.getElementById('no-results');
+                        function filterByYear(year) {
+                            const rows = document.querySelectorAll('table tbody tr[data-year]');
+                            let any = false;
+                            rows.forEach(r => {
+                                const y = r.getAttribute('data-year') || '';
+                                if (!year || year === '') {
+                                    r.style.display = '';
+                                    any = true;
+                                } else if (y === year) {
+                                    r.style.display = '';
+                                    any = true;
+                                } else {
+                                    r.style.display = 'none';
+                                }
+                            });
+                            if (noResults) noResults.style.display = any ? 'none' : 'block';
+                        }
 
-            function filterByYear(year) {
-                const rows = document.querySelectorAll('table tbody tr[data-year]');
-                let any = false;
-                rows.forEach(r => {
-                    const y = r.getAttribute('data-year') || '';
-                    if (!year || year === '') {
-                        r.style.display = '';
-                        any = true;
-                    } else if (y === year) {
-                        r.style.display = '';
-                        any = true;
-                    } else {
-                        r.style.display = 'none';
-                    }
-                });
-                if (noResults) noResults.style.display = any ? 'none' : 'block';
-            }
+                        if (yearBtn) {
+                            yearBtn.addEventListener('click', function () {
+                                filterByYear(yearSelect ? yearSelect.value : '');
+                            });
+                        }
+                    })();
 
-            // Only filter when user clicks the search button.
-            if (yearBtn) {
-                yearBtn.addEventListener('click', function () {
-                    filterByYear(yearSelect ? yearSelect.value : '');
-                });
-            }
-        })();
-    </script>
+                    // Delete confirmation modal
+                    (function () {
+                        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                        const modalPlanCode = document.getElementById('modalPlanCode');
+                        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+                        let currentRow = null;
+
+                        document.querySelectorAll('.action-btn.btn-delete').forEach(btn => {
+                            btn.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                const planCode = btn.dataset.planCode;
+                                modalPlanCode.textContent = planCode;
+                                // Store reference to the table row
+                                currentRow = btn.closest('tr');
+                                deleteModal.show();
+                            });
+                        });
+
+                        // Handle confirm delete - remove from DOM only, not from database
+                        confirmDeleteBtn.addEventListener('click', function () {
+                            if (currentRow) {
+                                // Remove the row from the table
+                                currentRow.remove();
+                                currentRow = null;
+                                deleteModal.hide();
+
+                                // Check if there are any rows left
+                                const rows = document.querySelectorAll('table tbody tr[data-year]');
+                                if (rows.length === 0) {
+                                    const tbody = document.querySelector('table tbody');
+                                    tbody.innerHTML = '<tr style="font-style: italic;"><td colspan="4" class="text-center text-muted py-4">Chưa có kế hoạch mua sắm nào.</td></tr>';
+                                }
+                            }
+                        });
+                    })();
+                </script>
 </body>
 
 </html>

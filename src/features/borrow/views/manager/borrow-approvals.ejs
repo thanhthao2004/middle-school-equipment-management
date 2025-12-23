@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách Phiếu Mượn Chờ Duyệt</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/public/stylesheets/style.css" rel="stylesheet">
-    <link href="/public/stylesheets/borrow.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/borrow.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         .filter-section { background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e9ecef; }
@@ -17,12 +17,12 @@
 </head>
 <body>
     <!-- Header -->
-    <%- include('../../../../views/partials/header') %>
+    <%- include('../../../../views/partials/header', { currentPage: 'borrow-approvals', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar QLTB -->
-            <%- include('../../../../views/partials/admin-sidebar', { currentPage: 'borrow-approvals' }) %>
+            <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'borrow-approvals', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
@@ -86,7 +86,7 @@
                                             <td>2025-09-20</td>
                                             <td>2025-09-25</td>
                                             <td><span class="badge bg-success">Đang mượn</span></td>
-                                            <td><a class="btn btn-link p-0" href="/borrow/detail/P001">Xem</a></td>
+                                            <td><a class="btn btn-link p-0" href="/manager/borrow/P001">Xem</a></td>
                                         </tr>
                                         <tr data-id="P002" data-status="pending">
                                             <td class="fw-bold">P002</td>
@@ -95,7 +95,7 @@
                                             <td>2025-09-21</td>
                                             <td>2025-09-26</td>
                                             <td><span class="badge bg-warning text-dark">Chờ duyệt</span></td>
-                                            <td><a class="btn btn-link p-0" href="/borrow/detail/P002">Xem</a></td>
+                                            <td><a class="btn btn-link p-0" href="/manager/borrow/P002">Xem</a></td>
                                         </tr>
                                         <tr data-id="P003" data-status="dang_muon">
                                             <td class="fw-bold">P003</td>
@@ -104,7 +104,7 @@
                                             <td>2025-09-22</td>
                                             <td>2025-09-23</td>
                                             <td><span class="badge bg-success">Đang mượn</span></td>
-                                            <td><a class="btn btn-link p-0" href="/borrow/detail/P003">Xem</a></td>
+                                            <td><a class="btn btn-link p-0" href="/manager/borrow/P003">Xem</a></td>
                                         </tr>
                                         <tr data-id="P005" data-status="pending">
                                             <td class="fw-bold">P005</td>
@@ -113,7 +113,7 @@
                                             <td>2025-09-23</td>
                                             <td>2025-09-29</td>
                                             <td><span class="badge bg-warning text-dark">Chờ duyệt</span></td>
-                                            <td><a class="btn btn-link p-0" href="/borrow/detail/P005">Xem</a></td>
+                                            <td><a class="btn btn-link p-0" href="/manager/borrow/P005">Xem</a></td>
                                         </tr>
                                     </tbody>
                                 </table>

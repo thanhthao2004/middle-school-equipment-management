@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const openDeleteModal = (id, code) => {
         deleteText.textContent = `Bạn có chắc chắn muốn xóa báo cáo "${code}" không?`;
-        deleteForm.action = `/disposal/delete/${id}`;
+        deleteForm.action = `/manager/disposal/${id}/delete`;
         deleteModal.classList.add("active");
     };
 
@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (deleteModal) {
         const openDeleteModal = (id, code) => {
             deleteText.textContent = `Bạn có chắc chắn muốn xóa báo cáo "${code}" không?`;
-            deleteForm.action = `/disposal/delete/${id}`;
+            deleteForm.action = `/manager/disposal/${id}/delete`;
             deleteModal.classList.add("active");
         };
 

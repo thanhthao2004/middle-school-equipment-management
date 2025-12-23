@@ -6,18 +6,20 @@
     <title>Trang chủ giáo viên - Mượn thiết bị</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="/public/stylesheets/style.css" rel="stylesheet">
-    <link href="/public/stylesheets/borrow.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/borrow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 <body>
-    <%- include('../../../views/partials/borrow-sidebar', { currentPage: 'teacher-home' }) %>
+    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'giao_vien' }; %>
+    <div class="app-shell">
+        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'teacher-home', user: userObj }) %>
 
-    <div class="main-content">
-        
-        <%- include('../../../views/partials/header', { currentPage: 'home' }) %>
+        <div class="main-content">
+            
+            <%- include('../../../views/partials/header', { currentPage: 'teacher-home', user: userObj }) %>
 
-        <div class="container py-5">
+            <div class="container py-5">
             <div 
  class="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -39,7 +41,7 @@
                                 <h5 class="card-title mb-1">Đăng ký mượn</h5>
                   
                <p class="card-text text-muted mb-3">Chọn thiết bị và tạo phiếu mượn.</p>
-                                <a class="feature-link" href="/borrow/register">Đi tới đăng ký →</a>
+                                <a class="feature-link" href="/teacher/borrow/register">Đi tới đăng ký →</a>
                             </div>
                        
   </div>
@@ -57,7 +59,7 @@
               
                    <h5 class="card-title mb-1">Chờ duyệt</h5>
                                 <p class="card-text text-muted mb-3">Theo dõi phiếu mượn đang chờ duyệt.</p>
-                                <a class="feature-link" href="/borrow/pending-approvals">Xem danh sách →</a>
+                                <a class="feature-link" href="/teacher/borrow/pending">Xem danh sách →</a>
              
                 </div>
                         </div>
@@ -76,7 +78,7 @@
                                 <h5 class="card-title mb-1">Lịch sử mượn/trả</h5>
                                 <p class="card-text text-muted mb-3">Xem lại các phiếu đã mượn/trả.</p>
             
-                     <a class="feature-link" href="/borrow/history">Xem lịch sử →</a>
+                     <a class="feature-link" href="/teacher/borrow/history">Xem lịch sử →</a>
                             </div>
                         </div>
                     </div>
@@ -85,9 +87,11 @@
             </div>
         </div>
 
-        <%- include('../../../views/partials/footer') %>
-        
-    </div> 
+            <%- include('../../../views/partials/footer') %>
+            
+            </div> 
+        </div>
+    </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

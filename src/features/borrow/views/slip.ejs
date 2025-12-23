@@ -6,15 +6,17 @@
     <title>Phiếu mượn thiết bị</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="/public/stylesheets/style.css" rel="stylesheet">
-    <link href="/public/stylesheets/borrow.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/borrow.css" rel="stylesheet">
 </head>
 <body>
-    <%- include('../../../views/partials/borrow-sidebar', { currentPage: 'slip' }) %>
+    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'giao_vien' }; %>
+    <div class="app-shell">
+        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'slip', user: userObj }) %>
 
-    <div class="main-content">
+        <div class="main-content">
         
-        <%- include('../../../views/partials/header', { currentPage: 'borrow' }) %>
+        <%- include('../../../views/partials/header', { currentPage: 'slip', user: userObj }) %>
 
         <div class="container py-4">
 
@@ -24,21 +26,33 @@
                 
                 <div class="slip-header">
                     <div class="slip-title">Phiếu mượn</div>
-         
-            <div class="slip-id">MÃ PHIẾU: PM02</div>
-                    <% if (typeof from !== 'undefined' && from === 'pending') { %>
+                    <div class="slip-id">MÃ PHIẾU: <%= slip.maPhieu || 'N/A' %></div>
+                    <% 
+                    const status = slip.trangThai || 'dang_muon';
+                    %>
+                    <% if (from === 'pending' || status === 'dang_muon') { %>
                         <div class="mt-2">
-      
-                       <span class="badge bg-warning text-dark">Trạng thái: chờ duyệt</span>
+                            <span class="badge bg-warning text-dark">Trạng thái: chờ duyệt</span>
+                        </div>
+                    <% } else if (status === 'approved') { %>
+                        <div class="mt-2">
+                            <span class="badge bg-success">Trạng thái: đã duyệt</span>
+                        </div>
+                    <% } else if (status === 'da_hoan_tat') { %>
+                        <div class="mt-2">
+                            <span class="badge bg-secondary">Trạng thái: đã hoàn tất</span>
+                        </div>
+                    <% } else if (status === 'huy') { %>
+                        <div class="mt-2">
+                            <span class="badge bg-danger">Trạng thái: đã hủy</span>
                         </div>
                     <% } %>
-  
-               </div>
+                </div>
 
                 <h6 class="mb-3">Thiết bị mượn:</h6>
                 <div class="table-responsive">
                     <table class="table table-bordered equipment-table">
-                         <thead>
+                        <thead>
                             <tr>
                                 <th>S</th>
                                 <th>Tên Thiết Bị</th>
@@ -53,72 +67,46 @@
                                 <th>Nội dung</th>
                                 <th>Tình trạng</th>
                             </tr>
-                          </thead>
+                        </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>Bộ dụng cụ thí nghiệm</td>
-                                <td>Hóa học</td>
-                                <td>cái</td>
-                                <td>Phòng thí nghiệm</td>
-                                <td>NCC</td>
-                                <td>10/09/2025</td>
-                                <td>30/09/2025</td>
-                                <td>3</td>
-                                <td>Sáng</td>
-                                <td>Hóa học</td>
-                                <td>tốt</td>
-           
-                  </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Bộ thí nghiệm H</td>
-                                <td>Hóa học</td>
-                                <td>bộ</td>
-                                <td>Kho Hóa</td>
-                                <td>GV</td>
-                                <td>10/09/2025</td>
-                                <td>30/09/2025</td>
-                                <td>3</td>
-                                <td>Chiều</td>
-                                <td>Hóa học</td>
-                                <td>tốt</td>
-                            </tr>
-                 
-            <tr>
-                                <td>3</td>
-                                <td>Laptop Dell Ins</td>
-                                <td>Tin học</td>
-                                <td>cái</td>
-                                <td>Phòng IT</td>
-                                <td>NCC</td>
-                                <td>10/09/2025</td>
-                                <td>10/10/2025</td>
-                                <td>3</td>
-                                <td>Sáng</td>
-                                <td>AI</td>
-                                <td>tốt</td>
+                            <% if (slip.details && slip.details.length > 0) { %>
+                                <% slip.details.forEach((detail, index) => { %>
+                                    <tr>
+                                        <td><%= index + 1 %></td>
+                                        <td><%= detail.device?.tenTB || detail.maTB || 'N/A' %></td>
+                                        <td><%= detail.device?.category?.tenDM || 'N/A' %></td>
+                                        <td>cái</td>
+                                        <td><%= detail.device?.viTriLuuTru || 'N/A' %></td>
+                                        <td><%= detail.device?.nguonGoc || 'N/A' %></td>
+                                        <td><%= slip.ngayMuon ? new Date(slip.ngayMuon).toLocaleDateString('vi-VN') : 'N/A' %></td>
+                                        <td><%= detail.ngayTraDuKien ? new Date(detail.ngayTraDuKien).toLocaleDateString('vi-VN') : (slip.ngayDuKienTra ? new Date(slip.ngayDuKienTra).toLocaleDateString('vi-VN') : 'N/A') %></td>
+                                        <td><%= detail.soLuongMuon || 1 %></td>
+                                        <td><%= slip.sessionTime === 'sang' ? 'Sáng' : slip.sessionTime === 'chieu' ? 'Chiều' : 'N/A' %></td>
+                                        <td><%= slip.lyDo || 'N/A' %></td>
+                                        <td><%= detail.tinhTrangLucMuon || 'Bình thường' %></td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="12" class="text-center text-muted py-3">Không có thiết bị nào trong phiếu mượn này</td>
                                 </tr>
+                            <% } %>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="borrower-info">
                     <div class="row">
-
                         <div class="col-md-4">
-                            <strong>Giáo viên mượn:</strong> Thanh Thảo
+                            <strong>Giáo viên mượn:</strong> <%= slip.nguoiLapPhieuId?.hoTen || slip.nguoiLapPhieuId?.name || 'N/A' %>
                         </div>
-                  
                         <div class="col-md-4">
-                            <strong>Tổ bộ môn:</strong> Hóa học
+                            <strong>Tổ bộ môn:</strong> <%= slip.nguoiLapPhieuId?.department || 'N/A' %>
                         </div>
-
-                            <div class="col-md-4">
-                            <strong>Ngày tạo phiếu:</strong> 14:00 06/09/2025
+                        <div class="col-md-4">
+                            <strong>Ngày tạo phiếu:</strong> <%= slip.createdAt ? new Date(slip.createdAt).toLocaleString('vi-VN') : 'N/A' %>
                         </div>
-        
-             </div>
+                    </div>
                 </div>
 
                 <div class="text-center mt-4">
@@ -130,7 +118,8 @@
 
         <%- include('../../../views/partials/footer') %>
         
-    </div> 
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -138,11 +127,11 @@
          const params = new URLSearchParams(window.location.search);
         const from = params.get('from');
             if (from === 'pending') {
-                            window.location.href = '/borrow/pending-approvals';
+                            window.location.href = '/teacher/borrow/pending';
             } else if (from === 'history') {
-                            window.location.href = '/borrow/history';
+                            window.location.href = '/teacher/borrow/history';
             } else {
-                            window.location.href = '/borrow/register';
+                            window.location.href = '/teacher/borrow/register';
             }
                     }
     </script>

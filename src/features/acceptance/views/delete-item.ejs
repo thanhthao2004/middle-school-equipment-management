@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xóa chi tiết Biên bản Nghiệm thu</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         .acceptance-delete-box { border: 1px solid #ddd; padding: 30px; border-radius: 8px; background-color: #fff; max-width: 1100px; margin: 20px auto; }
@@ -16,12 +16,12 @@
 </head>
 <body>
     <!-- Header -->
-    <%- include('../../../views/partials/header') %>
+    <%- include('../../../views/partials/header', { currentPage: 'acceptance', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar QLTB -->
-            <%- include('../../../views/partials/admin-sidebar', { currentPage: 'reports-inspection' }) %>
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'acceptance', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
@@ -103,7 +103,7 @@
             event.preventDefault();
             if (confirm('Bạn có chắc chắn muốn xóa các mục đã chọn khỏi biên bản nghiệm thu này không?')) {
                 alert('Xóa chi tiết nghiệm thu thành công! (MOCK)');
-                window.location.href = '/acceptance/list';
+                window.location.href = '/manager/acceptance';
             }
             return false;
         }

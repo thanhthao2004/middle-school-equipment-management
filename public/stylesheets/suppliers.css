@@ -1,0 +1,267 @@
+/* ============================
+   SUPPLIERS – ADMIN STYLE
+   ============================ */
+
+/* ---------- Global ---------- */
+* {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+body {
+    min-height: 100vh;
+    font-size: 14px;
+    background: #f8fafc;
+    color: #334155;
+}
+
+/* ---------- Page Header ---------- */
+.main-content h1 {
+    font-weight: 700;
+    font-size: 22px;
+    color: #1e293b;
+    letter-spacing: 0.3px;
+}
+
+.main-content .btn {
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+.main-content .btn-primary {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.main-content .btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.main-content .btn-outline-secondary {
+    color: #475569;
+    border-color: #cbd5f5;
+}
+
+.main-content .btn-outline-secondary:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+/* ---------- Card ---------- */
+.main-content .card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.main-content .card + .card {
+    margin-top: 20px;
+}
+
+/* ---------- Search Box ---------- */
+.main-content .card .row.g-3 {
+    align-items: center;
+}
+
+.main-content input[name="keyword"] {
+    height: 42px;
+    border-radius: 8px 0 0 8px;
+    border-color: #e2e8f0;
+}
+
+.main-content input[name="keyword"]:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+
+.main-content .card button.btn-primary {
+    height: 42px;
+    border-radius: 0 8px 8px 0;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 3px 8px rgba(37,99,235,0.35);
+}
+
+.main-content .card button.btn-primary:hover {
+    background: #1e40af;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.45);
+}
+
+@media (max-width: 768px) {
+    .main-content input[name="keyword"],
+    .main-content .card button.btn-primary {
+        border-radius: 8px;
+    }
+}
+
+/* ---------- Table ---------- */
+.main-content table {
+    margin-bottom: 0;
+}
+
+.main-content thead th {
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.main-content tbody td {
+    font-size: 14px;
+    vertical-align: middle;
+    color: #334155;
+}
+
+.main-content tbody tr:hover {
+    background: #f1f5f9;
+}
+
+/* ---------- Code (Mã NCC) ---------- */
+.main-content .code-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* ---------- Status Badge ---------- */
+.main-content .badge.bg-success {
+    background: #22c55e !important;
+}
+
+.main-content .badge.bg-danger {
+    background: #ef4444 !important;
+}
+
+/* ---------- Action Buttons ---------- */
+.main-content .btn-group-sm .btn {
+    padding: 4px 10px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+/* ---------- Delete Modal ---------- */
+#deleteModal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15,23,42,0.55);
+    z-index: 1000;
+    transition: opacity 0.25s ease;
+}
+
+#deleteModal.active {
+    display: flex;
+    opacity: 1;
+}
+
+#deleteModal .modal-box {
+    background: #fff;
+    padding: 28px 24px;
+    border-radius: 12px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+#deleteModal h3 {
+    color: #dc2626;
+    font-size: 18px;
+    margin-bottom: 16px;
+}
+
+#deleteModal p {
+    margin-bottom: 22px;
+    color: #475569;
+}
+
+#deleteModal .btn-danger {
+    background: #dc2626;
+}
+
+#deleteModal .btn-secondary {
+    background: #e5e7eb;
+    color: #1e293b;
+}
+
+
+/* ============================
+   ADD SUPPLIER FORM – POLISH
+   ============================ */
+
+/* Page title */
+.main-content h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+/* Form card */
+.main-content .card {
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* Labels */
+.main-content .form-label {
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+/* Inputs */
+.main-content .form-control,
+.main-content .form-select {
+    height: 44px;
+    border-radius: 10px;
+    border-color: #e2e8f0;
+    padding: 10px 14px;
+}
+
+.main-content .form-control::placeholder {
+    color: #94a3b8;
+}
+
+.main-content .form-control:focus,
+.main-content .form-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+
+/* Readonly input */
+.main-content input[readonly] {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #64748b;
+}
+
+/* Buttons */
+.main-content .btn-primary {
+    padding: 10px 22px;
+    font-size: 14px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+}
+
+.main-content .btn-primary:hover {
+    box-shadow: 0 6px 16px rgba(37,99,235,0.45);
+}
+
+.main-content .btn-secondary {
+    padding: 10px 18px;
+    border-radius: 10px;
+}
+
+/* Footer button area */
+.main-content form .d-flex {
+    padding-top: 10px;
+    border-top: 1px solid #e5e7eb;
+}

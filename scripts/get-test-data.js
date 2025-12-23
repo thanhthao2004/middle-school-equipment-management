@@ -20,7 +20,7 @@ async function getTestData() {
         
         const db = mongoose.connection.db;
         const dbName = db.databaseName;
-        console.log(`✅ Đã kết nối đến database: ${dbName}\n`);
+        console.log(`Đã kết nối đến database: ${dbName}\n`);
 
         // 1. Lấy Users
         console.log('👤 Danh sách Users:');
@@ -35,7 +35,7 @@ async function getTestData() {
         console.log('');
 
         // 2. Lấy Categories
-        console.log('📁 Danh sách Categories:');
+        console.log(' Danh sách Categories:');
         const categories = await Category.find({});
         console.log(`   Tổng số: ${categories.length}`);
         categories.forEach((cat, index) => {
@@ -111,14 +111,13 @@ async function getTestData() {
 if (require.main === module) {
     getTestData()
         .then(() => {
-            console.log('\n✅ Script hoàn thành!');
+            console.log('\n Script hoàn thành!');
             process.exit(0);
         })
         .catch((error) => {
-            console.error('\n❌ Script thất bại:', error);
+            console.error('\n Script thất bại:', error);
             process.exit(1);
         });
 }
 
 module.exports = { getTestData };
-

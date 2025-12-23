@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/public/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         .filter-section { background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e9ecef; }
@@ -15,12 +15,12 @@
 </head>
 <body>
     <!-- Header -->
-    <%- include('../../../../views/partials/header') %>
+    <%- include('../../../../views/partials/header', { currentPage: 'return-slips', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar QLTB -->
-            <%- include('../../../../views/partials/admin-sidebar', { currentPage: 'return-slips' }) %>
+            <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'return-slips', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
@@ -69,7 +69,7 @@
                                                     <td><%= slip.ngayTraDuKien %></td>
                                                     <td><%= slip.ngayTraThucTe %></td>
                                                     <td><span class="badge bg-success"><%= slip.trangThai %></span></td>
-                                                    <td><a class="btn btn-link p-0" href="/return/detail/<%= slip.maPhieu.replace('P00', '') %>">Xem</a></td>
+                                                    <td><a class="btn btn-link p-0" href="/manager/return/<%= slip.maPhieu.replace('P00', '') %>">Xem</a></td>
                                                 </tr>
                                             <% }) %>
                                         <% } else { %>

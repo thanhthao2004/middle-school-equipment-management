@@ -1,0 +1,116 @@
+<div class="col-md-3 col-lg-2 sidebar">
+    <div class="d-flex align-items-center p-3">
+        <i class="fas fa-toolbox me-2 text-white"></i>
+        <span class="text-white fw-bold">QUẢN LÝ THIẾT BỊ</span>
+    </div>
+
+    <nav class="nav flex-column mt-3">
+        <!-- TRANG CHỦ QLTB -->
+        <a class="nav-link <%= currentPage === 'manager-home' ? 'active' : '' %>" href="/manager">
+            <i class="fas fa-home me-2"></i>
+            Trang chủ QLTB
+        </a>
+
+        <!-- QUẢN LÝ THIẾT BỊ -->
+        <h6 class="sidebar-heading text-muted mt-3 mb-1 px-3">Quản lý thiết bị</h6>
+
+        <a class="nav-link <%= currentPage === 'devices' ? 'active' : '' %>" href="/manager/devices">
+            <i class="fas fa-boxes me-2"></i>
+            Danh sách thiết bị
+        </a>
+
+        <a class="nav-link <%= currentPage === 'devices-create' ? 'active' : '' %>" href="/manager/devices/create">
+            <i class="fas fa-plus-circle me-2"></i>
+            Thêm thiết bị mới
+        </a>
+
+        <a class="nav-link <%= currentPage === 'categories' ? 'active' : '' %>" href="/manager/categories">
+            <i class="fas fa-folder me-2"></i>
+            Danh mục thiết bị
+        </a>
+
+        <!-- QUẢN LÝ MƯỢN/TRẢ -->
+        <h6 class="sidebar-heading text-muted mt-3 mb-1 px-3">Quản lý mượn/trả</h6>
+
+        <a class="nav-link <%= currentPage === 'borrow-approvals' ? 'active' : '' %>" href="/manager/borrow/approvals">
+            <i class="fas fa-clipboard-check me-2"></i>
+            Duyệt phiếu mượn
+        </a>
+
+        <a class="nav-link <%= currentPage === 'return-slips' ? 'active' : '' %>" href="/manager/borrow/return-slips">
+            <i class="fas fa-undo me-2"></i>
+            Quản lý phiếu trả
+        </a>
+
+        <!-- BÁO CÁO & THỐNG KÊ -->
+        <h6 class="sidebar-heading text-muted mt-3 mb-1 px-3">Báo cáo & thống kê</h6>
+
+        <a class="nav-link <%= currentPage === 'device-stats' ? 'active' : '' %>" href="/manager/device-stats">
+            <i class="fas fa-chart-bar me-2"></i>
+            Thống kê thiết bị
+        </a>
+
+        <a class="nav-link <%= currentPage === 'periodic-reports' ? 'active' : '' %>" href="/manager/periodic-reports">
+            <i class="fas fa-file-alt me-2"></i>
+            Báo cáo định kỳ
+        </a>
+
+        <a class="nav-link <%= currentPage === 'acceptance' ? 'active' : '' %>" href="/manager/acceptance">
+            <i class="fas fa-check-double me-2"></i>
+            Nghiệm thu thiết bị
+        </a>
+
+        <a class="nav-link <%= currentPage === 'disposal' ? 'active' : '' %>" href="/manager/disposal">
+            <i class="fas fa-trash-alt me-2"></i>
+            Thanh lý thiết bị
+        </a>
+    </nav>
+</div>
+
+<style>
+    .sidebar-heading {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05rem;
+        font-weight: 700;
+        color: #94a3b8 !important;
+    }
+
+    /* Override global sidebar styles if needed - use fixed positioning */
+    .sidebar {
+        background-color: #1e3a8a;
+        min-height: 100vh;
+        padding: 0;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 100vh;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+
+    .sidebar .nav-link {
+        color: white;
+        padding: 10px 15px;
+        transition: background-color 0.2s;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        margin: 0 8px 4px 8px;
+    }
+
+    .sidebar .nav-link:hover {
+        background-color: #3b82f6;
+    }
+
+    .sidebar .nav-link.active {
+        background-color: #3b82f6;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    }
+
+    .sidebar .nav-link i {
+        width: 20px;
+        text-align: center;
+    }
+</style>
