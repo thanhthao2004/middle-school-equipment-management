@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { getNextCode } = require('../../../core/libs/sequence');
 
 const PeriodicReportSchema = new mongoose.Schema(
   {
@@ -48,7 +49,7 @@ PeriodicReportSchema.pre('validate', async function ensureMaBC(next) {
 		next(e);
 	}
 });
-module.exports = model('PeriodicReport', PeriodicReportSchema);
+module.exports = mongoose.model('PeriodicReport', PeriodicReportSchema);
 
 
 

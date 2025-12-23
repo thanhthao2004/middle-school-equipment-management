@@ -39,6 +39,20 @@
                                 </a>
                             </div>
 
+                            <!-- Flash Messages -->
+                            <% if (typeof messages !== 'undefined' && messages.success) { %>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <%= messages.success %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            <% } %>
+                            <% if (typeof messages !== 'undefined' && messages.error) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <%= messages.error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            <% } %>
+
                             <!-- Search Box -->
                             <div class="card mb-4">
                                 <div class="card-body">

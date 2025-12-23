@@ -125,6 +125,29 @@ class PeriodicReportController {
       res.status(500).send(error.message);
     }
   }
+
+  // GET /periodic-reports/export
+  async exportReport(req, res) {
+    try {
+      // TODO: Implement export functionality (Excel/PDF)
+      // For now, redirect to list page
+      res.redirect("/manager/periodic-reports");
+    } catch (error) {
+      console.error("Error exporting reports:", error);
+      res.status(500).send(error.message);
+    }
+  }
+
+  // POST /periodic-reports/:id/item/:itemId/status
+  async updateItemStatus(req, res) {
+    try {
+      // TODO: Implement item status update
+      res.redirect(`/manager/periodic-reports/${req.params.id}`);
+    } catch (error) {
+      console.error("Error updating item status:", error);
+      res.status(500).send(error.message);
+    }
+  }
 }
 
 module.exports = new PeriodicReportController();

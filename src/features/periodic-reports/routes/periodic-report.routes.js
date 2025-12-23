@@ -28,18 +28,15 @@ const storage = multer.diskStorage({
 
 
 const upload = multer({ storage });
+
 // PAGE ROUTES (GET)
 // ==========================
-
-
-const upload = multer({ storage });
 
 // LIST
 router.get('/', controller.getReportListPage);
 
 // CREATE
 router.get('/create', controller.getCreateReportPage);
-router.post('/', upload.single('file'), controller.createReport);
 
 // EXPORT đặt trước /:id
 router.get('/export', controller.exportReport);
@@ -49,11 +46,12 @@ router.get('/export', controller.exportReport);
 router.post(
   '/',
   upload.single('reportFile'),          // name="reportFile" trong form
-  periodicReportController.createReport
+  controller.createReport
 );
+
 // Cập nhật báo cáo
 // POST /periodic-reports/:id
-router.post('/:id', periodicReportController.updateReport);
+router.post('/:id', controller.updateReport);
 
 // DELETE
 router.post('/:id/delete', controller.deleteReport);
