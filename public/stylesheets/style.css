@@ -33,6 +33,33 @@ body {
   min-height: 100vh;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   background: var(--light-gray);
+  display: flex;
+  flex-direction: column;
+}
+
+.container-fluid,
+.app-shell,
+main {
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
+  margin-top: auto;
+  transition: margin-left 0.3s;
+}
+
+/* For pages with sidebar */
+.main-content~footer,
+.container-fluid~footer,
+body:not(.login-page):not(.forgot-password-page) footer {
+  margin-left: 260px;
+}
+
+@media (max-width: 576px) {
+  body:not(.login-page):not(.forgot-password-page) footer {
+    margin-left: 0;
+  }
 }
 
 a {
