@@ -15,6 +15,12 @@ const UserSchema = new Schema(
 		matKhauHash: { type: String, required: true },
 		trangThai: { type: String, default: 'active', trim: true }, // active | inactive
 
+		// Additional Info
+		ngaySinh: { type: Date },
+		gioiTinh: { type: String, enum: ['Nam', 'Nữ'], default: 'Nam' },
+		boMon: { type: String, default: '' },
+		trinhDo: { type: String, default: '' },
+
 		// Registration token fields for first-time login
 		registrationToken: { type: String, unique: true, sparse: true },
 		registrationTokenExpiry: { type: Date },

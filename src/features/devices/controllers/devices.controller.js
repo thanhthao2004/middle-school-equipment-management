@@ -1,6 +1,33 @@
 const devicesService = require('../services/devices.service');
 const path = require('path');
+const fs = require('fs');
 const { deleteOldFile, deleteMultipleFiles } = require('../../../config/upload');
+
+/**
+ * Helper: Lọc và làm sạch danh sách ảnh (loại bỏ duplicate, null, empty)
+ * @param {Array} imagePaths - Mảng các đường dẫn ảnh
+ * @returns {Array} - Mảng ảnh đã được lọc
+ */
+function cleanImagePaths(imagePaths) {
+    if (!imagePaths) return [];
+    
+    // Normalize to array
+    let images = Array.isArray(imagePaths) ? imagePaths : (imagePaths ? [imagePaths] : []);
+    
+    // Loại bỏ duplicate và giá trị rỗng
+    const seen = new Set();
+    return images.filter(imgPath => {
+        if (!imgPath || typeof imgPath !== 'string' || !imgPath.trim()) {
+            return false;
+        }
+        const normalized = imgPath.trim();
+        if (seen.has(normalized)) {
+            return false; // Duplicate
+        }
+        seen.add(normalized);
+        return true;
+    });
+}
 
 // Devices Controller
 class DevicesController {
@@ -82,6 +109,7 @@ class DevicesController {
 
             // Validate image uploads (max 5 files, check type and size)
             if (req.files && req.files.length > 0) {
+                console.log('[UPLOAD] Received files:', req.files.length);
                 const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
                 const maxSize = 5 * 1024 * 1024; // 5MB
 
@@ -94,6 +122,7 @@ class DevicesController {
 
                 // Validate each file
                 for (const file of req.files) {
+                    console.log('[UPLOAD] File:', file.filename, 'Path:', file.path, 'Size:', file.size);
                     if (!allowedTypes.includes(file.mimetype)) {
                         req.files.forEach(f => deleteOldFile(`/uploads/devices/${f.filename}`));
                         throw new Error(`File "${file.originalname}" không phải định dạng ảnh hợp lệ (JPG/PNG/GIF/WEBP)`);
@@ -105,6 +134,7 @@ class DevicesController {
                 }
 
                 deviceData.hinhAnh = req.files.map(file => `/uploads/devices/${file.filename}`);
+                console.log('[UPLOAD] Saved image paths:', deviceData.hinhAnh);
             }
 
             // Convert empty strings to null/undefined for optional fields
@@ -142,6 +172,11 @@ class DevicesController {
             const deviceId = req.params.id;
             const device = await devicesService.getDeviceById(deviceId);
 
+            // Lọc ảnh trùng lặp trước khi hiển thị
+            if (device.hinhAnh) {
+                device.hinhAnh = cleanImagePaths(device.hinhAnh);
+            }
+
             res.render('devices/views/detail', {
                 title: `Chi tiết thiết bị - ${device.maTB}`,
                 currentPage: 'devices',
@@ -170,6 +205,11 @@ class DevicesController {
                 devicesService.getCategories(),
                 devicesService.getFilterOptions()
             ]);
+
+            // Lọc ảnh trùng lặp trước khi hiển thị
+            if (device.hinhAnh) {
+                device.hinhAnh = cleanImagePaths(device.hinhAnh);
+            }
 
             // Lấy formData từ session nếu có (sau validation fail)
             const formData = req.session?.flash?.formData || {};
@@ -210,8 +250,31 @@ class DevicesController {
 
             // Lấy device cũ để xử lý ảnh
             const oldDevice = await devicesService.getDeviceById(deviceId);
-            let oldImagePaths = Array.isArray(oldDevice.hinhAnh) ? oldDevice.hinhAnh :
-                (oldDevice.hinhAnh ? [oldDevice.hinhAnh] : []);
+            // Lọc ảnh trùng lặp trước khi xử lý
+            let oldImagePaths = cleanImagePaths(oldDevice.hinhAnh);
+
+            // KIỂM TRA VÀ LOẠI BỎ ẢNH KHÔNG TỒN TẠI TRÊN DISK
+            // Điều này xử lý trường hợp ảnh đã bị xóa khỏi disk nhưng vẫn còn trong database
+            const originalImageCount = oldImagePaths.length;
+            oldImagePaths = oldImagePaths.filter(imgPath => {
+                if (!imgPath) return false;
+                // Chỉ kiểm tra file trong thư mục uploads
+                if (imgPath.startsWith('/uploads/')) {
+                    const fullPath = path.join(__dirname, '../../../public', imgPath);
+                    const exists = fs.existsSync(fullPath);
+                    if (!exists) {
+                        console.log(`[UPDATE] Image file not found on disk, removing from list: ${imgPath}`);
+                    }
+                    return exists;
+                }
+                return true; // Giữ lại nếu không phải đường dẫn uploads
+            });
+
+            // Nếu có ảnh bị loại bỏ do không tồn tại, log để theo dõi
+            if (oldImagePaths.length < originalImageCount) {
+                console.log(`[UPDATE] Removed ${originalImageCount - oldImagePaths.length} missing image(s) from database`);
+            }
+            console.log('[UPDATE] Valid images after checking disk:', oldImagePaths);
 
             // XỬ LÝ XÓA ảnh (nếu user click nút X)
             let imagesToDelete = [];
@@ -267,6 +330,19 @@ class DevicesController {
             if (deviceData.soLuong === '') deviceData.soLuong = 0;
             else deviceData.soLuong = parseInt(deviceData.soLuong) || 0;
 
+            // Xử lý trường lop (multi-select)
+            if (deviceData.lop) {
+                // Nếu là array (từ multi-select), giữ nguyên
+                // Nếu là string (từ single select), chuyển thành array
+                if (typeof deviceData.lop === 'string') {
+                    deviceData.lop = deviceData.lop ? [deviceData.lop] : [];
+                } else if (!Array.isArray(deviceData.lop)) {
+                    deviceData.lop = [];
+                }
+            } else {
+                deviceData.lop = [];
+            }
+
             await devicesService.updateDevice(deviceId, deviceData);
 
             // XÓA các file ảnh đã bị remove khỏi disk
@@ -296,6 +372,28 @@ class DevicesController {
         }
     }
 
+    async deleteDevice(req, res) {
+    try {
+        const deviceId = req.params.id;
+        await devicesService.deleteDevice(deviceId);
+
+        if (!req.session.flash) {
+            req.session.flash = {};
+        }
+
+        req.session.flash.success = 'Xóa thiết bị thành công';
+        res.redirect('/devices');
+    } catch (error) {
+        console.error('Error deleting device:', error);
+
+        if (!req.session.flash) {
+            req.session.flash = {};
+        }
+
+        req.session.flash.error = 'Xóa thiết bị thất bại';
+        res.redirect('/devices');
+    }
+}
     // GET /devices/delete/:id - Trang xác nhận xóa
     async getDeletePage(req, res) {
         try {
@@ -355,4 +453,3 @@ class DevicesController {
 }
 
 module.exports = new DevicesController();
-

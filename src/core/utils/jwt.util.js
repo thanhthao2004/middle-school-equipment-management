@@ -12,7 +12,7 @@ const config = require('../../config/env');
  * @param {String} expiresIn - Token expiration (default from config)
  * @returns {String} Signed JWT token
  */
-function sign(payload, expiresIn = config.jwt.expiresIn) {
+function sign(payload, expiresIn = config.jwt.expiresIn || '24h') {
     if (!config.jwt.secret) {
         throw new Error('JWT_SECRET is not defined in environment variables');
     }

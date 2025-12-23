@@ -33,6 +33,33 @@ body {
   min-height: 100vh;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   background: var(--light-gray);
+  display: flex;
+  flex-direction: column;
+}
+
+.container-fluid,
+.app-shell,
+main {
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
+  margin-top: auto;
+  transition: margin-left 0.3s;
+}
+
+/* For pages with sidebar */
+.main-content~footer,
+.container-fluid~footer,
+body:not(.login-page):not(.forgot-password-page) footer {
+  margin-left: 260px;
+}
+
+@media (max-width: 576px) {
+  body:not(.login-page):not(.forgot-password-page) footer {
+    margin-left: 0;
+  }
 }
 
 a {
@@ -48,8 +75,7 @@ a {
 }
 
 /* --- Sidebar (Global Rule) --- */
-/* COMMENTED OUT - Sidebar styling moved to qltb-sidebar.ejs with position:sticky */
-/*
+/* Base sidebar styling - can be overridden by inline styles in each sidebar partial */
 .sidebar {
   width: 260px;
   background-color: var(--sidebar-bg);
@@ -68,7 +94,6 @@ a {
   font-size: 14px;
   line-height: 1.45;
 }
-*/
 
 .sidebar .menu-title {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -147,11 +172,11 @@ a {
 /* mobile narrow sidebar look (as in mock) */
 @media (max-width: 576px) {
   .sidebar {
-    position: relative;
+    position: relative !important;
     /* make sidebar flow on small screens */
-    width: 100%;
+    width: 100% !important;
     padding: 18px;
-    height: auto;
+    height: auto !important;
   }
 
   .app-shell {
@@ -160,6 +185,8 @@ a {
 
   /* main content takes full width when sidebar is stacked */
   .main-content {
+    margin-left: 0 !important;
+    /* Remove margin on mobile */
     padding: 18px;
   }
 }
@@ -167,10 +194,11 @@ a {
 /* --- Main content area (Global Rule) --- */
 .main-content {
   flex: 1 1 auto;
+  margin-left: 260px;
+  /* Prevent overlap with fixed sidebar */
   padding: 0;
   /* Header/Footer sẽ tự chiếm đủ 100% */
   box-sizing: border-box;
-  /* margin-left removed - Bootstrap grid (col-md-9 col-lg-10) handles positioning */
 }
 
 .page-header {

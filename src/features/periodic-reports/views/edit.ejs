@@ -1,97 +1,140 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xem chi tiết báo cáo</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/stylesheets/style.css" rel="stylesheet">
-    <style>
-        .form-label { font-weight:600 }
-        .app-shell { display: flex; }
-        .main-content { margin-left: 230px; padding: 20px; width: 100%; }
-        .page-header { border-bottom: 1px solid #dee2e6; margin-bottom: 20px; padding-bottom: 10px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chi tiết báo cáo</title>
+
+  <link href="/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/stylesheets/style.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 </head>
+
 <body>
-    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'ql_thiet_bi' }; %>
-    <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'periodic-reports', user: userObj }) %>
+  <% const userObj = user || { role: 'ql_thiet_bi' }; %>
 
-    <div class="container-fluid p-0">
-      <div class="row g-0">
-        <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'periodic-reports', user: userObj }) %>
+  <%- include('../../../views/partials/header', {
+    currentPage: 'periodic-reports',
+    user: userObj
+  }) %>
 
-        <div class="col-md-9 col-lg-10 main-content">
-          <div class="container py-4">
-            <div class="app-shell">
+  <div class="container-fluid p-0">
+    <div class="row g-0">
+      <%- include('../../../views/partials/qltb-sidebar', {
+        currentPage: 'periodic-reports',
+        user: userObj
+      }) %>
 
-        <main class="main-content">
-            <div class="page-header">
-                <h1>Chi tiết báo cáo định kỳ</h1>
-                <div style="font-size:14px; margin-top:6px;">Mã báo cáo: <%= typeof report !== 'undefined' ? report.code : 'BC00X' %></div>
-            </div>
+      <div class="col-md-9 col-lg-10 main-content">
+        <div class="container py-4">
 
-            <% 
-                // Mock data in case 'report' variable is not passed
-                const report = typeof report !== 'undefined' ? report : {
-                    code: 'BC001',
-                    period: 'Học kỳ I 2024-2025',
-                    date: '2025-01-05',
-                    status: 'completed',
-                    fileName: 'BaoCaoHK1_2024-2025.pdf',
-                    fileUrl: '#',
-                    description: 'Báo cáo tổng kết tình trạng thiết bị trong Học kỳ I năm học 2024-2025.'
-                };
-                const readOnly = typeof readOnly !== 'undefined' ? readOnly : true; 
-            %>
-
-            <div class="card p-4 mx-auto" style="max-width: 700px;">
-                <h5 class="card-title mb-4">Thông tin báo cáo</h5>
-                <form action="/manager/periodic-reports/<%= report.id || report.code %>" method="post">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">Mã báo cáo</label>
-                            <input class="form-control" value="<%= report.code %>" readonly />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Ngày lập</label>
-                            <input class="form-control" value="<%= report.date %>" readonly />
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Kỳ báo cáo</label>
-                            <input type="text" class="form-control" value="<%= report.period %>" <%= readOnly ? 'readonly' : '' %>>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Trạng thái</label>
-                            <input class="form-control" value="<%= report.status === 'completed' ? 'Đã hoàn thành' : (report.status === 'pending' ? 'Đang chờ duyệt' : 'Từ chối') %>" readonly />
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">File đính kèm</label>
-                            <p class="form-control-static"><%= report.fileName %></p>
-                            <a href="<%= report.fileUrl %>" class="btn btn-sm btn-outline-primary" target="_blank">
-                                <i class="fas fa-file-download me-1"></i>Tải xuống/Xem file
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-3">
-                        <a href="/manager/periodic-reports" class="btn btn-secondary">Quay lại</a>
-                        <% if (!readOnly && report.status !== 'completed') { %>
-                            <button type="submit" class="btn btn-primary">Cập nhật</button>
-                        <% } %>
-                    </div>
-                </form>
-            </div>
-        </main>
+          <div class="page-header">
+            <h1>Chi tiết báo cáo định kỳ</h1>
+            <div style="font-size:14px;margin-top:6px">
+              Mã báo cáo: <%= report.code %>
             </div>
           </div>
+
+          <div class="card p-4 mx-auto" style="max-width:700px">
+            <h5 class="card-title mb-4">Thông tin báo cáo</h5>
+
+            <form action="/manager/periodic-reports/<%= report.id %>" method="post">
+              <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+                  <label class="form-label">Mã báo cáo</label>
+                  <input class="form-control" value="<%= report.code %>" readonly />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Ngày lập</label>
+                  <input class="form-control" value="<%= report.date %>" readonly />
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Kỳ báo cáo</label>
+                  <input
+                    type="text"
+                    name="period"
+                    class="form-control"
+                    value="<%= report.period %>"
+                    <%= readOnly ? 'readonly' : '' %>
+                  />
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Trạng thái</label>
+
+                  <% if (!readOnly && report.status === 'pending') { %>
+                    <!-- Khi pending và được phép sửa: dropdown -->
+                    <select name="trangThaiBaoCao" class="form-select">
+                      <option value="pending"   <%= report.status === 'pending'   ? 'selected' : '' %>>
+                        Đang chờ duyệt
+                      </option>
+                      <option value="completed" <%= report.status === 'completed' ? 'selected' : '' %>>
+                        Đã hoàn thành (Duyệt)
+                      </option>
+                      <option value="rejected"  <%= report.status === 'rejected'  ? 'selected' : '' %>>
+                        Từ chối
+                      </option>
+                    </select>
+                  <% } else { %>
+                    <!-- Khi completed/rejected hoặc readOnly: chỉ text -->
+                    <input
+                      type="text"
+                      class="form-control"
+                      readonly
+                      value="<%= report.status === 'completed'
+                               ? 'Đã hoàn thành (Duyệt)'
+                               : (report.status === 'pending'
+                                   ? 'Đang chờ duyệt'
+                                   : 'Từ chối') %>"
+                    />
+                    <!-- vẫn gửi giá trị lên server nếu submit -->
+                    <input
+                      type="hidden"
+                      name="trangThaiBaoCao"
+                      value="<%= report.status %>"
+                    />
+                  <% } %>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">File đính kèm</label>
+                  <p class="form-control-plaintext"><%= report.fileName %></p>
+                  <a
+                    href="/manager/periodic-reports/<%= report.id %>/download"
+                    class="btn btn-sm btn-outline-primary"
+                    target="_blank"
+                  >
+                    <i class="fas fa-file-download me-1"></i>
+                    Tải xuống
+                  </a>
+                </div>
+
+              </div>
+
+              <div class="d-flex justify-content-end gap-3">
+                <a href="/manager/periodic-reports" class="btn btn-secondary">
+                  Quay lại
+                </a>
+
+                <% if (!readOnly && report.status !== 'completed') { %>
+                  <button type="submit" class="btn btn-primary">
+                    Cập nhật
+                  </button>
+                <% } %>
+              </div>
+
+            </form>
+          </div>
+
         </div>
       </div>
     </div>
+  </div>
 
-    <%- include('../../../views/partials/footer') %>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <%- include('../../../views/partials/footer') %>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

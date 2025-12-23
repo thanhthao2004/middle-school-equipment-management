@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>Danh sách báo cáo định kỳ</title>
 
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/stylesheets/style.css" rel="stylesheet">
-
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        .table-acceptance th { background-color: #e9ecef; }
+        .table-acceptance th, .table-acceptance td { vertical-align: middle; font-size: 0.9rem; }
+        .filter-section { margin-bottom: 20px; }
+    </style>
+    <!-- <style>
         .app-shell {
             display: flex;
             width: 100%;
@@ -53,7 +56,7 @@
         }
 
         .controls .left { display: flex; gap: 10px; }
-    </style>
+    </style> -->
 </head>
 
 <body>
@@ -67,9 +70,7 @@
 
         <div class="col-md-9 col-lg-10 main-content">
           <div class="container py-4">
-            <div class="app-shell">
 
-        <main class="main-content">
             <div class="page-header">
                 <h1>Quản lý báo cáo định kỳ</h1>
             </div>
@@ -131,10 +132,7 @@
                                             <td><%= report.fileName || 'Không có file' %></td>
 
                                             <td class="text-end">
-                                                <a href="/manager/periodic-reports/<%= report.id %>" class="btn btn-sm btn-outline-primary">Xem</a>
-                                                <a href="/manager/periodic-reports/<%= report.id %>/download" class="btn btn-sm btn-outline-success">Tải</a>
-
-                                                <% if (report.status === 'pending') { %>
+                                                 <% if (report.status === 'pending') { %>
                                                     <form action="/manager/periodic-reports/<%= report.id %>/delete"
                                                         method="post"
                                                         style="display:inline-block;">
@@ -144,6 +142,10 @@
                                                         </button>
                                                     </form>
                                                 <% } %>
+                                                <a href="/manager/periodic-reports/<%= report.id %>" class="btn btn-sm btn-outline-primary">Xem</a>
+                                                <a href="/manager/periodic-reports/<%= report.id %>/download" class="btn btn-sm btn-outline-success">Tải</a>
+
+                                               
                                             </td>
                                         </tr>
                                     <% }) %>
@@ -160,8 +162,7 @@
                     <% } %>
 
                 </div>
-            </div>
-        </main>
+         
     </div>
 
     <script src="/js/bootstrap.bundle.min.js"></script>

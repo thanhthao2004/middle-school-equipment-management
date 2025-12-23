@@ -9,6 +9,7 @@ const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const logger = require('morgan');
+const methodOverride = require('method-override');
 const config = require('./env');
 
 /**
@@ -36,6 +37,9 @@ function configureMiddleware(app) {
 	app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 	app.use(cookieParser());
 
+	// Method Override for PUT and DELETE requests
+	app.use(methodOverride('_method'));
+
 	// Session middleware (FIX for req.session.flash)
 	app.use(session({
 		secret: config.session.secret || 'middle-school-equipment-secret-key-2024',
@@ -54,6 +58,9 @@ function configureMiddleware(app) {
 	app.use('/stylesheets', express.static(path.join(__dirname, '../../public/stylesheets')));
 	// Serve uploads directory for uploaded images
 	app.use('/uploads', express.static(path.join(__dirname, '../../public/uploads')));
+	// Serve stylesheets and javascripts at root level
+	app.use('/stylesheets', express.static(path.join(__dirname, '../../public/stylesheets')));
+	app.use('/javascripts', express.static(path.join(__dirname, '../../public/javascripts')));
 }
 
 module.exports = { configureMiddleware };
