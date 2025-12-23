@@ -1,5 +1,7 @@
 const DisposalReport = require("../models/disposal-report.model");
 const Device = require("../../devices/models/device.model");
+const disposalService = require("../services/disposal.service");
+
 
 /* ======================
    LIST
@@ -23,10 +25,12 @@ exports.index = async (req, res) => {
 
         res.render("disposal/views/list", {
             disposal: reports,
+            currentAcademicYear: disposalService.getCurrentAcademicYear(),
             created: req.query.created || null,
             currentPage: "disposal",
             user: req.user
         });
+
     } catch (err) {
         console.error(err);
         res.redirect("/manager");
@@ -236,11 +240,16 @@ exports.view = async (req, res) => {
 exports.edit = async (req, res) => {
     try {
         const disposal = await DisposalReport.findById(req.params.id)
-            .populate("items.device")               // populate thông tin thiết bị
-            .populate("items.device.category");     // nếu category là ref
+            .populate("items.device")
+            .populate("items.device.category");
 
         if (!disposal) {
             return res.redirect("/manager/disposal");
+        }
+
+        // ⛔ KHÔNG PHẢI NĂM HỌC HIỆN TẠI → CHỈ XEM
+        if (!disposalService.isCurrentAcademicYear(disposal.year)) {
+            return res.redirect(`/manager/disposal/view/${disposal._id}`);
         }
 
         res.render("disposal/views/edit", {
@@ -253,6 +262,7 @@ exports.edit = async (req, res) => {
         res.redirect("/manager/disposal");
     }
 };
+
 
 /* ======================
    UPDATE
@@ -267,7 +277,14 @@ exports.update = async (req, res) => {
             return res.status(404).json({ success: false, message: "Không tìm thấy" });
         }
 
-        // Cập nhật level + reason
+        // ⛔ KHÓA CHỈNH SỬA
+        if (!disposalService.isCurrentAcademicYear(report.year)) {
+            return res.status(403).json({
+                success: false,
+                message: "Chỉ được chỉnh sửa báo cáo năm học hiện tại"
+            });
+        }
+
         report.items.forEach((item, index) => {
             item.level = (levels && levels[index]) || "";
             item.reason = (reasons && reasons[index]) || "";
@@ -288,6 +305,15 @@ exports.update = async (req, res) => {
 ====================== */
 exports.delete = async (req, res) => {
     try {
+        const report = await DisposalReport.findById(req.params.id);
+        if (!report) {
+            return res.redirect("/manager/disposal");
+        }
+
+        if (!disposalService.isCurrentAcademicYear(report.year)) {
+            return res.redirect(`/manager/disposal/view/${report._id}`);
+        }
+
         await DisposalReport.findByIdAndDelete(req.params.id);
         res.redirect("/manager/disposal");
     } catch (err) {
@@ -295,3 +321,4 @@ exports.delete = async (req, res) => {
         res.redirect("/manager/disposal");
     }
 };
+

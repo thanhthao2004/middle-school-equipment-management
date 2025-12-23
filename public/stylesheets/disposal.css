@@ -428,3 +428,25 @@ body {
     justify-content: center;
     gap: 12px;
 }
+
+/* ===== LOCK ICON (READ ONLY - SQUARE) ===== */
+.lock-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    border-radius: 4px;
+    /* bo rất nhẹ, gần như vuông */
+    background: #f8fafc;
+    color: #94a3b8;
+
+    border: 1px solid #e2e8f0;
+    cursor: not-allowed;
+}
+
+.lock-icon i {
+    font-size: 14px;
+}

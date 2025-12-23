@@ -87,21 +87,33 @@
                                                         </td>
                                                         <td class="text-center">
                                                             <div class="d-flex justify-content-center gap-2">
-                                                                <a href="/manager/disposal/view/<%= r.id %>"
+                                                                <a href="/manager/disposal/view/<%= r._id %>"
                                                                     class="btn btn-sm btn-outline-primary">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
-                                                                <a href="/manager/disposal/edit/<%= r.id %>"
-                                                                    class="btn btn-sm btn-warning">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                                <button type="button"
-                                                                    class="btn btn-sm btn-danger btn-delete"
-                                                                    data-id="<%= r.id %>" data-code="<%= r.code %>">
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </button>
+
+                                                                <% if (r.year===currentAcademicYear) { %>
+                                                                    <a href="/manager/disposal/edit/<%= r._id %>"
+                                                                        class="btn btn-sm btn-warning">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </a>
+
+                                                                    <button type="button"
+                                                                        class="btn btn-sm btn-danger btn-delete"
+                                                                        data-id="<%= r._id %>"
+                                                                        data-code="<%= r.code %>">
+                                                                        <i class="fas fa-trash-alt"></i>
+                                                                    </button>
+                                                                    <% } else { %>
+                                                                        <span class="lock-icon"
+                                                                            title="Báo cáo năm học cũ – chỉ xem">
+                                                                            <i class="fas fa-lock"></i>
+                                                                        </span>
+
+                                                                        <% } %>
                                                             </div>
                                                         </td>
+
                                                     </tr>
                                                     <% }) %>
                                             </tbody>
