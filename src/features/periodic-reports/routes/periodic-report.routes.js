@@ -60,6 +60,6 @@ router.post('/:id/delete', controller.deleteReport);
 router.get('/:id/download', controller.downloadReportFile);
 
 // PLACEHOLDER
-router.post('/:id/item/:itemId/status', controller.updateItemStatus);
+// router.post('/:id/item/:itemId/status', controller.updateItemStatus);
 
 module.exports = router;

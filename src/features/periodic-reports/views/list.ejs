@@ -89,9 +89,48 @@
                     <button id="period-filter-btn" class="btn btn-outline-primary">Lọc</button>
                 </div>
 
-                <a href="/manager/periodic-reports/create" class="btn-register">+ Lập báo cáo mới</a>
-            </div>
-
+                <!-- LIST -->
+                <% if (reports && reports.length > 0) { %>
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mã</th>
+                                <th>Kỳ</th>
+                                <th>Ngày lập</th>
+                                <!-- <th>Trạng thái</th> -->
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsList">
+                            <% reports.forEach(r => { %>
+                                <tr data-period="<%= r.period %>">
+                                    <!-- <td><%= r.code %></td>
+                                    <td><%= r.period %></td>
+                                    <td><%= r.date %></td>
+                                    <td>
+                                        <% if (r.status === 'pending') { %>
+                                            <span class="badge bg-warning">Chờ duyệt</span>
+                                        <% } else if (r.status === 'completed') { %>
+                                            <span class="badge bg-success">Đã duyệt</span>
+                                        <% } else { %>
+                                            <span class="badge bg-danger">Từ chối</span>
+                                        <% } %>
+                                    </td>
+                                    <td> -->
+                                        <a href="/manager/periodic-reports/<%= r.id %>"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Xem
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <div class="alert alert-info">
+                        Chưa có báo cáo định kỳ nào.
+                    </div>
+                <% } %>
 
             <!-- TABLE -->
             <div class="card">
