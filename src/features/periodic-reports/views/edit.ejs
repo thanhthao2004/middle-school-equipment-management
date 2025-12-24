@@ -86,7 +86,7 @@
 
                             <!-- TRẠNG THÁI -->
                            <div class="col-12">
-    <label class="form-label">Trạng thái</label>
+    <!-- <label class="form-label">Trạng thái</label>
 
     <% if (r.status === 'pending') { %>
         <!-- Khi pending: hiển thị dropdown -->
@@ -101,7 +101,7 @@
                 Từ chối
             </option>
         </select>
-    <% } else { %>
+    <% } else { %> -->
         <!-- Khi completed hoặc rejected: hiển thị text tĩnh -->
         <input type="text" class="form-control" readonly 
                value="<%= r.status === 'completed' ? 'Đã hoàn thành (Duyệt)' : 'Từ chối' %>">

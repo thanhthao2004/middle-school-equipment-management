@@ -69,14 +69,14 @@
                                 <th>Mã</th>
                                 <th>Kỳ</th>
                                 <th>Ngày lập</th>
-                                <th>Trạng thái</th>
+                                <!-- <th>Trạng thái</th> -->
                                 <th>Thao tác</th>
                             </tr>
                         </thead>
                         <tbody id="reportsList">
                             <% reports.forEach(r => { %>
                                 <tr data-period="<%= r.period %>">
-                                    <td><%= r.code %></td>
+                                    <!-- <td><%= r.code %></td>
                                     <td><%= r.period %></td>
                                     <td><%= r.date %></td>
                                     <td>
@@ -88,7 +88,7 @@
                                             <span class="badge bg-danger">Từ chối</span>
                                         <% } %>
                                     </td>
-                                    <td>
+                                    <td> -->
                                         <a href="/manager/periodic-reports/<%= r.id %>"
                                            class="btn btn-sm btn-outline-primary">
                                             Xem
