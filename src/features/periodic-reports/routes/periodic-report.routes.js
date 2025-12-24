@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const router = express.Router();
-const controller = require('../controllers/periodic.controller');
+const periodicReportController = require('../controllers/periodic.controller');
 
 // Cấu hình multer lưu file báo cáo
 const uploadDir = path.join(__dirname, '../../../../public/uploads/devices');
@@ -32,14 +32,22 @@ const upload = multer({ storage });
 // PAGE ROUTES (GET)
 // ==========================
 
-// LIST
-router.get('/', controller.getReportListPage);
+// Danh sách báo cáo định kỳ
+// URL: /periodic-reports
+router.get('/', periodicReportController.getReportListPage);
 
-// CREATE
-router.get('/create', controller.getCreateReportPage);
+// Trang tạo báo cáo
+// URL: /periodic-reports/create
+router.get('/create', periodicReportController.getCreateReportPage);
 
-// EXPORT đặt trước /:id
-router.get('/export', controller.exportReport);
+// Trang xem chi tiết báo cáo (hoặc chỉnh sửa)
+// URL: /periodic-reports/:id
+router.get('/:id', periodicReportController.getReportDetailPage);
+
+
+// ==========================
+// ACTION ROUTES (POST)
+// ==========================
 
 // Tạo báo cáo mới
 // POST /periodic-reports
@@ -53,13 +61,16 @@ router.post(
 // POST /periodic-reports/:id
 router.post('/:id', controller.updateReport);
 
-// DELETE
-router.post('/:id/delete', controller.deleteReport);
+// Xóa báo cáo
+// POST /periodic-reports/:id/delete
+router.post('/:id/delete', periodicReportController.deleteReport);
 
-// DOWNLOAD
-router.get('/:id/download', controller.downloadReportFile);
+// Tải file báo cáo
+// GET /periodic-reports/:id/download
+router.get('/:id/download', periodicReportController.downloadReportFile);
 
 // PLACEHOLDER
 // router.post('/:id/item/:itemId/status', controller.updateItemStatus);
 
+// ==========================
 module.exports = router;
