@@ -83,12 +83,12 @@ class BorrowRepository {
 
                 try {
                     await BorrowDetail.insertMany(details);
-                    
+
                     // Cập nhật trạng thái DeviceUnit sang 'dang_muon'
                     for (const assigned of assignedUnits) {
                         await DeviceUnit.findOneAndUpdate(
                             { maDonVi: assigned.maDonVi },
-                            { 
+                            {
                                 trangThai: 'dang_muon',
                                 maPhieuMuonHienTai: assigned.maPhieu,
                                 $push: {
@@ -173,15 +173,29 @@ class BorrowRepository {
 
             // 1. Lấy danh sách phiếu mượn của user
             const borrowQuery = {};
-            
+
             // Chỉ filter theo userId nếu có và hợp lệ
             if (userId && mongoose.Types.ObjectId.isValid(userId)) {
                 borrowQuery.nguoiLapPhieuId = new mongoose.Types.ObjectId(userId);
             }
             // Nếu không có userId, lấy tất cả (cho testing hoặc admin)
 
-            if (filters.status) {
-                borrowQuery.trangThai = filters.status;
+            // Filter theo trạng thái - quét tuyệt đối tất cả các trạng thái
+            if (filters.status && filters.status !== '') {
+                // Map các giá trị filter sang trạng thái thực tế trong DB
+                const statusMap = {
+                    'cho_duyet': 'cho_duyet',
+                    'dang_muon': 'dang_muon',
+                    'approved': 'approved',
+                    'rejected': 'rejected',
+                    'da_tra_mot_phan': 'da_tra_mot_phan',
+                    'da_hoan_tat': 'da_hoan_tat',
+                    'huy': 'huy',
+                    'da_tra_het': 'da_hoan_tat' // Map da_tra_het thành da_hoan_tat
+                };
+
+                const mappedStatus = statusMap[filters.status] || filters.status;
+                borrowQuery.trangThai = mappedStatus;
             }
 
             if (filters.createdFrom) {
@@ -304,9 +318,9 @@ class BorrowRepository {
 
             const devices = await Device.find(query).populate('category');
 
-            // Nếu không có data trong DB, trả về mockup data
+            // Nếu không có data trong DB, trả về mảng rỗng
             if (!devices || devices.length === 0) {
-                return this.getMockupDevices(filters);
+                return [];
             }
 
             // Enrich với số lượng sẵn sàng từ DeviceUnit
@@ -330,9 +344,8 @@ class BorrowRepository {
             return enrichedDevices;
         } catch (error) {
             console.error('Error getting devices:', error);
-            // Nếu có lỗi (ví dụ DB chưa kết nối), trả về mockup data
-            console.warn('Returning mockup devices due to error');
-            return this.getMockupDevices(filters);
+            // Throw error để caller có thể xử lý
+            throw error;
         }
     }
 
@@ -444,16 +457,145 @@ class BorrowRepository {
     }
 
     // Cập nhật trạng thái phiếu mượn
-    async updateBorrowRequestStatus(slipId, status) {
+    async updateBorrowRequestStatus(slipId, status, ghiChu = '') {
         try {
+            const updateData = { trangThai: status };
+            if (ghiChu) {
+                updateData.ghiChu = ghiChu;
+            }
             const result = await BorrowTicket.findOneAndUpdate(
                 { maPhieu: slipId },
-                { trangThai: status },
+                updateData,
                 { new: true }
             );
             return result;
         } catch (error) {
             console.error('Error updating borrow request status:', error);
+            throw error;
+        }
+    }
+
+    // Duyệt phiếu mượn - cập nhật trạng thái và DeviceUnit
+    async approveBorrowRequest(slipId, approvedBy) {
+        try {
+            // 1. Cập nhật trạng thái phiếu mượn
+            const ticket = await BorrowTicket.findOneAndUpdate(
+                { maPhieu: slipId, trangThai: 'cho_duyet' },
+                {
+                    trangThai: 'approved',
+                    ghiChu: `Đã duyệt bởi: ${approvedBy}`
+                },
+                { new: true }
+            );
+
+            if (!ticket) {
+                throw new Error('Phiếu mượn không tồn tại hoặc đã được duyệt/từ chối');
+            }
+
+            // 2. Lấy tất cả BorrowDetail của phiếu này
+            const details = await BorrowDetail.find({ maPhieu: slipId });
+
+            // 3. Cập nhật trạng thái các DeviceUnit sang 'dang_muon'
+            for (const detail of details) {
+                for (const maDonVi of detail.danhSachDonVi || []) {
+                    await DeviceUnit.findOneAndUpdate(
+                        { maDonVi: maDonVi },
+                        {
+                            trangThai: 'dang_muon',
+                            maPhieuMuonHienTai: slipId,
+                            $push: {
+                                lichSu: {
+                                    maPhieu: slipId,
+                                    loai: 'muon',
+                                    ngay: new Date(),
+                                    nguoiThucHien: ticket.nguoiLapPhieuId,
+                                    ghiChu: `Đã duyệt bởi: ${approvedBy}`
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+
+            return ticket;
+        } catch (error) {
+            console.error('Error approving borrow request:', error);
+            throw error;
+        }
+    }
+
+    // Từ chối phiếu mượn
+    async rejectBorrowRequest(slipId, reason, rejectedBy) {
+        try {
+            const ticket = await BorrowTicket.findOneAndUpdate(
+                { maPhieu: slipId, trangThai: 'cho_duyet' },
+                {
+                    trangThai: 'rejected',
+                    ghiChu: `Từ chối bởi: ${rejectedBy}. Lý do: ${reason}`
+                },
+                { new: true }
+            );
+
+            if (!ticket) {
+                throw new Error('Phiếu mượn không tồn tại hoặc đã được duyệt/từ chối');
+            }
+
+            return ticket;
+        } catch (error) {
+            console.error('Error rejecting borrow request:', error);
+            throw error;
+        }
+    }
+
+    // Lấy danh sách phiếu mượn chờ duyệt (cho QLTB)
+    async getPendingBorrowTicketsForManager(filters = {}) {
+        try {
+            const query = { trangThai: 'cho_duyet' };
+
+            if (filters.search) {
+                query.$or = [
+                    { maPhieu: { $regex: filters.search, $options: 'i' } },
+                    { lyDo: { $regex: filters.search, $options: 'i' } }
+                ];
+            }
+
+            if (filters.createdFrom) {
+                query.createdAt = { $gte: new Date(filters.createdFrom) };
+            }
+
+            if (filters.createdTo) {
+                query.createdAt = { ...query.createdAt, $lte: new Date(filters.createdTo) };
+            }
+
+            const tickets = await BorrowTicket.find(query)
+                .populate('nguoiLapPhieuId', 'hoTen email role maNV')
+                .sort({ createdAt: -1 })
+                .limit(filters.limit || 100);
+
+            // Enrich với BorrowDetails
+            const enrichedTickets = await Promise.all(tickets.map(async (ticket) => {
+                const details = await BorrowDetail.find({ maPhieu: ticket.maPhieu });
+                const detailsWithDevice = await Promise.all(details.map(async (detail) => {
+                    const device = await Device.findOne({ maTB: detail.maTB }).populate('category');
+                    return {
+                        ...detail.toObject(),
+                        device: device ? {
+                            ...device.toObject(),
+                            tenTB: device.tenTB || detail.maTB,  // Use actual name or fallback to code
+                            tenDM: device.category?.tenDM || '-' // Get category name
+                        } : null
+                    };
+                }));
+
+                return {
+                    ...ticket.toObject(),
+                    details: detailsWithDevice
+                };
+            }));
+
+            return enrichedTickets;
+        } catch (error) {
+            console.error('Error getting pending borrow tickets for manager:', error);
             throw error;
         }
     }
@@ -466,6 +608,61 @@ class BorrowRepository {
             return result;
         } catch (error) {
             console.error('Error deleting borrow request:', error);
+            throw error;
+        }
+    }
+
+    // Lấy phiếu mượn đang mượn (approved/dang_muon/da_tra_mot_phan) để tạo phiếu trả
+    async getActiveBorrowTicketsForReturn(filters = {}) {
+        try {
+            const query = {
+                trangThai: { $in: ['approved', 'dang_muon', 'da_tra_mot_phan'] } // Include partially returned tickets
+            };
+
+            if (filters.search) {
+                query.$or = [
+                    { maPhieu: { $regex: filters.search, $options: 'i' } }
+                ];
+            }
+
+            if (filters.createdFrom) {
+                query.ngayMuon = { $gte: new Date(filters.createdFrom) };
+            }
+
+            if (filters.createdTo) {
+                query.ngayMuon = { ...query.ngayMuon, $lte: new Date(filters.createdTo) };
+            }
+
+            const tickets = await BorrowTicket.find(query)
+                .populate('nguoiLapPhieuId', 'hoTen email role maNV')
+                .sort({ ngayMuon: -1 })
+                .limit(100);
+
+            // Enrich với BorrowDetails và Device info
+            const enrichedTickets = await Promise.all(tickets.map(async (ticket) => {
+                const details = await BorrowDetail.find({ maPhieu: ticket.maPhieu });
+                const detailsWithDevice = await Promise.all(details.map(async (detail) => {
+                    const device = await Device.findOne({ maTB: detail.maTB }).populate('category');
+                    return {
+                        ...detail.toObject(),
+                        device: device ? {
+                            ...device.toObject(),
+                            tenTB: device.tenTB || detail.maTB,
+                            tenDM: device.category?.tenDM || '-'
+                        } : null
+                    };
+                }));
+
+                return {
+                    ...ticket.toObject(),
+                    details: detailsWithDevice,
+                    totalItems: detailsWithDevice.length
+                };
+            }));
+
+            return enrichedTickets;
+        } catch (error) {
+            console.error('Error getting active borrow tickets for return:', error);
             throw error;
         }
     }
@@ -508,7 +705,7 @@ class BorrowRepository {
     async getPendingApprovals(userId, filters = {}) {
         try {
             const query = {};
-            
+
             // Mặc định lấy phiếu chờ duyệt, cho phép override nếu cần
             query.trangThai = filters.status || 'cho_duyet';
 
@@ -702,10 +899,8 @@ class BorrowRepository {
      */
     async createReturnSlip(employeeId, borrowedItemIds, returnData) {
         const mongoose = require('mongoose');
-        const session = await mongoose.startSession();
 
         try {
-            await session.startTransaction();
 
             // 1. Validate employee ID
             if (!employeeId || !mongoose.Types.ObjectId.isValid(employeeId)) {
@@ -715,7 +910,7 @@ class BorrowRepository {
             // 2. Fetch and validate borrowed items
             const borrowedItems = await BorrowDetail.find({
                 _id: { $in: borrowedItemIds.map(id => new mongoose.Types.ObjectId(id)) }
-            }).session(session);
+            });
 
             if (borrowedItems.length === 0) {
                 throw new Error('Không tìm thấy thiết bị mượn cần trả');
@@ -742,13 +937,20 @@ class BorrowRepository {
                 ghiChu: returnData.notes || ''
             });
 
-            await returnSlip.save({ session });
+            await returnSlip.save();
 
-            // 5. Update each borrowed item
+            // 5. Create ReturnDetail và update BorrowDetail cho mỗi item
+            const { ReturnDetail } = require('../models/borrow-ticket.model');
             const updatedItems = [];
+
             for (const item of borrowedItems) {
                 const returnQty = quantities[item._id.toString()] || item.soLuongMuon - item.soLuongDaTra;
                 const newTotalReturned = item.soLuongDaTra + returnQty;
+
+                // Validate return quantity
+                if (returnQty <= 0) {
+                    continue; // Skip items with invalid return quantity
+                }
 
                 // Determine new status
                 let newStatus;
@@ -760,7 +962,17 @@ class BorrowRepository {
                     newStatus = 'dang_muon';
                 }
 
-                // Update borrowed item
+                // Create ReturnDetail
+                const returnDetail = new ReturnDetail({
+                    maPhieuTra: returnSlip.maPhieuTra,
+                    maTB: item.maTB,
+                    soLuongTra: returnQty,
+                    tinhTrangLucTra: returnData.itemConditions?.[item._id.toString()] || 'Bình thường',
+                    ghiChu: returnData.itemNotes?.[item._id.toString()] || ''
+                });
+                await returnDetail.save();
+
+                // Update BorrowDetail
                 const updated = await BorrowDetail.findByIdAndUpdate(
                     item._id,
                     {
@@ -768,48 +980,62 @@ class BorrowRepository {
                         trangThai: newStatus,
                         maPhieuTra: returnSlip.maPhieuTra
                     },
-                    { new: true, session }
+                    { new: true }
                 );
 
                 updatedItems.push(updated);
 
-                // 6. Update device inventory
-                const device = await Device.findOne({ maTB: item.maTB }).session(session);
+                // 6. Update DeviceUnit status - chuyển từ 'dang_muon' về 'san_sang'
+                // Chỉ update số lượng tương ứng với số lượng trả
+                const unitsToReturn = item.danhSachDonVi?.slice(0, returnQty) || [];
+                for (const maDonVi of unitsToReturn) {
+                    await DeviceUnit.findOneAndUpdate(
+                        { maDonVi: maDonVi, maPhieuMuonHienTai: item.maPhieu },
+                        {
+                            trangThai: 'san_sang',
+                            maPhieuMuonHienTai: null,
+                            $push: {
+                                lichSu: {
+                                    maPhieu: returnSlip.maPhieuTra,
+                                    loai: 'tra',
+                                    ngay: new Date(returnData.returnDate),
+                                    nguoiThucHien: new mongoose.Types.ObjectId(employeeId),
+                                    ghiChu: `Trả thiết bị - Phiếu trả: ${returnSlip.maPhieuTra}`
+                                }
+                            }
+                        }
+                    );
+                }
+
+                // 7. Update device inventory (log only)
+                const device = await Device.findOne({ maTB: item.maTB });
                 if (device) {
-                    // Note: Equipment inventory increase is handled here
-                    // In real system, you might want to track this in a separate inventory transaction log
-                    console.log(`[Inventory] Returned ${returnQty} of ${device.tenTB}, updating inventory if needed`);
+                    console.log(`[Inventory] Returned ${returnQty} of ${device.tenTB} (${device.maTB})`);
                 }
             }
 
             // 7. Update parent BorrowTicket status
             const maPhieu = borrowedItems[0].maPhieu;
-            await this.updateBorrowTicketStatusByItems(maPhieu, session);
-
-            await session.commitTransaction();
+            await this.updateBorrowTicketStatusByItems(maPhieu);
 
             // 8. Return the created return slip with details
             const result = await this.getReturnSlipById(returnSlip.maPhieuTra);
             return result;
 
         } catch (error) {
-            await session.abortTransaction();
             console.error('Error creating return slip:', error);
             throw error;
-        } finally {
-            session.endSession();
         }
     }
 
     /**
      * Update BorrowTicket status based on its child BorrowDetail items
      * @param {string} maPhieu - Borrowing slip ID
-     * @param {Object} session - Mongoose session for transaction
      */
-    async updateBorrowTicketStatusByItems(maPhieu, session) {
+    async updateBorrowTicketStatusByItems(maPhieu) {
         try {
             // Get all borrowed items for this ticket
-            const items = await BorrowDetail.find({ maPhieu }).session(session);
+            const items = await BorrowDetail.find({ maPhieu });
 
             if (items.length === 0) {
                 return;
@@ -831,8 +1057,7 @@ class BorrowRepository {
 
             await BorrowTicket.findOneAndUpdate(
                 { maPhieu },
-                { trangThai: newStatus },
-                { session }
+                { trangThai: newStatus }
             );
 
             console.log(`[Status Update] BorrowTicket ${maPhieu} updated to ${newStatus}`);

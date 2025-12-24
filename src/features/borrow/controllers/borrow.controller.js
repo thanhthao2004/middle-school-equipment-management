@@ -430,6 +430,248 @@ class BorrowController {
             });
         }
     }
+
+    // GET /manager/borrow/returns/borrowed-items/api - API lấy danh sách thiết bị đang mượn (cho tạo phiếu trả)
+    async getBorrowedItemsForReturn(req, res) {
+        try {
+            const { maPhieu, userId, status, maTB } = req.query;
+            const items = await borrowService.getBorrowedItemsForReturn({
+                maPhieu,
+                userId,
+                status,
+                maTB
+            });
+            res.json({ success: true, data: items });
+        } catch (error) {
+            console.error('Error fetching borrowed items for return:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Lỗi khi lấy danh sách thiết bị đang mượn'
+            });
+        }
+    }
+
+    // =================================================================
+    // QLTB (Equipment Manager) - Quản lý phiếu mượn và trả
+    // =================================================================
+
+    // GET /manager/borrow/approvals - Trang duyệt phiếu mượn (QLTB)
+    async getBorrowApprovalsPage(req, res) {
+        try {
+            console.log('========================================');
+            console.log('[DEBUG] getBorrowApprovalsPage CALLED');
+            console.log('[DEBUG] Rendering view: borrow/views/manager/borrow-approvals');
+            console.log('========================================');
+
+            res.render('borrow/views/manager/borrow-approvals', {
+                title: 'Duyệt Phiếu Mượn Thiết Bị',
+                currentPage: 'borrow-approvals',
+                layout: 'with-sidebar',
+                sidebarType: 'sidebar',
+                user: req.user || { role: 'ql_thiet_bi' }
+            });
+        } catch (error) {
+            console.error('Error rendering borrow approvals page:', error);
+            res.status(500).send(error.message);
+        }
+    }
+
+    // GET /manager/borrow/approvals/api - API lấy danh sách phiếu mượn chờ duyệt
+    async getBorrowApprovalsApi(req, res) {
+        try {
+            const { search, createdFrom, createdTo } = req.query;
+            console.log('[DEBUG] getBorrowApprovalsApi - Filters:', { search, createdFrom, createdTo });
+
+            const tickets = await borrowService.getPendingBorrowTicketsForManager({
+                search,
+                createdFrom,
+                createdTo
+            });
+
+            console.log(`[DEBUG] getBorrowApprovalsApi - Found ${tickets.length} pending tickets`);
+            console.log('[DEBUG] getBorrowApprovalsApi - Sample ticket:', tickets[0] || 'No tickets');
+
+            res.json({ success: true, data: tickets });
+        } catch (error) {
+            console.error('Error fetching borrow approvals:', error);
+            res.status(500).json({ success: false, message: 'Lỗi khi lấy danh sách phiếu mượn' });
+        }
+    }
+
+    // GET /manager/borrow/approvals/:id - Chi tiết phiếu mượn cho manager
+    async getBorrowDetailForManager(req, res) {
+        try {
+            const slipId = req.params.id;
+            const slip = await borrowService.getBorrowSlip(slipId);
+
+            res.render('borrow/views/manager/borrow-detail', {
+                title: `Chi tiết phiếu mượn ${slipId}`,
+                currentPage: 'borrow-approvals',
+                layout: 'with-sidebar',
+                sidebarType: 'sidebar',
+                slip: slip,
+                user: req.user || { role: 'ql_thiet_bi' }
+            });
+        } catch (error) {
+            console.error('Error rendering borrow detail for manager:', error);
+            res.status(500).send(error.message);
+        }
+    }
+
+    // POST /manager/borrow/approvals/:id/approve - API Duyệt phiếu mượn (Manager)
+    async approveBorrowSlipForManager(req, res) {
+        try {
+            const slipId = req.params.id;
+            const approvedBy = req.user?.hoTen || req.user?.name || 'QLTB';
+            const ticket = await borrowService.approveBorrow(slipId, approvedBy);
+            res.json({
+                success: true,
+                message: `Đã duyệt thành công phiếu mượn ${slipId}`,
+                data: ticket
+            });
+        } catch (error) {
+            console.error('Error approving borrow slip:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Lỗi khi duyệt phiếu mượn'
+            });
+        }
+    }
+
+    // POST /manager/borrow/approvals/:id/reject - API Từ chối phiếu mượn (Manager)
+    async rejectBorrowSlipForManager(req, res) {
+        try {
+            const slipId = req.params.id;
+            const { reason } = req.body;
+            const rejectedBy = req.user?.hoTen || req.user?.name || 'QLTB';
+            const ticket = await borrowService.rejectBorrow(slipId, reason || 'Không rõ lý do', rejectedBy);
+            res.json({
+                success: true,
+                message: `Đã từ chối phiếu mượn ${slipId}`,
+                data: ticket
+            });
+        } catch (error) {
+            console.error('Error rejecting borrow slip:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Lỗi khi từ chối phiếu mượn'
+            });
+        }
+    }
+
+    // GET /manager/borrow/returns - Trang quản lý phiếu trả (QLTB)
+    async getReturnSlipsListPage(req, res) {
+        try {
+            res.render('borrow/views/manager/return-slips-list', {
+                title: 'Quản lý Phiếu Trả Thiết Bị',
+                currentPage: 'return-slips',
+                layout: 'with-sidebar',
+                sidebarType: 'sidebar',
+                user: req.user || { role: 'ql_thiet_bi' }
+            });
+        } catch (error) {
+            console.error('Error rendering return slips list page:', error);
+            res.status(500).send(error.message);
+        }
+    }
+
+    // GET /manager/borrow/returns/api - API lấy danh sách phiếu mượn đang mượn (cần trả)
+    async getReturnSlipsApi(req, res) {
+        try {
+            const { search, createdFrom, createdTo } = req.query;
+
+            // Lấy phiếu mượn đang mượn thay vì phiếu trả
+            const borrowTickets = await borrowService.getActiveBorrowTicketsForReturn({
+                search,
+                createdFrom,
+                createdTo
+            });
+
+            res.json({ success: true, data: borrowTickets });
+        } catch (error) {
+            console.error('Error fetching active borrow tickets:', error);
+            res.status(500).json({ success: false, message: 'Lỗi khi lấy danh sách phiếu mượn' });
+        }
+    }
+
+    // GET /manager/borrow/returns/create - Trang tạo phiếu trả
+    async getCreateReturnSlipPage(req, res) {
+        try {
+            res.render('borrow/views/manager/return-slip-detail', {
+                title: 'Tạo Phiếu Trả Thiết Bị',
+                currentPage: 'return-slips',
+                layout: 'with-sidebar',
+                sidebarType: 'sidebar',
+                mode: 'create',
+                user: req.user || { role: 'ql_thiet_bi' }
+            });
+        } catch (error) {
+            console.error('Error rendering create return slip page:', error);
+            res.status(500).send(error.message);
+        }
+    }
+
+    // GET /manager/borrow/returns/:id - Chi tiết phiếu trả cho manager
+    async getReturnSlipDetailForManager(req, res) {
+        try {
+            const slipId = req.params.id;
+            const slip = await borrowService.getReturnSlip(slipId);
+
+            res.render('borrow/views/manager/return-slip-detail', {
+                title: `Chi tiết phiếu trả ${slipId}`,
+                currentPage: 'return-slips',
+                layout: 'with-sidebar',
+                sidebarType: 'sidebar',
+                slip: slip,
+                mode: 'view',
+                user: req.user || { role: 'ql_thiet_bi' }
+            });
+        } catch (error) {
+            console.error('Error rendering return slip detail for manager:', error);
+            res.status(500).send(error.message);
+        }
+    }
+
+    // POST /manager/borrow/returns - Tạo phiếu trả mới
+    async createReturnSlipForManager(req, res) {
+        try {
+            const employeeId = req.user?.id || req.user?._id;
+            if (!employeeId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Không xác định được nhân viên'
+                });
+            }
+
+            const result = await borrowService.createReturnSlip(employeeId, req.body);
+            res.json(result);
+        } catch (error) {
+            console.error('Error creating return slip:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Lỗi khi tạo phiếu trả'
+            });
+        }
+    }
+
+    // GET /borrow/return/:id - Xem chi tiết phiếu trả (cho giáo viên)
+    async getReturnSlipForTeacher(req, res) {
+        try {
+            const slipId = req.params.id;
+            const slip = await borrowService.getReturnSlip(slipId);
+
+            res.render('borrow/views/return-slip', {
+                title: `Chi tiết phiếu trả ${slipId}`,
+                currentPage: 'history',
+                sidebarType: 'borrow-sidebar',
+                slip: slip,
+                user: req.user || { role: 'giao_vien' }
+            });
+        } catch (error) {
+            console.error('Error rendering return slip for teacher:', error);
+            res.status(500).send(error.message);
+        }
+    }
 }
 
 module.exports = new BorrowController();

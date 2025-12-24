@@ -49,9 +49,83 @@
                   <input class="form-control" value="<%= report.code %>" readonly />
                 </div>
 
-                <div class="col-md-6">
-                  <label class="form-label">Ngày lập</label>
-                  <input class="form-control" value="<%= report.date %>" readonly />
+                <div class="card p-4 mx-auto" style="max-width: 700px;">
+                    <h5 class="mb-4">Thông tin báo cáo</h5>
+
+                    <form method="post" action="/manager/periodic-reports/<%= r.id %>">
+                        <div class="row g-3 mb-4">
+
+                            <div class="col-md-6">
+                                <label class="form-label">Mã báo cáo</label>
+                                <input class="form-control" value="<%= r.code %>" readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Ngày lập</label>
+                                <input class="form-control" value="<%= r.date %>" readonly>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Kỳ báo cáo</label>
+                                <input class="form-control"
+                                       name="kyBaoCao"
+                                       value="<%= r.period %>"
+                                       readonly>
+                            </div>
+
+                            <!-- TRẠNG THÁI -->
+                           <div class="col-12">
+    <!-- <label class="form-label">Trạng thái</label>
+
+    <% if (r.status === 'pending') { %>
+        <!-- Khi pending: hiển thị dropdown -->
+        <select name="trangThaiBaoCao" class="form-select">
+            <option value="pending" <%= r.status === 'pending' ? 'selected' : '' %>>
+                Đang chờ duyệt
+            </option>
+            <option value="completed" <%= r.status === 'completed' ? 'selected' : '' %>>
+                Đã hoàn thành (Duyệt)
+            </option>
+            <option value="rejected" <%= r.status === 'rejected' ? 'selected' : '' %>>
+                Từ chối
+            </option>
+        </select>
+    <% } else { %> -->
+        <!-- Khi completed hoặc rejected: hiển thị text tĩnh -->
+        <input type="text" class="form-control" readonly 
+               value="<%= r.status === 'completed' ? 'Đã hoàn thành (Duyệt)' : 'Từ chối' %>">
+        <!-- Hidden input để gửi giá trị lên server khi submit -->
+        <input type="hidden" name="trangThaiBaoCao" value="<%= r.status %>">
+    <% } %>
+</div>
+
+                            <div class="col-12">
+                                <label class="form-label">File đính kèm</label>
+                                <p class="mb-2"><%= r.fileName || 'Không có file' %></p>
+                                <% if (r.fileUrl && r.fileUrl !== '#') { %>
+                                    <a href="<%= r.fileUrl %>" target="_blank"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Xem / Tải file
+                                    </a>
+                                <% } %>
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="/manager/periodic-reports"
+                               class="btn btn-secondary">
+                                Quay lại
+                            </a>
+
+                            <% if (r.status === 'pending') { %>
+        <button type="submit" class="btn btn-primary">
+            Cập nhật
+        </button>
+    <% } %>
+                        </div>
+
+                    </form>
                 </div>
 
                 <div class="col-12">

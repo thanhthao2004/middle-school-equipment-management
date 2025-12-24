@@ -21,31 +21,13 @@ class BorrowService {
 
             // Map MongoDB format sang format mà frontend mong đợi
             const mappedDevices = await Promise.all(devices.map(async (device) => {
-                // Tính số lượng đã mượn (chưa trả) từ BorrowDetail
-                // Nếu là mockup device (có _id bắt đầu bằng 'mock'), skip aggregate
-                let soLuongConLai = device.soLuong || 0;
+                // Sử dụng soLuongSanSang từ repository (đã được tính từ DeviceUnit với điều kiện tinhTrang: Tốt/Khá và trangThai: san_sang)
+                // Điều này đảm bảo chỉ đếm thiết bị sẵn sàng cho mượn (không hỏng)
+                let soLuongConLai = device.soLuongSanSang || 0;
 
-                if (device.maTB && !device._id.toString().startsWith('mock')) {
-                    try {
-                        const borrowedDetails = await BorrowDetail.aggregate([
-                            { $match: { maTB: device.maTB } },
-                            {
-                                $group: {
-                                    _id: null,
-                                    totalBorrowed: { $sum: '$soLuongMuon' },
-                                    totalReturned: { $sum: '$soLuongDaTra' }
-                                }
-                            }
-                        ]);
-
-                        const totalBorrowed = borrowedDetails[0]?.totalBorrowed || 0;
-                        const totalReturned = borrowedDetails[0]?.totalReturned || 0;
-                        const soLuongDangMuon = totalBorrowed - totalReturned;
-                        soLuongConLai = Math.max(0, (device.soLuong || 0) - soLuongDangMuon);
-                    } catch (err) {
-                        // Nếu aggregate fail (DB chưa có data), dùng số lượng gốc
-                        console.warn('Error calculating borrowed quantity, using original quantity:', err.message);
-                    }
+                // Nếu là mockup device, dùng soLuong gốc
+                if (device._id && device._id.toString().startsWith('mock')) {
+                    soLuongConLai = device.soLuong || 0;
                 }
 
                 // Map category name
@@ -80,6 +62,16 @@ class BorrowService {
                 const categoryKey = categoryName.toLowerCase().replace(/\s+/g, '');
                 const mappedCategory = categoryMap[categoryKey] || 'chemistry';
 
+                // Xử lý hình ảnh: đảm bảo là mảng và đường dẫn đúng
+                let images = [];
+                if (device.hinhAnh) {
+                    if (Array.isArray(device.hinhAnh)) {
+                        images = device.hinhAnh.filter(img => img && typeof img === 'string' && img.trim());
+                    } else if (typeof device.hinhAnh === 'string' && device.hinhAnh.trim()) {
+                        images = [device.hinhAnh.trim()];
+                    }
+                }
+
                 return {
                     id: device.maTB || device._id.toString(),
                     name: device.tenTB || '',
@@ -92,14 +84,17 @@ class BorrowService {
                     unit: 'cái', // Mặc định
                     class: '', // Có thể thêm vào model sau
                     description: device.huongDanSuDung || '',
-                    images: device.hinhAnh || [] // Map from hinhAnh field in DB
+                    images: images // Map from hinhAnh field in DB, ensure it's an array
                 };
             }));
 
-            // Lưu vào cache (TTL 2 phút cho dữ liệu thiết bị)
-            cache.set(cacheKey, mappedDevices, 120000);
+            // Lọc bỏ thiết bị không có số lượng sẵn sàng (soLuongConLai = 0) - tức là chỉ có thiết bị hỏng hoặc đã mượn hết
+            const availableDevices = mappedDevices.filter(device => device.quantity > 0);
 
-            return mappedDevices;
+            // Lưu vào cache (TTL 2 phút cho dữ liệu thiết bị)
+            cache.set(cacheKey, availableDevices, 120000);
+
+            return availableDevices;
         } catch (error) {
             console.error('Error in getDevices service:', error);
             throw error;
@@ -305,16 +300,82 @@ class BorrowService {
         ];
     }
 
-    // API cho QLTB: Duyệt phiếu mượn (Mock)
+    // API cho QLTB: Duyệt phiếu mượn
     async approveBorrow(slipId, approvedBy) {
-        console.log(`QLTB approved borrow ${slipId} by ${approvedBy}`);
-        return { id: slipId, status: 'approved' };
+        try {
+            const ticket = await borrowRepo.approveBorrowRequest(slipId, approvedBy);
+            cache.clear(); // Clear cache sau khi duyệt
+            return ticket;
+        } catch (error) {
+            console.error('Error approving borrow:', error);
+            throw error;
+        }
     }
 
-    // API cho QLTB: Từ chối phiếu mượn (Mock)
-    async rejectBorrow(slipId, reason) {
-        console.log(`QLTB rejected borrow ${slipId} because: ${reason}`);
-        return { id: slipId, status: 'rejected' };
+    // API cho QLTB: Từ chối phiếu mượn
+    async rejectBorrow(slipId, reason, rejectedBy) {
+        try {
+            const ticket = await borrowRepo.rejectBorrowRequest(slipId, reason, rejectedBy);
+            cache.clear(); // Clear cache sau khi từ chối
+            return ticket;
+        } catch (error) {
+            console.error('Error rejecting borrow:', error);
+            throw error;
+        }
+    }
+
+    // API cho QLTB: Lấy danh sách phiếu mượn chờ duyệt
+    async getPendingBorrowTicketsForManager(filters = {}) {
+        try {
+            const tickets = await borrowRepo.getPendingBorrowTicketsForManager(filters);
+            return tickets;
+        } catch (error) {
+            console.error('Error getting pending borrow tickets for manager:', error);
+            throw error;
+        }
+    }
+
+    // API cho QLTB: Lấy danh sách phiếu trả
+    async getReturnSlipsForManager(filters = {}) {
+        try {
+            const { ReturnSlip } = require('../models/borrow-ticket.model');
+            const query = {};
+
+            if (filters.search) {
+                query.$or = [
+                    { maPhieuTra: { $regex: filters.search, $options: 'i' } },
+                    { maPhieuMuon: { $regex: filters.search, $options: 'i' } }
+                ];
+            }
+
+            if (filters.createdFrom) {
+                query.createdAt = { $gte: new Date(filters.createdFrom) };
+            }
+
+            if (filters.createdTo) {
+                query.createdAt = { ...query.createdAt, $lte: new Date(filters.createdTo) };
+            }
+
+            const slips = await ReturnSlip.find(query)
+                .populate('nguoiTraId', 'hoTen email role maNV')
+                .sort({ createdAt: -1 })
+                .limit(filters.limit || 100);
+
+            // Enrich với ReturnDetails và BorrowTicket
+            const enrichedSlips = await Promise.all(slips.map(async (slip) => {
+                const returnDetails = await borrowRepo.getReturnSlipById(slip.maPhieuTra);
+                return {
+                    ...slip.toObject(),
+                    details: returnDetails?.details || [],
+                    borrowTicket: returnDetails?.borrowTicket || null
+                };
+            }));
+
+            return enrichedSlips;
+        } catch (error) {
+            console.error('Error getting return slips for manager:', error);
+            throw error;
+        }
     }
 
     // API cho QLTB: Xác nhận trả phiếu (Mock)
@@ -389,6 +450,21 @@ class BorrowService {
             return items;
         } catch (error) {
             console.error('Error in getBorrowedItemsForReturn service:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get active borrow tickets (approved/dang_muon) for return management
+     * @param {Object} filters - Filter options  
+     * @returns {Promise<Array>} - List of active borrow tickets
+     */
+    async getActiveBorrowTicketsForReturn(filters = {}) {
+        try {
+            const tickets = await borrowRepo.getActiveBorrowTicketsForReturn(filters);
+            return tickets;
+        } catch (error) {
+            console.error('Error getting active borrow tickets for return:', error);
             throw error;
         }
     }

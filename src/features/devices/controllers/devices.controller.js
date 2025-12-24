@@ -178,6 +178,20 @@ class DevicesController {
             // Lấy formData từ session nếu có (sau validation fail)
             const formData = req.session?.flash?.formData || {};
 
+            // Lấy danh sách kỳ báo cáo cho filter (nếu có)
+            let periods = [];
+            try {
+                const PeriodicReport = require('../../periodic-reports/models/periodic-report.model');
+                periods = await PeriodicReport.distinct('kyBaoCao');
+                if (!Array.isArray(periods)) {
+                    periods = [];
+                }
+            } catch (err) {
+                // Nếu không lấy được, để mảng rỗng
+                console.warn('Could not load periods for filter:', err.message);
+                periods = [];
+            }
+
             res.render('devices/views/edit', {
                 title: 'Sửa thiết bị',
                 currentPage: 'devices',
@@ -186,6 +200,7 @@ class DevicesController {
                 categories,
                 filterOptions,
                 formData,
+                periods: periods || [],
                 user: req.user || { role: 'ql_thiet_bi' },
                 messages: {
                     success: req.session?.flash?.success || null,

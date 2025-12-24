@@ -452,14 +452,14 @@ async function seedCategories() {
     for (const catData of CATEGORIES) {
         const existing = await Category.findOne({ name: catData.name });
         if (existing) {
-            console.log(`  ⚠️  Category "${catData.name}" already exists`);
+            console.log(`   Category "${catData.name}" already exists`);
             skipped++;
             continue;
         }
         
         const category = new Category(catData);
         await category.save();
-        console.log(`  ✅ Created category: ${catData.name}`);
+        console.log(`   Created category: ${catData.name}`);
         created++;
     }
     

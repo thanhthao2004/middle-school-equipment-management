@@ -19,7 +19,17 @@ class CategoriesController {
                 keyword: keyword || "",
                 currentPage: "categories",
                 user: req.user,
+                messages: {
+                    success: req.session?.flash?.success || null,
+                    error: req.session?.flash?.error || null
+                }
             });
+
+            // Clear flash messages after rendering
+            if (req.session?.flash) {
+                delete req.session.flash.success;
+                delete req.session.flash.error;
+            }
         } catch (err) {
             console.error(err);
             res.status(500).send("Lỗi tải danh sách danh mục");
@@ -42,7 +52,17 @@ class CategoriesController {
                 currentPage: "categories",
                 user: req.user,
                 nextId, // gửi xuống view để hiển thị
+                messages: {
+                    success: req.session?.flash?.success || null,
+                    error: req.session?.flash?.error || null
+                }
             });
+
+            // Clear flash messages after rendering
+            if (req.session?.flash) {
+                delete req.session.flash.success;
+                delete req.session.flash.error;
+            }
         } catch (err) {
             console.error(err);
             res.redirect("/manager/categories");
@@ -60,7 +80,17 @@ class CategoriesController {
                 category,
                 currentPage: "categories",
                 user: req.user,
+                messages: {
+                    success: req.session?.flash?.success || null,
+                    error: req.session?.flash?.error || null
+                }
             });
+
+            // Clear flash messages after rendering
+            if (req.session?.flash) {
+                delete req.session.flash.success;
+                delete req.session.flash.error;
+            }
         } catch (err) {
             console.error(err);
             res.redirect("/manager/categories");
@@ -72,12 +102,35 @@ class CategoriesController {
         try {
             const { name, location } = req.body;
 
-            await Category.create({ name, location }); // id tự sinh trong model
+            // Validation
+            if (!name || !name.trim()) {
+                if (!req.session.flash) req.session.flash = {};
+                req.session.flash.error = "Tên danh mục không được để trống";
+                return res.redirect("/manager/categories/add");
+            }
 
+            if (!location || !location.trim()) {
+                if (!req.session.flash) req.session.flash = {};
+                req.session.flash.error = "Vị trí lưu trữ không được để trống";
+                return res.redirect("/manager/categories/add");
+            }
+
+            await Category.create({ name: name.trim(), location: location.trim() }); // id tự sinh trong model
+
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.success = "Thêm danh mục thành công";
             res.redirect("/manager/categories");
         } catch (err) {
-            console.error(err);
-            res.status(500).send("Thêm danh mục thất bại");
+            console.error("Error creating category:", err);
+            if (!req.session.flash) req.session.flash = {};
+            
+            // Handle duplicate key error
+            if (err.code === 11000) {
+                req.session.flash.error = "Mã danh mục đã tồn tại";
+            } else {
+                req.session.flash.error = err.message || "Thêm danh mục thất bại";
+            }
+            res.redirect("/manager/categories/add");
         }
     }
 
@@ -86,16 +139,41 @@ class CategoriesController {
     async updateCategory(req, res) {
         try {
             const { name, location } = req.body;
+            const categoryId = req.params.id;
 
-            await Category.findOneAndUpdate(
-                { id: req.params.id },
-                { name, location }
+            // Validation
+            if (!name || !name.trim()) {
+                if (!req.session.flash) req.session.flash = {};
+                req.session.flash.error = "Tên danh mục không được để trống";
+                return res.redirect(`/manager/categories/edit/${categoryId}`);
+            }
+
+            if (!location || !location.trim()) {
+                if (!req.session.flash) req.session.flash = {};
+                req.session.flash.error = "Vị trí lưu trữ không được để trống";
+                return res.redirect(`/manager/categories/edit/${categoryId}`);
+            }
+
+            const category = await Category.findOneAndUpdate(
+                { id: categoryId },
+                { name: name.trim(), location: location.trim() },
+                { new: true }
             );
 
+            if (!category) {
+                if (!req.session.flash) req.session.flash = {};
+                req.session.flash.error = "Không tìm thấy danh mục";
+                return res.redirect("/manager/categories");
+            }
+
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.success = "Cập nhật danh mục thành công";
             res.redirect("/manager/categories");
         } catch (err) {
-            console.error(err);
-            res.status(500).send("Cập nhật danh mục thất bại");
+            console.error("Error updating category:", err);
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.error = err.message || "Cập nhật danh mục thất bại";
+            res.redirect(`/manager/categories/edit/${req.params.id}`);
         }
     }
 
@@ -104,19 +182,33 @@ class CategoriesController {
         try {
             const categoryId = req.params.id;
 
+            // Kiểm tra danh mục có tồn tại không
+            const category = await Category.findOne({ id: categoryId });
+            if (!category) {
+                if (!req.session.flash) req.session.flash = {};
+                req.session.flash.error = "Không tìm thấy danh mục";
+                return res.redirect("/manager/categories");
+            }
+
             // Kiểm tra xem có thiết bị nào thuộc danh mục này không
             const relatedDevices = await Device.find({ maDM: categoryId }).limit(1);
             if (relatedDevices.length > 0) {
-                // Không xóa được
-                return res.status(400).send("Không thể xóa danh mục này, còn thiết bị thuộc danh mục");
+                if (!req.session.flash) req.session.flash = {};
+                req.session.flash.error = "Không thể xóa danh mục này, còn thiết bị thuộc danh mục";
+                return res.redirect("/manager/categories");
             }
 
             // Xóa danh mục
             await Category.findOneAndDelete({ id: categoryId });
+            
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.success = "Xóa danh mục thành công";
             res.redirect("/manager/categories");
         } catch (err) {
-            console.error(err);
-            res.status(500).send("Xóa danh mục thất bại");
+            console.error("Error deleting category:", err);
+            if (!req.session.flash) req.session.flash = {};
+            req.session.flash.error = err.message || "Xóa danh mục thất bại";
+            res.redirect("/manager/categories");
         }
     }
 }

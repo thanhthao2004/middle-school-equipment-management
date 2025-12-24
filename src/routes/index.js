@@ -40,7 +40,8 @@ router.use('/manager/acceptance', authenticate, requireRole('ql_thiet_bi'), requ
 router.use('/manager/periodic-reports', authenticate, requireRole('ql_thiet_bi'), require('../features/periodic-reports/routes/periodic-report.routes'));
 router.use('/manager/disposal', authenticate, requireRole('ql_thiet_bi'), require('../features/disposal/routes/disposal.routes'));
 
-router.use('/manager', require('../features/manager/routes/manager.routes'));
+// Manager borrow management (duyệt phiếu mượn và quản lý phiếu trả)
+router.use('/manager/borrow', require('../features/borrow/routes/manager-borrow.routes'));
 
 // ==========================
 // TEACHER (Giáo viên bộ môn)
