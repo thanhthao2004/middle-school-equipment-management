@@ -13,6 +13,7 @@ const { configureViewEngine } = require('./src/config/view-engine');
 const { initializeDatabase } = require('./src/config/database');
 const { errorHandler, notFoundHandler } = require('./src/core/middlewares/error.middleware');
 const routes = require('./src/routes');
+const path = require('path');
 
 // ==========================
 // Initialize Express App
@@ -24,6 +25,7 @@ const app = express();
 // ==========================
 configureViewEngine(app);
 configureMiddleware(app);
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // ==========================
 // Database Connection

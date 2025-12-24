@@ -1,42 +1,56 @@
 const express = require('express');
+const multer  = require('multer');
 const path = require('path');
-const multer = require('multer');
+const fs = require('fs');
 
 const router = express.Router();
 const controller = require('../controllers/periodic.controller');
 
-// cấu hình upload
+// Cấu hình multer lưu file báo cáo
+const uploadDir = path.join(__dirname, '../../../../public/uploads/devices');
+
+// Tạo thư mục nếu chưa tồn tại
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Cấu hình multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(
-      null,
-      path.join(__dirname, '../../../../public/uploads/devices')
-    );
+    cb(null, uploadDir); // public/uploads/devices
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const safeName = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, safeName + ext);
+    // tên vật lý trên ổ đĩa (random để không trùng)
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, unique + path.extname(file.originalname));
   }
 });
 
 
 const upload = multer({ storage });
 
+// PAGE ROUTES (GET)
+// ==========================
+
 // LIST
 router.get('/', controller.getReportListPage);
 
 // CREATE
 router.get('/create', controller.getCreateReportPage);
-router.post('/', upload.single('file'), controller.createReport);
 
 // EXPORT đặt trước /:id
 router.get('/export', controller.exportReport);
 
-// DETAIL
-router.get('/:id', controller.getReportDetailPage);
+// Tạo báo cáo mới
+// POST /periodic-reports
+router.post(
+  '/',
+  upload.single('reportFile'),          // name="reportFile" trong form
+  controller.createReport
+);
 
-// UPDATE
+// Cập nhật báo cáo
+// POST /periodic-reports/:id
 router.post('/:id', controller.updateReport);
 
 // DELETE

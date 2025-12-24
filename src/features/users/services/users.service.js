@@ -79,3 +79,11 @@ exports.updateUser = async (id, data) => {
 exports.deleteUser = async (id) => {
   return await repo.delete(id);
 };
+
+exports.toggleStatus = async (id) => {
+  const user = await repo.findById(id);
+  if (!user) throw new Error('Người dùng không tồn tại');
+
+  const newStatus = user.trangThai === 'active' ? 'inactive' : 'active';
+  return await repo.update(id, { trangThai: newStatus });
+};
