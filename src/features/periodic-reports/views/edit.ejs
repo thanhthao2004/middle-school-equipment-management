@@ -9,9 +9,12 @@
   <link href="/stylesheets/style.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 </head>
-
 <body>
-  <% const userObj = user || { role: 'ql_thiet_bi' }; %>
+  <%
+    // nếu controller không truyền thì mặc định true
+    const readOnlyFlag = (typeof readOnly !== 'undefined') ? readOnly : true;
+    const userObj = user || { role: 'ql_thiet_bi' };
+  %>
 
   <%- include('../../../views/partials/header', {
     currentPage: 'periodic-reports',
@@ -58,14 +61,14 @@
                     name="period"
                     class="form-control"
                     value="<%= report.period %>"
-                    <%= readOnly ? 'readonly' : '' %>
+                    <%= readOnlyFlag ? 'readonly' : '' %>
                   />
                 </div>
 
-                <div class="col-12">
-                  <label class="form-label">Trạng thái</label>
+                <div class="col-12 disabled" style="display:none">
+                  <label class="form-label disabled">Trạng thái</label>
 
-                  <% if (!readOnly && report.status === 'pending') { %>
+                  <% if (!readOnlyFlag && report.status === 'pending') { %>
                     <!-- Khi pending và được phép sửa: dropdown -->
                     <select name="trangThaiBaoCao" class="form-select">
                       <option value="pending"   <%= report.status === 'pending'   ? 'selected' : '' %>>
@@ -119,7 +122,7 @@
                   Quay lại
                 </a>
 
-                <% if (!readOnly && report.status !== 'completed') { %>
+                <% if (!readOnlyFlag && report.status !== 'completed') { %>
                   <button type="submit" class="btn btn-primary">
                     Cập nhật
                   </button>
