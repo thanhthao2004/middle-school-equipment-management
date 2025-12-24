@@ -10,6 +10,22 @@ const PeriodicReportSchema = new Schema(
 		trangThaiBaoCao: { type: String, trim: true },
 		tenFile: { type: String, trim: true },
 		duongDanFile: { type: String, default: '' },
+
+		// Snapshot dữ liệu thiết bị tại thời điểm báo cáo
+		items: [{
+			maTB: String,
+			tenTB: String,
+			soLuong: Number,
+			donViTinh: String,
+			categoryName: String,
+			stats: {
+				tot: { type: Number, default: 0 },
+				kha: { type: Number, default: 0 },
+				trungBinh: { type: Number, default: 0 },
+				hong: { type: Number, default: 0 }
+			},
+			ghiChu: String
+		}]
 	},
 	{ timestamps: true }
 );

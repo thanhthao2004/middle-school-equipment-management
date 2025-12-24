@@ -1,5 +1,5 @@
 const express = require('express');
-const multer  = require('multer');
+const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
@@ -54,12 +54,12 @@ router.get('/:id', periodicReportController.getReportDetailPage);
 router.post(
   '/',
   upload.single('reportFile'),          // name="reportFile" trong form
-  controller.createReport
+  periodicReportController.createReport
 );
 
 // Cập nhật báo cáo
 // POST /periodic-reports/:id
-router.post('/:id', controller.updateReport);
+router.post('/:id', periodicReportController.updateReport);
 
 // Xóa báo cáo
 // POST /periodic-reports/:id/delete

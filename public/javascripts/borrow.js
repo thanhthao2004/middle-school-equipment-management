@@ -1020,3 +1020,17 @@ function showErrorModal(message) {
         this.remove();
     });
 }
+
+function viewBorrowSlip(maPhieu) {
+    if (!maPhieu && maPhieu !== 'N/A') {
+        window.location.href = '/teacher/borrow/history';
+        return;
+    }
+    // Chuyển hướng đến trang chi tiết phiếu mượn
+    // Giả sử URL là /teacher/borrow/slip?id=MA_PHIEU hoặc /teacher/borrow/history?open=MA_PHIEU
+    // Dựa vào slip.ejs, nó lấy thông tin từ render, nên ta có thể redirect về history với param để mở modal hoặc trang slip riêng
+    // Tuy nhiên, slip.ejs là một page riêng (route /teacher/borrow/slip/:id hoặc similar)
+    // Check controller routes:
+    // GET /teacher/borrow/:id -> chi tiết (see borrow.routes.js line 43)
+    window.location.href = `/teacher/borrow/${maPhieu}?from=register`;
+}

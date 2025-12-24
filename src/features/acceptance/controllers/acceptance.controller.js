@@ -4,6 +4,34 @@ const CURRENT_YEAR = "2025-2026";
 
 class AcceptanceController {
 
+    async getCreatePage(req, res) {
+        const { PurchasingPlan } = require('../../purchasing-plans/models/purchasing-plan.model');
+        // Fetch approved plans for the current year
+        const plans = await PurchasingPlan.find({
+            trangThai: 'da_duyet',
+            namHoc: CURRENT_YEAR
+        }).lean();
+
+        res.render("acceptance/views/create", {
+            plans,
+            currentYear: CURRENT_YEAR,
+            user: req.user
+        });
+    }
+
+    async postCreate(req, res) {
+        try {
+            const { planId } = req.body;
+            if (!planId) return res.send("Vui lòng chọn kế hoạch");
+
+            const minute = await acceptanceService.createFromPlan(planId, req.user);
+            res.redirect(`/manager/acceptance/edit/${minute._id}`);
+        } catch (error) {
+            console.error('Error creating acceptance:', error);
+            res.status(500).send(error.message);
+        }
+    }
+
     async getListPage(req, res) {
         const selectedYear = req.query.year || "";
         const filter = {};
@@ -13,8 +41,8 @@ class AcceptanceController {
 
         res.render("acceptance/views/list", {
             years: [
-                "2019-2020","2020-2021","2021-2022",
-                "2022-2023","2023-2024","2024-2025","2025-2026"
+                "2019-2020", "2020-2021", "2021-2022",
+                "2022-2023", "2023-2024", "2024-2025", "2025-2026"
             ],
             selectedYear,
             currentYear: CURRENT_YEAR,

@@ -48,6 +48,15 @@ class DevicesController {
             const categories = await devicesService.getCategories();
             const filterOptions = await devicesService.getFilterOptions();
 
+            // Load suppliers
+            let suppliers = [];
+            try {
+                const Supplier = require('../../suppliers/models/supplier.model');
+                suppliers = await Supplier.find({}).sort({ name: 1 }).lean();
+            } catch (err) {
+                console.warn('Could not load suppliers:', err.message);
+            }
+
             // Lấy formData từ session nếu có (sau validation fail)
             const formData = req.session?.flash?.formData || {};
 
@@ -56,6 +65,7 @@ class DevicesController {
                 currentPage: 'devices',
                 sidebarType: 'qltb-sidebar',
                 categories,
+                suppliers,
                 filterOptions,
                 formData, // Truyền dữ liệu form cũ
                 user: req.user || { role: 'ql_thiet_bi' },
@@ -111,12 +121,21 @@ class DevicesController {
                 console.log('[UPLOAD] Saved image paths:', deviceData.hinhAnh);
             }
 
+            // Xử lý vị trí lưu trữ tùy chỉnh
+            if (deviceData.viTriLuuTru === '__custom__' && deviceData.customViTriLuuTru) {
+                deviceData.viTriLuuTru = deviceData.customViTriLuuTru;
+            }
+            delete deviceData.customViTriLuuTru; // Không lưu field tạm này vào DB
+
             // Convert empty strings to null/undefined for optional fields
             if (deviceData.ngayNhap === '') delete deviceData.ngayNhap;
             if (deviceData.category === '') delete deviceData.category;
+            if (deviceData.supplier === '') delete deviceData.supplier;
+            if (deviceData.viTriLuuTru === '' || deviceData.viTriLuuTru === '__custom__') delete deviceData.viTriLuuTru;
             if (deviceData.soLuong === '') deviceData.soLuong = 0;
             else deviceData.soLuong = parseInt(deviceData.soLuong) || 0;
 
+            console.log('[CREATE] Device data before save:', JSON.stringify(deviceData, null, 2));
             const device = await devicesService.createDevice(deviceData);
             if (!req.session.flash) req.session.flash = {};
             req.session.flash.success = 'Thêm thiết bị thành công';
@@ -192,15 +211,26 @@ class DevicesController {
                 periods = [];
             }
 
+            // Load suppliers
+            let suppliers = [];
+            try {
+                const Supplier = require('../../suppliers/models/supplier.model');
+                suppliers = await Supplier.find({}).sort({ name: 1 }).lean();
+            } catch (err) {
+                console.warn('Could not load suppliers:', err.message);
+            }
+
             res.render('devices/views/edit', {
                 title: 'Sửa thiết bị',
                 currentPage: 'devices',
                 sidebarType: 'qltb-sidebar',
                 device,
                 categories,
+                suppliers,
                 filterOptions,
                 formData,
                 periods: periods || [],
+                reports: [], // Empty array for reports table in edit view
                 user: req.user || { role: 'ql_thiet_bi' },
                 messages: {
                     success: req.session?.flash?.success || null,
@@ -248,7 +278,7 @@ class DevicesController {
                 }
                 return true; // Giữ lại nếu không phải đường dẫn uploads
             });
-            
+
             // Nếu có ảnh bị loại bỏ do không tồn tại, log để theo dõi
             if (oldImagePaths.length < originalImageCount) {
                 console.log(`[UPDATE] Removed ${originalImageCount - oldImagePaths.length} missing image(s) from database`);
@@ -306,6 +336,7 @@ class DevicesController {
             // Convert empty strings to null/undefined for optional fields
             if (deviceData.ngayNhap === '') delete deviceData.ngayNhap;
             if (deviceData.category === '') delete deviceData.category;
+            if (deviceData.supplier === '') delete deviceData.supplier; // Handle empty supplier
             if (deviceData.soLuong === '') deviceData.soLuong = 0;
             else deviceData.soLuong = parseInt(deviceData.soLuong) || 0;
 
@@ -377,37 +408,37 @@ class DevicesController {
     }
 
     // POST /devices/delete/:id - Xóa thiết bị
-async deleteDevice(req, res) {
-    try {
-        const deviceId = req.params.id;
+    async deleteDevice(req, res) {
+        try {
+            const deviceId = req.params.id;
 
-        // Lấy device để xóa ảnh
-        const device = await devicesService.getDeviceById(deviceId);
-        const images = Array.isArray(device.hinhAnh)
-            ? device.hinhAnh
-            : device.hinhAnh ? [device.hinhAnh] : [];
+            // Lấy device để xóa ảnh
+            const device = await devicesService.getDeviceById(deviceId);
+            const images = Array.isArray(device.hinhAnh)
+                ? device.hinhAnh
+                : device.hinhAnh ? [device.hinhAnh] : [];
 
-        await devicesService.deleteDevice(deviceId);
+            await devicesService.deleteDevice(deviceId);
 
-        // Xóa ảnh trên disk
-        if (images.length > 0) {
-            deleteMultipleFiles(images);
+            // Xóa ảnh trên disk
+            if (images.length > 0) {
+                deleteMultipleFiles(images);
+            }
+
+            req.session.flash = req.session.flash || {};
+            req.session.flash.success = 'Xóa thiết bị thành công';
+
+            res.redirect('/manager/devices');
+        } catch (error) {
+            console.error('Error deleting device:', error);
+            req.session.flash = req.session.flash || {};
+            req.session.flash.error = error.message;
+            res.redirect('/manager/devices');
         }
-
-        req.session.flash = req.session.flash || {};
-        req.session.flash.success = 'Xóa thiết bị thành công';
-
-        res.redirect('/manager/devices');
-    } catch (error) {
-        console.error('Error deleting device:', error);
-        req.session.flash = req.session.flash || {};
-        req.session.flash.error = error.message;
-        res.redirect('/manager/devices');
     }
-}
 
 }
 
-    
+
 
 module.exports = new DevicesController();

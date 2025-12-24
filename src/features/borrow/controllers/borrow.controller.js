@@ -5,12 +5,14 @@ class BorrowController {
     // GET /borrow/register - Đăng ký mượn thiết bị
     async getRegisterPage(req, res) {
         try {
+            const filters = await borrowService.getFilterOptions();
             res.render('borrow/views/register', {
                 title: 'Đăng ký mượn thiết bị',
                 currentPage: 'register',
                 sidebarType: 'borrow-sidebar',
                 bodyClass: '',
-                user: req.user || { name: 'Nguyễn Văn A', role: 'giao_vien' }
+                user: req.user || { name: 'Nguyễn Văn A', role: 'giao_vien' },
+                filters
             });
         } catch (error) {
             console.error('Error rendering register page:', error);

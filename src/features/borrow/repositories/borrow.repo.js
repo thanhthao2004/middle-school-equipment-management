@@ -3,6 +3,7 @@ const { BorrowTicket, BorrowDetail, ReturnSlip, ReturnDetail } = require('../mod
 const Device = require('../../devices/models/device.model');
 const DeviceUnit = require('../../devices/models/device-unit.model');
 const Category = require('../../categories/models/category.model');
+const Supplier = require('../../suppliers/models/supplier.model');
 const User = require('../../users/models/user.model');
 
 class BorrowRepository {
@@ -140,7 +141,7 @@ class BorrowRepository {
             // Fetch device info for each detail
             const detailsWithDevice = await Promise.all(details.map(async (detail) => {
                 try {
-                    const device = await Device.findOne({ maTB: detail.maTB }).populate('category');
+                    const device = await Device.findOne({ maTB: detail.maTB }).populate('category').populate('supplier').lean();
                     return {
                         ...detail.toObject(),
                         device: device
@@ -316,7 +317,7 @@ class BorrowRepository {
                 ];
             }
 
-            const devices = await Device.find(query).populate('category');
+            const devices = await Device.find(query).populate('category').populate('supplier').lean();
 
             // Nếu không có data trong DB, trả về mảng rỗng
             if (!devices || devices.length === 0) {
@@ -329,13 +330,13 @@ class BorrowRepository {
                     // Đếm số lượng đơn vị sẵn sàng cho mượn (tình trạng Tốt/Khá và trạng thái san_sang)
                     const availableCount = await DeviceUnit.countAvailable(device.maTB);
                     return {
-                        ...device.toObject(),
+                        ...device,
                         soLuongSanSang: availableCount
                     };
                 } catch (err) {
                     // Nếu chưa có DeviceUnit, dùng soLuong từ Device
                     return {
-                        ...device.toObject(),
+                        ...device,
                         soLuongSanSang: device.soLuong || 0
                     };
                 }
@@ -468,6 +469,59 @@ class BorrowRepository {
                 updateData,
                 { new: true }
             );
+
+            // Nếu trạng thái là 'huy' hoặc 'rejected', cần trả lại kho (DeviceUnit -> san_sang)
+            if (status === 'huy' || status === 'rejected') {
+                console.log(`[Inventory] Attempting to release items for slip ${slipId} with status ${status}`);
+
+                // Robust restoration: Find the specific units from BorrowDetail
+                const details = await BorrowDetail.find({ maPhieu: slipId });
+                const unitCodes = details.flatMap(d => d.danhSachDonVi || []);
+
+                if (unitCodes.length > 0) {
+                    console.log(`[Inventory] Found ${unitCodes.length} units to release:`, unitCodes);
+                    const updateResult = await DeviceUnit.updateMany(
+                        { maDonVi: { $in: unitCodes } },
+                        {
+                            $set: {
+                                trangThai: 'san_sang',
+                                maPhieuMuonHienTai: null
+                            },
+                            $push: {
+                                lichSu: {
+                                    maPhieu: slipId,
+                                    loai: 'huy_muon',
+                                    ngay: new Date(),
+                                    ghiChu: `Hủy phiếu mượn (status: ${status})`
+                                }
+                            }
+                        }
+                    );
+                    console.log(`[Inventory] Released items result for ${slipId}:`, updateResult);
+                } else {
+                    // Fallback if BorrowDetails are missing unit codes (legacy data)
+                    console.log(`[Inventory] No unit codes in details, falling back to maPhieuMuonHienTai`);
+                    const updateResult = await DeviceUnit.updateMany(
+                        { maPhieuMuonHienTai: slipId },
+                        {
+                            $set: {
+                                trangThai: 'san_sang',
+                                maPhieuMuonHienTai: null
+                            },
+                            $push: {
+                                lichSu: {
+                                    maPhieu: slipId,
+                                    loai: 'huy_muon',
+                                    ngay: new Date(),
+                                    ghiChu: `Hủy phiếu mượn (status: ${status})`
+                                }
+                            }
+                        }
+                    );
+                    console.log(`[Inventory] Fallback release result for ${slipId}:`, updateResult);
+                }
+            }
+
             return result;
         } catch (error) {
             console.error('Error updating borrow request status:', error);
@@ -538,6 +592,50 @@ class BorrowRepository {
 
             if (!ticket) {
                 throw new Error('Phiếu mượn không tồn tại hoặc đã được duyệt/từ chối');
+            }
+
+            // Restore Device Units (release inventory)
+            // Robust restoration: Find the specific units from BorrowDetail
+            const details = await BorrowDetail.find({ maPhieu: slipId });
+            const unitCodes = details.flatMap(d => d.danhSachDonVi || []);
+
+            if (unitCodes.length > 0) {
+                await DeviceUnit.updateMany(
+                    { maDonVi: { $in: unitCodes } },
+                    {
+                        $set: {
+                            trangThai: 'san_sang',
+                            maPhieuMuonHienTai: null
+                        },
+                        $push: {
+                            lichSu: {
+                                maPhieu: slipId,
+                                loai: 'huy_muon',
+                                ngay: new Date(),
+                                ghiChu: `Phiếu mượn bị từ chối: ${reason}`
+                            }
+                        }
+                    }
+                );
+            } else {
+                // Fallback
+                await DeviceUnit.updateMany(
+                    { maPhieuMuonHienTai: slipId },
+                    {
+                        $set: {
+                            trangThai: 'san_sang',
+                            maPhieuMuonHienTai: null
+                        },
+                        $push: {
+                            lichSu: {
+                                maPhieu: slipId,
+                                loai: 'huy_muon',
+                                ngay: new Date(),
+                                ghiChu: `Phiếu mượn bị từ chối: ${reason}`
+                            }
+                        }
+                    }
+                );
             }
 
             return ticket;
@@ -1143,6 +1241,25 @@ class BorrowRepository {
         } catch (error) {
             console.error('Error getting borrowed items for return:', error);
             throw error;
+        }
+    }
+    // Lấy các options cho bộ lọc (Category, Location, Supplier)
+    async getFilterOptions() {
+        try {
+            const [categories, locations, suppliers] = await Promise.all([
+                Category.find({}).sort({ tenDM: 1 }).lean(),
+                Device.distinct('viTriLuuTru'),
+                Supplier.find({ status: 'Hoạt động' }).sort({ name: 1 }).lean()
+            ]);
+
+            return {
+                categories,
+                locations: locations.filter(l => l), // remove nulls
+                suppliers
+            };
+        } catch (error) {
+            console.error('Error getting filter options:', error);
+            return { categories: [], locations: [], suppliers: [] };
         }
     }
 }

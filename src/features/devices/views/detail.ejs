@@ -81,8 +81,9 @@
                                                     <div class="row mb-3">
                                                         <div class="col-md-4 fw-bold">Danh mục:</div>
                                                         <div class="col-md-8">
-                                                            <% if (device.category && device.category.tenDM) { %>
-                                                                <%= device.category.tenDM %>
+                                                            <% if (device.category && (device.category.name ||
+                                                                device.category.tenDM)) { %>
+                                                                <%= device.category.name || device.category.tenDM %>
                                                                     <% } else if (device.maDM) { %>
                                                                         <%= device.maDM %>
                                                                             <% } else { %>
@@ -93,13 +94,15 @@
                                                     <div class="row mb-3">
                                                         <div class="col-md-4 fw-bold">Lớp:</div>
                                                         <div class="col-md-8">
-                                                            <% if (device.lop && Array.isArray(device.lop) && device.lop.length > 0) { %>
+                                                            <% if (device.lop && Array.isArray(device.lop) &&
+                                                                device.lop.length> 0) { %>
                                                                 <% device.lop.forEach(function(lop, index) { %>
-                                                                    <span class="badge bg-secondary me-1">Lớp <%= lop %></span>
-                                                                <% }); %>
-                                                            <% } else { %>
-                                                                <span class="text-muted">-</span>
-                                                            <% } %>
+                                                                    <span class="badge bg-secondary me-1">Lớp <%= lop %>
+                                                                    </span>
+                                                                    <% }); %>
+                                                                        <% } else { %>
+                                                                            <span class="text-muted">-</span>
+                                                                            <% } %>
                                                         </div>
                                                     </div>
                                                     <div class="row mb-3">
@@ -193,30 +196,22 @@
                                                     <h5 class="mb-0"><i class="fas fa-images"></i> Hình ảnh</h5>
                                                 </div>
                                                 <div class="card-body text-center p-0">
-                                                    <%
-                                                    // Normalize hinhAnh to array (backward compatibility)
-                                                    let images = [];
-                                                    if (device.hinhAnh) {
-                                                        if (Array.isArray(device.hinhAnh)) {
-                                                            images = device.hinhAnh;
-                                                        } else if (typeof device.hinhAnh === 'string') {
-                                                            images = [device.hinhAnh];
-                                                        }
-                                                    }
-                                                    
-                                                    // Loại bỏ ảnh trùng lặp và ảnh rỗng
-                                                    const uniqueImages = [];
-                                                    const seenImages = new Set();
-                                                    images.forEach(img => {
+                                                    <% // Normalize hinhAnh to array (backward compatibility) let
+                                                        images=[]; if (device.hinhAnh) { if
+                                                        (Array.isArray(device.hinhAnh)) { images=device.hinhAnh; } else
+                                                        if (typeof device.hinhAnh==='string' ) {
+                                                        images=[device.hinhAnh]; } } // Loại bỏ ảnh trùng lặp và ảnh
+                                                        const uniqueImages=[]; const seenImages=new Set();
+                                                        images.forEach(img=> {
                                                         if (img && img.trim() && !seenImages.has(img)) {
-                                                            seenImages.add(img);
-                                                            uniqueImages.push(img);
+                                                        seenImages.add(img);
+                                                        uniqueImages.push(img);
                                                         }
-                                                    });
-                                                    images = uniqueImages;
-                                                    %>
+                                                        });
+                                                        images = uniqueImages;
+                                                        %>
 
-                                                    <% if (images.length > 0) { %>
+                                                        <% if (images.length> 0) { %>
                                                             <!-- Bootstrap Carousel -->
                                                             <div id="deviceImageCarousel" class="carousel slide"
                                                                 data-bs-ride="carousel">
@@ -244,9 +239,12 @@
                                                                                         alt="<%= device.tenTB %> - <%= index + 1 %>"
                                                                                         style="max-height: 400px; object-fit: contain; background: #f8f9fa;"
                                                                                         onerror="var img=this; img.onerror=null; img.style.display='none'; var placeholder=img.nextElementSibling; if(placeholder) placeholder.style.display='block';">
-                                                                                    <div class="d-block w-100 text-center py-5" style="max-height: 400px; background: #f8f9fa; display: none;">
-                                                                                        <i class="fas fa-image fa-3x text-muted"></i>
-                                                                                        <p class="text-muted mt-2">Không thể tải ảnh</p>
+                                                                                    <div class="w-100 text-center py-5"
+                                                                                        style="max-height: 400px; background: #f8f9fa; display: none;">
+                                                                                        <i
+                                                                                            class="fas fa-image fa-3x text-muted"></i>
+                                                                                        <p class="text-muted mt-2">Không
+                                                                                            thể tải ảnh</p>
                                                                                     </div>
                                                                                     <!-- Badge hiển thị số ảnh -->
                                                                                     <div
@@ -262,7 +260,7 @@
                                                                         </div>
 
                                                                         <!-- Controls (only if multiple images) -->
-                                                                        <% if (images.length > 1) { %>
+                                                                        <% if (images.length> 1) { %>
                                                                             <button class="carousel-control-prev"
                                                                                 type="button"
                                                                                 data-bs-target="#deviceImageCarousel"

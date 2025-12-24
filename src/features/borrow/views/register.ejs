@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,187 +10,200 @@
     <link href="/stylesheets/style.css" rel="stylesheet">
     <link href="/stylesheets/borrow.css" rel="stylesheet">
 </head>
+
 <body>
-    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'giao_vien' }; %>
-    <div class="app-shell">
-        <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'register', user: userObj }) %>
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'giao_vien' }; %>
+        <div class="app-shell">
+            <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'register' , user: userObj }) %>
 
-        <div class="main-content">
-        
-        <%- include('../../../views/partials/header', { currentPage: 'register', user: userObj }) %>
+                <div class="main-content">
 
-        <div class="container py-4">
+                    <%- include('../../../views/partials/header', { currentPage: 'register' , user: userObj }) %>
 
-            <div class="card mb-4">
-                <div class="card-body">
-                    
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-muted small">DANH MỤC THIẾT BỊ</label>
-                            <select class="form-select" id="categoryFilter">
-                                <option value="">Tất cả danh mục</option>
-                                <option value="chemistry">Hóa học</option>
-                                <option value="it">Tin học</option>
-                                <option value="literature">Ngữ văn</option>
-                                <option value="physics">Vật lý</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-muted small">LỚP HỌC</label>
-                            <select class="form-select" id="classFilter">
-                                <option value="">Tất cả lớp</option>
-                                <option value="6">Lớp 6</option>
-                                <option value="7">Lớp 7</option>
-                                <option value="8">Lớp 8</option>
-                                <option value="9">Lớp 9</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-bold text-muted small">NGÀY MƯỢN TỪ</label>
-                            <input type="date" class="form-control" id="borrowDateFrom" value="" min="">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-bold text-muted small">NGÀY MƯỢN ĐẾN</label>
-                            <input type="date" class="form-control" id="borrowDateTo" value="" min="">
-                        </div>
-                    </div>
+                        <div class="container py-4">
 
-                    <div class="row g-3 mt-3">
-                        <div class="col-md-11">
-                            <label class="form-label fw-bold text-muted small">TÌM KIẾM THIẾT BỊ</label>
-                            <div class="search-container">
-                                <input type="text" class="form-control" placeholder="Nhập tên thiết bị, mã thiết bị..." id="searchInput">
-                                <i class="fas fa-search search-icon"></i>
+                            <div class="card mb-4">
+                                <div class="card-body">
+
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold text-muted small">DANH MỤC THIẾT BỊ</label>
+                                            <select class="form-select" id="categoryFilter">
+                                                <option value="">Tất cả danh mục</option>
+                                                <% if (typeof filters !=='undefined' && filters.categories) { %>
+                                                    <% filters.categories.forEach(cat=> { %>
+                                                        <option value="<%= cat.tenDM %>">
+                                                            <%= cat.tenDM %>
+                                                        </option>
+                                                        <% }); %>
+                                                            <% } %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold text-muted small">LỚP HỌC</label>
+                                            <select class="form-select" id="classFilter">
+                                                <option value="">Tất cả lớp</option>
+                                                <option value="6">Lớp 6</option>
+                                                <option value="7">Lớp 7</option>
+                                                <option value="8">Lớp 8</option>
+                                                <option value="9">Lớp 9</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-bold text-muted small">NGÀY MƯỢN TỪ</label>
+                                            <input type="date" class="form-control" id="borrowDateFrom" value="" min="">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-bold text-muted small">NGÀY MƯỢN ĐẾN</label>
+                                            <input type="date" class="form-control" id="borrowDateTo" value="" min="">
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3 mt-3">
+                                        <div class="col-md-11">
+                                            <label class="form-label fw-bold text-muted small">TÌM KIẾM THIẾT BỊ</label>
+                                            <div class="search-container">
+                                                <input type="text" class="form-control"
+                                                    placeholder="Nhập tên thiết bị, mã thiết bị..." id="searchInput">
+                                                <i class="fas fa-search search-icon"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-end">
+                                            <button class="btn btn-outline-secondary w-100" onclick="resetFilters()"
+                                                title="Reset bộ lọc">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3 mt-2" id="advancedFilters" style="display: none;">
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold text-muted small">TRẠNG THÁI</label>
+                                            <select class="form-select" id="statusFilter">
+                                                <option value="">Tất cả trạng thái</option>
+                                                <option value="available">Có sẵn</option>
+                                                <option value="borrowed">Đã mượn</option>
+                                            </select>
+                                        </div>
+                                        <!-- Đã bỏ filter Tình trạng - chỉ hiển thị thiết bị sẵn sàng cho mượn -->
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold text-muted small">VỊ TRÍ LƯU TRỮ</label>
+                                            <select class="form-select" id="locationFilter">
+                                                <option value="">Tất cả vị trí</option>
+                                                <% if (typeof filters !=='undefined' && filters.locations) { %>
+                                                    <% filters.locations.forEach(loc=> { %>
+                                                        <option value="<%= loc %>">
+                                                            <%= loc %>
+                                                        </option>
+                                                        <% }); %>
+                                                            <% } %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold text-muted small">NGUỒN GỐC</label>
+                                            <select class="form-select" id="originFilter">
+                                                <option value="">Tất cả nguồn gốc</option>
+                                                <% if (typeof filters !=='undefined' && filters.suppliers) { %>
+                                                    <% filters.suppliers.forEach(sup=> { %>
+                                                        <option value="<%= sup.name %>">
+                                                            <%= sup.name %>
+                                                        </option>
+                                                        <% }); %>
+                                                            <% } %>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3 mt-2" id="advancedFilterButtons" style="display: none;">
+                                        <div class="col-12 d-flex justify-content-end">
+                                            <div class="d-flex gap-2 w-auto">
+                                                <button class="btn btn-outline-info btn-sm" onclick="applyFilters()">
+                                                    <i class="fas fa-filter me-1"></i>Áp dụng
+                                                </button>
+                                                <button class="btn btn-outline-warning btn-sm"
+                                                    onclick="clearAdvancedFilters()">
+                                                    <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center mt-3">
+                                        <button class="btn btn-link text-muted" onclick="toggleAdvancedFilters()"
+                                            id="toggleAdvancedBtn">
+                                            <i class="fas fa-chevron-down me-1"></i>
+                                            Bộ lọc nâng cao
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-1 d-flex align-items-end">
-                            <button class="btn btn-outline-secondary w-100" onclick="resetFilters()" title="Reset bộ lọc">
-                                <i class="fas fa-undo"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="row g-3 mt-2" id="advancedFilters" style="display: none;">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-muted small">TRẠNG THÁI</label>
-                            <select class="form-select" id="statusFilter">
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="available">Có sẵn</option>
-                                <option value="borrowed">Đã mượn</option>
-                            </select>
-                        </div>
-                        <!-- Đã bỏ filter Tình trạng - chỉ hiển thị thiết bị sẵn sàng cho mượn -->
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-muted small">VỊ TRÍ LƯU TRỮ</label>
-                            <select class="form-select" id="locationFilter">
-                                <option value="">Tất cả vị trí</option>
-                                <option value="Phòng thiết bị 2">Phòng thiết bị 2</option>
-                                <option value="Kho Hóa học">Kho Hóa học</option>
-                                <option value="Phòng IT">Phòng IT</option>
-                                <option value="Phòng 101">Phòng 101</option>
-                                <option value="Phòng thiết bị 3">Phòng thiết bị 3</option>
-                                <option value="Thư viện">Thư viện</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-muted small">NGUỒN GỐC</label>
-                            <select class="form-select" id="originFilter">
-                                <option value="">Tất cả nguồn gốc</option>
-                                <option value="CC">CC</option>
-                                <option value="NCC">NCC</option>
-                                <option value="GV Thanh Th">GV Thanh Th</option>
-                                <option value="Bộ giáo dục">Bộ giáo dục</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div class="row g-3 mt-2" id="advancedFilterButtons" style="display: none;">
-                        <div class="col-12 d-flex justify-content-end">
-                            <div class="d-flex gap-2 w-auto">
-                                <button class="btn btn-outline-info btn-sm" onclick="applyFilters()">
-                                    <i class="fas fa-filter me-1"></i>Áp dụng
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0 me-3">Danh sách thiết bị</h5>
+                                    <span class="selection-counter" id="selectionCounter" style="display: none;">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        <span id="selectedCount">0</span> thiết bị đã chọn
+                                    </span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="selectAllAvailable()">
+                                        <i class="fas fa-check-double me-1"></i>Chọn tất cả có sẵn
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="cancelSelection()">
+                                        <i class="fas fa-times me-1"></i>Bỏ chọn tất cả
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="card mt-2">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover equipment-table mb-0" id="equipmentTable">
+                                            <thead>
+                                                <tr>
+                                                    <th width="5%">Mã TB</th>
+                                                    <th width="20%">Tên Thiết Bị</th>
+                                                    <th width="8%">Danh mục</th>
+                                                    <th width="6%">Đơn vị</th>
+                                                    <th width="8%">Lớp</th>
+                                                    <th width="6%">SL Tồn</th>
+                                                    <th width="8%">Trạng Thái</th>
+                                                    <th width="8%">Tình trạng</th>
+                                                    <th width="12%">VỊ Trí Lưu Trữ</th>
+                                                    <th width="8%">Nguồn Gốc</th>
+                                                    <th width="6%">Chi tiết</th>
+                                                    <th width="5%">Chọn</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="equipmentTableBody">
+                                                <!-- Dữ liệu thiết bị sẽ được load động từ API /borrow/api/devices bằng JavaScript -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-4 gap-3">
+                                <button class="btn btn-cancel text-white" onclick="cancelSelection()">
+                                    <i class="fas fa-times me-2"></i>Hủy chọn
                                 </button>
-                                <button class="btn btn-outline-warning btn-sm" onclick="clearAdvancedFilters()">
-                                    <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                                <button class="btn btn-register text-white" onclick="openBorrowForm()">
+                                    <i class="fas fa-clipboard-list me-2"></i>Đăng ký
                                 </button>
                             </div>
+
+                            <%- include('./_modal_device_details') %>
+                                <%- include('./_modal_borrow_form') %>
+
                         </div>
-                    </div>
-                    
-                    <div class="text-center mt-3">
-                        <button class="btn btn-link text-muted" onclick="toggleAdvancedFilters()" id="toggleAdvancedBtn">
-                            <i class="fas fa-chevron-down me-1"></i>
-                            Bộ lọc nâng cao
-                        </button>
-                    </div>
-                </div>
-            </div>
+                        <%- include('../../../views/partials/footer') %>
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex align-items-center">
-                    <h5 class="mb-0 me-3">Danh sách thiết bị</h5>
-                    <span class="selection-counter" id="selectionCounter" style="display: none;">
-                        <i class="fas fa-check-circle me-1"></i>
-                        <span id="selectedCount">0</span> thiết bị đã chọn
-                    </span>
                 </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-primary btn-sm" onclick="selectAllAvailable()">
-                        <i class="fas fa-check-double me-1"></i>Chọn tất cả có sẵn
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="cancelSelection()">
-                        <i class="fas fa-times me-1"></i>Bỏ chọn tất cả
-                    </button>
-                </div>
-            </div>
-
-            <div class="card mt-2">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover equipment-table mb-0" id="equipmentTable">
-                            <thead>
-                                <tr>
-                                    <th width="5%">Mã TB</th>
-                                    <th width="20%">Tên Thiết Bị</th>
-                                    <th width="8%">Danh mục</th>
-                                    <th width="6%">Đơn vị</th>
-                                    <th width="8%">Lớp</th>
-                                    <th width="6%">SL Tồn</th>
-                                    <th width="8%">Trạng Thái</th>
-                                    <th width="8%">Tình trạng</th>
-                                    <th width="12%">VỊ Trí Lưu Trữ</th>
-                                    <th width="8%">Nguồn Gốc</th>
-                                    <th width="6%">Chi tiết</th>
-                                    <th width="5%">Chọn</th>
-                                </tr>
-                            </thead>
-                            <tbody id="equipmentTableBody">
-                                <!-- Dữ liệu thiết bị sẽ được load động từ API /borrow/api/devices bằng JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-end mt-4 gap-3">
-                <button class="btn btn-cancel text-white" onclick="cancelSelection()">
-                    <i class="fas fa-times me-2"></i>Hủy chọn
-                </button>
-                <button class="btn btn-register text-white" onclick="openBorrowForm()">
-                    <i class="fas fa-clipboard-list me-2"></i>Đăng ký
-                </button>
-            </div>
-
-            <%- include('./_modal_device_details') %>
-            <%- include('./_modal_borrow_form') %>
-            
-        </div> 
-        <%- include('../../../views/partials/footer') %>
-        
         </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script src="/javascripts/borrow.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script src="/javascripts/borrow.js"></script>
 </body>
+
 </html>

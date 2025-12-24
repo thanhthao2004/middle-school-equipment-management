@@ -82,7 +82,7 @@ class DevicesService {
                     const soThuTu = existingCount + i + 1;
                     // Tự động tạo maDonVi: TB001-001, TB001-002, ...
                     const maDonVi = `${device.maTB}-${String(soThuTu).padStart(3, '0')}`;
-                    
+
                     const deviceUnit = new DeviceUnit({
                         maDonVi: maDonVi, // Tự động tạo mã đơn vị
                         maTB: device.maTB,
@@ -193,21 +193,30 @@ class DevicesService {
 
     /**
      * Lấy các giá trị unique cho filters
+     * Bao gồm cả dữ liệu từ categories (vị trí) và devices
      */
     async getFilterOptions() {
         try {
-            const [statuses, locations, origins] = await Promise.all([
+            const [statuses, deviceLocations, categoryLocations, origins] = await Promise.all([
                 Device.distinct('tinhTrangThietBi'),
                 Device.distinct('viTriLuuTru'),
+                Category.distinct('location'), // Lấy vị trí từ categories
                 Device.distinct('nguonGoc')
+            ]);
+
+            // Merge locations từ cả devices và categories
+            const allLocations = new Set([
+                ...deviceLocations.filter(l => l && l.trim() !== ''),
+                ...categoryLocations.filter(l => l && l.trim() !== '')
             ]);
 
             return {
                 statuses: statuses.filter(s => s && s.trim() !== ''),
-                locations: locations.filter(l => l && l.trim() !== ''),
+                locations: Array.from(allLocations).sort(),
                 origins: origins.filter(o => o && o.trim() !== '')
             };
         } catch (error) {
+            console.error('Error getting filter options:', error);
             return { statuses: [], locations: [], origins: [] };
         }
     }

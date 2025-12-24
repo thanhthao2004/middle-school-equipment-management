@@ -362,6 +362,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* -----------------------------
+       Auto-Fill Location from Category Selection
+       When category is selected, auto-populate storage location
+    ----------------------------- */
+    const categorySelect = document.getElementById('category');
+
+    if (categorySelect && locationSelect) {
+        categorySelect.addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const categoryLocation = selectedOption.getAttribute('data-location');
+
+            if (categoryLocation && categoryLocation.trim() !== '') {
+                // Check if the location exists in the dropdown
+                let locationFound = false;
+                for (let i = 0; i < locationSelect.options.length; i++) {
+                    if (locationSelect.options[i].value === categoryLocation) {
+                        locationSelect.value = categoryLocation;
+                        locationFound = true;
+                        break;
+                    }
+                }
+
+                // If location not found in dropdown, use custom input
+                if (!locationFound && customLocationInput) {
+                    locationSelect.value = '__custom__';
+                    customLocationInput.style.display = 'block';
+                    customLocationInput.value = categoryLocation;
+                    customLocationInput.setAttribute('name', 'viTriLuuTru');
+                    locationSelect.removeAttribute('name');
+                }
+            }
+        });
+    }
+
+    /* -----------------------------
        Auto-Price Handler for Teacher-Made Equipment
        When "Giáo viên tự làm" is selected, price = 0đ
     ----------------------------- */

@@ -49,18 +49,8 @@ class BorrowService {
                 }
 
                 // Map category name to frontend format
-                const categoryMap = {
-                    'hóa học': 'chemistry',
-                    'hoa hoc': 'chemistry',
-                    'tin học': 'it',
-                    'tin hoc': 'it',
-                    'vật lý': 'physics',
-                    'vat ly': 'physics',
-                    'ngữ văn': 'literature',
-                    'ngu van': 'literature'
-                };
-                const categoryKey = categoryName.toLowerCase().replace(/\s+/g, '');
-                const mappedCategory = categoryMap[categoryKey] || 'chemistry';
+                // Use actual category name if available, otherwise default to maDM or 'Khác'
+                const mappedCategory = categoryName || device.maDM || 'Khác';
 
                 // Xử lý hình ảnh: đảm bảo là mảng và đường dẫn đúng
                 let images = [];
@@ -79,7 +69,7 @@ class BorrowService {
                     category: mappedCategory,
                     condition: condition,
                     location: device.viTriLuuTru || '',
-                    origin: device.nguonGoc || '',
+                    origin: (device.supplier && device.supplier.name) ? device.supplier.name : (device.nguonGoc || ''),
                     status: soLuongConLai > 0 ? 'available' : 'borrowed',
                     unit: 'cái', // Mặc định
                     class: '', // Có thể thêm vào model sau
@@ -88,8 +78,8 @@ class BorrowService {
                 };
             }));
 
-            // Lọc bỏ thiết bị không có số lượng sẵn sàng (soLuongConLai = 0) - tức là chỉ có thiết bị hỏng hoặc đã mượn hết
-            const availableDevices = mappedDevices.filter(device => device.quantity > 0);
+            // Lọc bỏ thiết bị không có số lượng sẵn sàng (soLuongConLai = 0) hoặc bị hỏng
+            const availableDevices = mappedDevices.filter(device => device.quantity > 0 && device.condition !== 'damaged');
 
             // Lưu vào cache (TTL 2 phút cho dữ liệu thiết bị)
             cache.set(cacheKey, availableDevices, 120000);
@@ -469,6 +459,12 @@ class BorrowService {
         }
     }
 
+    /**
+     * Get filter options for UI
+     */
+    async getFilterOptions() {
+        return await borrowRepo.getFilterOptions();
+    }
 }
 
 module.exports = new BorrowService();

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <title>Chi tiết Biên bản Nghiệm thu</title>
@@ -17,75 +18,134 @@
             max-width: 900px;
             margin: 20px auto;
         }
-        .table-detail th, .table-detail td {
+
+        .table-detail th,
+        .table-detail td {
             font-size: 0.85rem;
             padding: 8px;
         }
-        .table-detail th { background-color: #e9ecef; }
+
+        .table-detail th {
+            background-color: #e9ecef;
+        }
     </style>
 </head>
+
 <body>
 
-<%- include('../../../views/partials/header', { currentPage: 'acceptance', user }) %>
+    <%- include('../../../views/partials/header', { currentPage: 'acceptance' , user }) %>
 
-<div class="container-fluid p-0">
-    <div class="row g-0">
-        <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'acceptance', user }) %>
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'acceptance' , user }) %>
 
-        <div class="col-md-9 col-lg-10 main-content">
-            <div class="container py-4">
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container py-4">
 
-                <h1 class="h3 mb-4">CHI TIẾT NGHIỆM THU</h1>
+                            <h1 class="h3 mb-4">CHI TIẾT NGHIỆM THU</h1>
 
-                <div class="acceptance-detail-box">
-                    <h4 class="mb-4">Mã: <%= minute.maBienBan %></h4>
+                            <div class="acceptance-detail-box">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h4 class="mb-0">Số hiệu: <%= minute.maBienBan %>
+                                    </h4>
+                                    <span class="badge bg-info p-2">Dựa trên kế hoạch: <%= minute.maKeHoachMuaSam %>
+                                            </span>
+                                </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-detail">
-                            <thead>
-                                <tr>
-                                    <th>STT</th>
-                                    <th>Mã thiết bị</th>
-                                    <th>Số lượng thực tế</th>
-                                    <th>Chất lượng</th>
-                                    <th>Lý do</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover align-middle row-border">
+                                        <thead class="table-light text-center">
+                                            <tr>
+                                                <th rowspan="2" width="40">STT</th>
+                                                <th rowspan="2">Thiết bị</th>
+                                                <th colspan="2">Số lượng</th>
+                                                <th colspan="2">Đơn giá (VNĐ)</th>
+                                                <th rowspan="2">Thành tiền thực tế</th>
+                                                <th rowspan="2">Tình trạng thực tế</th>
+                                                <th rowspan="2">Ghi chú</th>
+                                            </tr>
+                                            <tr>
+                                                <th width="80">Kế hoạch</th>
+                                                <th width="80">Thực tế</th>
+                                                <th width="120">Kế hoạch</th>
+                                                <th width="120">Thực tế</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% let totalAmount=0; if (details && details.length> 0) {
+                                                details.forEach((item, index) => {
+                                                totalAmount += (item.thanhTienThucTe || 0);
+                                                %>
+                                                <tr>
+                                                    <td class="text-center">
+                                                        <%= index + 1 %>
+                                                    </td>
+                                                    <td>
+                                                        <div class="fw-bold">
+                                                            <%= item.tenTB || 'Thiết bị' %>
+                                                        </div>
+                                                        <div class="small text-muted">
+                                                            <%= item.maTB %>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <%= item.soLuongKeHoach %>
+                                                    </td>
+                                                    <td class="text-center fw-bold">
+                                                        <%= item.soLuongThucTe %>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <%= (item.donGiaKeHoach || 0).toLocaleString('vi-VN') %>
+                                                    </td>
+                                                    <td class="text-end fw-bold">
+                                                        <%= (item.donGiaThucTe || 0).toLocaleString('vi-VN') %>
+                                                    </td>
+                                                    <td class="text-end fw-bold text-success">
+                                                        <%= (item.thanhTienThucTe || 0).toLocaleString('vi-VN') %>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span
+                                                            class="badge <%= item.chatLuong === 'Tốt' ? 'bg-success' : 'bg-warning' %>">
+                                                            <%= item.chatLuong %>
+                                                        </span>
+                                                    </td>
+                                                    <td class="small">
+                                                        <%= item.lyDo || '-' %>
+                                                    </td>
+                                                </tr>
+                                                <% }); } else { %>
+                                                    <tr>
+                                                        <td colspan="9" class="text-center text-muted py-4">Chưa có dữ
+                                                            liệu</td>
+                                                    </tr>
+                                                    <% } %>
+                                        </tbody>
+                                        <tfoot class="table-light">
+                                            <tr class="fw-bold">
+                                                <td colspan="6" class="text-end">TỔNG CỘNG NGHIỆM THU:</td>
+                                                <td class="text-end text-primary mb-0">
+                                                    <%= totalAmount.toLocaleString('vi-VN') %> đ
+                                                </td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
 
-                            <% if (details && details.length > 0) { %>
-                                <% details.forEach((d, i) => { %>
-                                    <tr>
-                                        <td><%= i + 1 %></td>
-                                        <td><%= d.maTB %></td>
-                                        <td><%= d.soLuongThucTe %></td>
-                                        <td><%= d.chatLuong %></td>
-                                        <td><%= d.lyDo || '' %></td>
-                                    </tr>
-                                <% }) %>
-                            <% } else { %>
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">
-                                        Không có dữ liệu chi tiết nghiệm thu
-                                    </td>
-                                </tr>
-                            <% } %>
+                                <div class="text-end mt-4">
+                                    <a href="/manager/acceptance" class="btn btn-secondary px-4">
+                                        <i class="fas fa-arrow-left me-1"></i> Quay lại
+                                    </a>
+                                </div>
+                            </div>
 
-                            </tbody>
-                        </table>
+                        </div>
                     </div>
-
-                    <div class="text-center mt-4">
-                        <button class="btn btn-secondary" onclick="window.history.back()">Quay lại</button>
-                    </div>
-                </div>
-
             </div>
         </div>
-    </div>
-</div>
 
-<%- include('../../../views/partials/footer') %>
-<script src="/js/bootstrap.bundle.min.js"></script>
+        <%- include('../../../views/partials/footer') %>
+            <script src="/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lập biên bản nghiệm thu mới</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        .selection-box {
+            border: 1px solid #ddd;
+            padding: 30px;
+            border-radius: 8px;
+            background-color: #fff;
+            max-width: 600px;
+            margin: 40px auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../../../views/partials/header', { currentPage: 'acceptance' , user }) %>
+
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'acceptance' , user }) %>
+
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container py-4">
+                            <div class="selection-box">
+                                <h4 class="text-center mb-4">LẬP BIÊN BẢN NGHIỆM THU</h4>
+
+                                <form action="/manager/acceptance/create" method="POST">
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">1. Năm học</label>
+                                        <input type="text" class="form-control" value="<%= currentYear %>" readonly>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">2. Chọn Kế hoạch mua sắm (Đã duyệt)</label>
+                                        <select name="planId" class="form-select" required>
+                                            <option value="">-- Chọn kế hoạch --</option>
+                                            <% if (plans && plans.length> 0) { %>
+                                                <% plans.forEach(plan=> { %>
+                                                    <option value="<%= plan._id %>">
+                                                        <%= plan.maKeHoachMuaSam %> - Năm học <%= plan.namHoc %>
+                                                    </option>
+                                                    <% }) %>
+                                                        <% } else { %>
+                                                            <option disabled>Không có kế hoạch nào đã được duyệt
+                                                            </option>
+                                                            <% } %>
+                                        </select>
+                                        <div class="form-text mt-2 text-warning">
+                                            <i class="fas fa-info-circle"></i>
+                                            Chỉ hiển thị các kế hoạch đã được Hiệu trưởng phê duyệt.
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary btn-lg" <%=(!plans ||
+                                            plans.length===0) ? 'disabled' : '' %>>
+                                            <i class="fas fa-plus-circle me-1"></i> Bắt đầu nghiệm thu
+                                        </button>
+                                        <a href="/manager/acceptance" class="btn btn-outline-secondary mt-2">Quay
+                                            lại</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+        <%- include('../../../views/partials/footer') %>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -14,22 +14,23 @@ const DeviceSchema = new Schema(
 		maTB: { type: String, required: true, unique: true, trim: true },
 		tenTB: { type: String, required: true, trim: true },
 		nguonGoc: { type: String, default: '' },
-		
+
 		// Số lượng tổng (tham khảo, số thực tế lấy từ DeviceUnit)
 		soLuong: { type: Number, default: 0 },
-		
+
 		giaThanh: { type: Number, default: 0 }, // Unit price (giá thành mua)
-		
+
 		// Đã bỏ tinhTrangThietBi - tình trạng được quản lý ở từng DeviceUnit
 		// Legacy field - giữ lại để backward compatible
 		tinhTrangThietBi: { type: String, default: 'Tốt' },
-		
+
 		viTriLuuTru: { type: String, default: '' },
 		ngayNhap: { type: Date },
 		hinhAnh: { type: [String], default: [] }, // Array of image paths (multiple images)
 		huongDanSuDung: { type: String, default: '' },
 		maDM: { type: String, trim: true },
 		category: { type: Types.ObjectId, ref: 'Category' },
+		supplier: { type: Types.ObjectId, ref: 'Supplier' }, // Nhà cung cấp
 		lop: { type: [String], default: [] }, // Array of classes: ['6', '7', '8', '9']
 	},
 	{ timestamps: true }

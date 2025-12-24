@@ -1,132 +1,380 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
-    <title>Danh sách báo cáo định kỳ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa thiết bị</title>
 
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/stylesheets/style.css" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/devices.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
     <style>
-        .page-header {
-            border-bottom: 1px solid #dee2e6;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+        .preview-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
     </style>
 </head>
 
 <body>
-<%
-    const userObj = user || { role: 'ql_thiet_bi' };
-%>
+    <%- include('../../../views/partials/header', { currentPage: 'devices' , user: typeof user !=='undefined' ? user : {
+        role: 'ql_thiet_bi' } }) %>
 
-<!-- HEADER -->
-<%- include('../../../views/partials/header', {
-    currentPage: 'periodic-reports',
-    user: userObj
-}) %>
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices' , user: typeof user
+                    !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
-<div class="container-fluid p-0">
-    <div class="row g-0">
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container-fluid py-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h1 class="h3 mb-0">THÊM THIẾT BỊ MỚI</h1>
+                                <a href="/manager/devices" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại
+                                </a>
+                            </div>
 
-        <!-- SIDEBAR -->
-        <%- include('../../../views/partials/qltb-sidebar', {
-            currentPage: 'periodic-reports',
-            user: userObj
-        }) %>
+                            <% if (typeof messages !=='undefined' && messages.error) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <%= messages.error %>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                <% } %>
 
-        <!-- CONTENT -->
-        <div class="col-md-9 col-lg-10">
-            <div class="container py-4">
-
-                <div class="page-header">
-                    <h1>Quản lý báo cáo định kỳ</h1>
-                </div>
-
-                <!-- FILTER -->
-                <div class="d-flex justify-content-between mb-3">
-                    <div>
-                        <select id="periodFilter" class="form-select w-25" style="display: inline-block; width: 250px !important;">
-                            <option value="">Tất cả kỳ báo cáo</option>
-                            <% (periods || []).forEach(p => { %>
-                                <option value="<%= p %>"><%= p %></option>
-                            <% }) %>
-                        </select>
-                    </div>
-
-                    <a href="/manager/periodic-reports/create"
-                       class="btn btn-primary">
-                        + Lập báo cáo mới
-                    </a>
-                </div>
-
-                <!-- LIST -->
-                <% if (reports && reports.length > 0) { %>
-                    <table class="table table-bordered align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Mã</th>
-                                <th>Kỳ</th>
-                                <th>Ngày lập</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportsList">
-                            <% reports.forEach(r => { %>
-                                <tr data-period="<%= r.period %>">
-                                    <td><%= r.code %></td>
-                                    <td><%= r.period %></td>
-                                    <td><%= r.date %></td>
-                                    <td>
-                                        <% if (r.status === 'pending') { %>
-                                            <span class="badge bg-warning">Chờ duyệt</span>
-                                        <% } else if (r.status === 'completed') { %>
-                                            <span class="badge bg-success">Đã duyệt</span>
-                                        <% } else { %>
-                                            <span class="badge bg-danger">Từ chối</span>
+                                    <% if (typeof messages !=='undefined' && messages.success) { %>
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            <%= messages.success %>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="alert"></button>
+                                        </div>
                                         <% } %>
-                                    </td>
-                                    <td>
-                                        <a href="/manager/periodic-reports/<%= r.id %>"
-                                           class="btn btn-sm btn-outline-primary">
-                                            Xem
-                                        </a>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
-                <% } else { %>
-                    <div class="alert alert-info">
-                        Chưa có báo cáo định kỳ nào.
-                    </div>
-                <% } %>
 
+                                            <div class="card shadow-sm">
+                                                <div class="card-body">
+                                                    <form action="/manager/devices/update/<%= device._id %>"
+                                                        method="POST" id="deviceForm" enctype="multipart/form-data">
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="tenTB" class="form-label">Tên thiết bị <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="text" class="form-control" id="tenTB"
+                                                                    name="tenTB" required
+                                                                    value="<%= device.tenTB || '' %>"
+                                                                    placeholder="Nhập tên thiết bị">
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="category" class="form-label">Danh
+                                                                    mục</label>
+                                                                <select class="form-select" id="category"
+                                                                    name="category">
+                                                                    <option value="">Chọn danh mục</option>
+                                                                    <% if (typeof categories !=='undefined' &&
+                                                                        categories.length> 0) { %>
+                                                                        <% categories.forEach(cat=> {
+                                                                            let isSelected = false;
+                                                                            if (typeof formData !== 'undefined' &&
+                                                                            formData.category) {
+                                                                            isSelected = formData.category.toString()
+                                                                            === cat._id.toString();
+                                                                            } else if (device.category) {
+                                                                            const devCatId = device.category._id ?
+                                                                            device.category._id.toString() :
+                                                                            device.category.toString();
+                                                                            isSelected = devCatId ===
+                                                                            cat._id.toString();
+                                                                            }
+                                                                            %>
+                                                                            <option value="<%= cat._id %>"
+                                                                                data-location="<%= cat.location || '' %>"
+                                                                                <%=isSelected ? 'selected' : '' %>>
+                                                                                <%= cat.tenDM || cat.name %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                                <% } %>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="lop" class="form-label">Lớp <span
+                                                                        class="text-muted">(Ctrl + Click để chọn
+                                                                        nhiều)</span></label>
+                                                                <select class="form-select" id="lop" name="lop" multiple
+                                                                    size="4">
+                                                                    <% ['6', '7' , '8' , '9' ].forEach(l=> {
+                                                                        let isSelected = false;
+                                                                        if (typeof formData !== 'undefined' &&
+                                                                        formData.lop) {
+                                                                        isSelected = Array.isArray(formData.lop) &&
+                                                                        formData.lop.includes(l);
+                                                                        } else if (device.lop) {
+                                                                        isSelected = Array.isArray(device.lop) &&
+                                                                        device.lop.includes(l);
+                                                                        }
+                                                                        %>
+                                                                        <option value="<%= l %>" <%=isSelected
+                                                                            ? 'selected' : '' %>>Lớp <%= l %>
+                                                                        </option>
+                                                                        <% }); %>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-3 mb-3">
+                                                                <label for="soLuong" class="form-label">Số lượng</label>
+                                                                <input type="number" class="form-control" id="soLuong"
+                                                                    name="soLuong" min="0"
+                                                                    value="<%= (typeof formData !== 'undefined' && formData.soLuong !== undefined) ? formData.soLuong : (device.soLuong || 0) %>">
+                                                            </div>
+                                                            <div class="col-md-3 mb-3">
+                                                                <label for="giaThanh" class="form-label">Giá thành (đơn
+                                                                    giá)</label>
+                                                                <input type="number" class="form-control" id="giaThanh"
+                                                                    name="giaThanh" min="0"
+                                                                    value="<%= (typeof formData !== 'undefined' && formData.giaThanh !== undefined) ? formData.giaThanh : (device.giaThanh || 0) %>">
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label fw-bold text-success">Thành
+                                                                    tiền (Tự động)</label>
+                                                                <input type="text" class="form-control bg-light fw-bold"
+                                                                    id="tongGia" readonly value="0 VNĐ">
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="tinhTrangThietBi" class="form-label">Tình
+                                                                    trạng</label>
+                                                                <select class="form-select" id="tinhTrangThietBi"
+                                                                    name="tinhTrangThietBi">
+                                                                    <% const statuses=['Tốt', 'Khá' , 'Trung bình'
+                                                                        , 'Hỏng' ]; statuses.forEach(status=> {
+                                                                        let isSelected = false;
+                                                                        if (typeof formData !== 'undefined' &&
+                                                                        formData.tinhTrangThietBi) {
+                                                                        isSelected = formData.tinhTrangThietBi ===
+                                                                        status;
+                                                                        } else if (device.tinhTrangThietBi) {
+                                                                        isSelected = device.tinhTrangThietBi === status;
+                                                                        }
+                                                                        %>
+                                                                        <option value="<%= status %>" <%=isSelected
+                                                                            ? 'selected' : '' %>><%= status %>
+                                                                        </option>
+                                                                        <% }); %>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="viTriLuuTru" class="form-label">Vị trí lưu
+                                                                    trữ</label>
+                                                                <select class="form-select" id="viTriLuuTru"
+                                                                    name="viTriLuuTru">
+                                                                    <option value="">-- Chọn vị trí --</option>
+                                                                    <% if (typeof filterOptions !=='undefined' &&
+                                                                        filterOptions.locations) {
+                                                                        filterOptions.locations.forEach(loc=> {
+                                                                        let isSelected = false;
+                                                                        if (typeof formData !== 'undefined' &&
+                                                                        formData.viTriLuuTru) {
+                                                                        isSelected = formData.viTriLuuTru === loc;
+                                                                        } else if (device.viTriLuuTru) {
+                                                                        isSelected = device.viTriLuuTru === loc;
+                                                                        }
+                                                                        %>
+                                                                        <option value="<%= loc %>" <%=isSelected
+                                                                            ? 'selected' : '' %>><%= loc %>
+                                                                        </option>
+                                                                        <% })} %>
+                                                                            <option value="__custom__">Khác (nhập
+                                                                                mới)...</option>
+                                                                </select>
+                                                                <input type="text" class="form-control mt-2"
+                                                                    id="customViTriLuuTru" name="customViTriLuuTru"
+                                                                    placeholder="Nhập vị trí mới"
+                                                                    style="display: none;">
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="supplier" class="form-label">Nhà cung
+                                                                    cấp</label>
+                                                                <select class="form-select" id="supplier"
+                                                                    name="supplier">
+                                                                    <option value="">-- Chọn nhà cung cấp --</option>
+                                                                    <% if (typeof suppliers !=='undefined' &&
+                                                                        suppliers.length> 0) { %>
+                                                                        <% suppliers.forEach(sup=> {
+                                                                            let isSelected = false;
+                                                                            if (typeof formData !== 'undefined' &&
+                                                                            formData.supplier) {
+                                                                            isSelected = formData.supplier.toString()
+                                                                            === sup._id.toString();
+                                                                            } else if (device.supplier) {
+                                                                            const devSupId = device.supplier._id ?
+                                                                            device.supplier._id.toString() :
+                                                                            device.supplier.toString();
+                                                                            isSelected = devSupId ===
+                                                                            sup._id.toString();
+                                                                            }
+                                                                            %>
+                                                                            <option value="<%= sup._id %>" <%=isSelected
+                                                                                ? 'selected' : '' %>>
+                                                                                <%= sup.name %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                                <% } %>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="ngayNhap" class="form-label">Ngày
+                                                                    nhập</label>
+                                                                <% let dateVal='' ; if (typeof formData !=='undefined'
+                                                                    && formData.ngayNhap) { dateVal=formData.ngayNhap; }
+                                                                    else if (device.ngayNhap) { try { dateVal=new
+                                                                    Date(device.ngayNhap).toISOString().split('T')[0]; }
+                                                                    catch (e) {} } %>
+                                                                    <input type="date" class="form-control"
+                                                                        id="ngayNhap" name="ngayNhap"
+                                                                        value="<%= dateVal %>">
+                                                            </div>
+                                                            <div class="col-md-12 mb-3">
+                                                                <label class="form-label">Hình ảnh (Tối đa 5
+                                                                    ảnh)</label>
+                                                                <!-- Display existing images -->
+                                                                <% if (device.hinhAnh) { let existingImgs=[]; if
+                                                                    (Array.isArray(device.hinhAnh))
+                                                                    existingImgs=device.hinhAnh; else if
+                                                                    (device.hinhAnh) existingImgs=[device.hinhAnh]; if
+                                                                    (existingImgs.length> 0) {
+                                                                    %>
+                                                                    <div class="d-flex gap-3 mb-3 flex-wrap">
+                                                                        <% existingImgs.forEach(img=> { %>
+                                                                            <div class="border rounded p-1">
+                                                                                <img src="<%= img %>"
+                                                                                    class="preview-image"
+                                                                                    style="height: 100px; width: 100px; object-fit: cover;">
+                                                                            </div>
+                                                                            <% }); %>
+                                                                    </div>
+                                                                    <% }} %>
+
+                                                                        <input type="file" class="form-control"
+                                                                            id="hinhAnh" name="hinhAnh" accept="image/*"
+                                                                            multiple>
+                                                                        <div id="imagePreviewGrid" class="row mt-3 g-2">
+                                                                        </div>
+                                                            </div>
+
+                                                            <div class="col-md-12 mb-3">
+                                                                <label for="huongDanSuDung" class="form-label">Hướng dẫn
+                                                                    sử dụng</label>
+                                                                <textarea class="form-control" id="huongDanSuDung"
+                                                                    name="huongDanSuDung"
+                                                                    rows="3"><%= typeof formData !== 'undefined' ? device.huongDanSuDung || '' : '' %></textarea>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="d-flex justify-content-end gap-2 mt-4">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                onclick="history.back()">Hủy</button>
+                                                            <button type="submit" class="btn btn-primary"><i
+                                                                    class="fas fa-save me-1"></i> Lưu thiết bị</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
 
-    </div>
-</div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const soLuongInp = document.getElementById('soLuong');
+                const giaThanhInp = document.getElementById('giaThanh');
+                const tongGiaInp = document.getElementById('tongGia');
+                const viTriSelect = document.getElementById('viTriLuuTru');
+                const customViTri = document.getElementById('customViTriLuuTru');
+                const imgInput = document.getElementById('hinhAnh');
+                const imgPreview = document.getElementById('imagePreviewGrid');
 
-<%- include('../../../views/partials/footer') %>
+                // 1. Tính tổng tiền
+                function updateTotalPrice() {
+                    const total = (parseFloat(soLuongInp.value) || 0) * (parseFloat(giaThanhInp.value) || 0);
+                    tongGiaInp.value = total.toLocaleString('vi-VN') + ' VNĐ';
+                }
+                soLuongInp.addEventListener('input', updateTotalPrice);
+                giaThanhInp.addEventListener('input', updateTotalPrice);
 
-<script>
-    document.getElementById('periodFilter').addEventListener('change', function() {
-        const selectedPeriod = this.value;
-        const rows = document.querySelectorAll('#reportsList tr');
-        
-        rows.forEach(row => {
-            const period = row.getAttribute('data-period');
-            if (!selectedPeriod || period === selectedPeriod) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    });
-</script>
+                // 2. Tự động điền vị trí lưu trữ khi chọn danh mục
+                const categorySelect = document.getElementById('category');
+                categorySelect.addEventListener('change', function () {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const location = selectedOption.getAttribute('data-location');
 
+                    console.log('Category changed:', {
+                        selectedValue: this.value,
+                        location: location,
+                        viTriSelectExists: !!viTriSelect
+                    });
+
+                    if (location) {
+                        // Tìm xem location có trong dropdown không
+                        let found = false;
+                        for (let i = 0; i < viTriSelect.options.length; i++) {
+                            if (viTriSelect.options[i].value === location) {
+                                viTriSelect.value = location;
+                                customViTri.style.display = 'none';
+                                found = true;
+                                console.log('Found location in dropdown, selected:', location);
+                                break;
+                            }
+                        }
+
+                        // Nếu không tìm thấy, dùng custom input
+                        if (!found) {
+                            viTriSelect.value = '__custom__';
+                            customViTri.value = location;
+                            customViTri.style.display = 'block';
+                            console.log('Location not found in dropdown, using custom input:', location);
+                        }
+                    } else {
+                        console.log('No location data for this category');
+                    }
+                });
+
+                // 3. Xử lý vị trí tùy chỉnh
+                viTriSelect.addEventListener('change', function () {
+                    customViTri.style.display = (this.value === '__custom__') ? 'block' : 'none';
+                    if (this.value === '__custom__') customViTri.focus();
+                });
+
+                // 4. Xem trước ảnh
+                imgInput.addEventListener('change', function () {
+                    imgPreview.innerHTML = '';
+                    Array.from(this.files).forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const col = document.createElement('div');
+                            col.className = 'col-auto';
+                            col.innerHTML = `<img src="${e.target.result}" class="preview-image">`;
+                            imgPreview.appendChild(col);
+                        }
+                        reader.readAsDataURL(file);
+                    });
+                });
+
+                // Khởi tạo giá trị ban đầu
+                updateTotalPrice();
+            });
+        </script>
 </body>
+
 </html>

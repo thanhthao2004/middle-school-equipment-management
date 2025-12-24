@@ -3,6 +3,8 @@ const router = express.Router();
 const controller = require("../controllers/acceptance.controller");
 
 router.get("/", controller.getListPage);
+router.get("/create", controller.getCreatePage);
+router.post("/create", controller.postCreate);
 router.get("/detail/:id", controller.getDetailPage);
 router.get("/edit/:id", controller.getEditPage);
 

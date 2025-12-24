@@ -1,4 +1,5 @@
 const Device = require('../models/device.model');
+const DeviceUnit = require('../models/device-unit.model');
 const Category = require('../../categories/models/category.model');
 
 class DevicesRepository {
@@ -37,9 +38,20 @@ class DevicesRepository {
         }
 
         const devices = await Device.find(query)
-            .populate('category', 'tenDM maDM')
+            .populate('category', 'name tenDM maDM')
+            .populate('supplier', 'name maNCC')
             .sort({ createdAt: -1 })
             .lean();
+
+        // Attach condition stats to each device
+        await Promise.all(devices.map(async (device) => {
+            try {
+                device.conditionStats = await DeviceUnit.getConditionStats(device.maTB);
+            } catch (err) {
+                console.warn(`Could not get stats for device ${device.maTB}:`, err);
+                device.conditionStats = { 'Tốt': 0, 'Khá': 0, 'Trung bình': 0, 'Hỏng': 0 };
+            }
+        }));
 
         return devices;
     }
@@ -49,7 +61,7 @@ class DevicesRepository {
      */
     async findById(id) {
         const device = await Device.findById(id)
-            .populate('category', 'tenDM maDM')
+            .populate('category', 'name tenDM maDM')
             .lean();
         return device;
     }
