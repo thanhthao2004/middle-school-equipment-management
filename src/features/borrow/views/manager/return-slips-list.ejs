@@ -1,101 +1,114 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= typeof title !== 'undefined' ? title : 'Quản lý Phiếu Trả Thiết Bị' %></title>
+    <title>
+        <%= typeof title !=='undefined' ? title : 'Quản lý Phiếu Trả Thiết Bị' %>
+    </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="/stylesheets/style.css" rel="stylesheet">
     <style>
-        .filter-section { 
-            background-color: #f8f9fa; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-            border: 1px solid #e9ecef; 
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
         }
-        .table-returns th { background-color: #e9ecef; }
-        .table-returns th, .table-returns td { vertical-align: middle; font-size: 0.9rem; }
+
+        .table-returns th {
+            background-color: #e9ecef;
+        }
+
+        .table-returns th,
+        .table-returns td {
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
+
 <body>
-    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'ql_thiet_bi' }; %>
-    <div class="app-shell">
-        <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'return-slips', user: userObj }) %>
-        
-        <div class="main-content">
-            <%- include('../../../../views/partials/header', { currentPage: 'return-slips', user: userObj }) %>
-            
-            <div class="container-fluid py-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="h3 mb-0">QUẢN LÝ PHIẾU TRẢ THIẾT BỊ</h1>
-                    <a href="/manager/borrow/returns/create" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i>Tạo phiếu trả mới
-                    </a>
-                </div>
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'ql_thiet_bi' }; %>
+        <div class="app-shell">
+            <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'return-slips' , user: userObj }) %>
 
-                <!-- Filter Section -->
-                <div class="filter-section">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-12 col-md-3">
-                            <label class="form-label small text-muted fw-bold">Tìm kiếm</label>
-                            <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Mã phiếu trả, mã phiếu mượn...">
-                        </div>
-                        <div class="col-12 col-md-2">
-                            <label class="form-label small text-muted fw-bold">Từ ngày</label>
-                            <input type="date" class="form-control form-control-sm" id="dateFrom">
-                        </div>
-                        <div class="col-12 col-md-2">
-                            <label class="form-label small text-muted fw-bold">Đến ngày</label>
-                            <input type="date" class="form-control form-control-sm" id="dateTo">
-                        </div>
-                        <div class="col-12 col-md-3 d-flex gap-2">
-                            <button class="btn btn-primary btn-sm" id="btnFilter">
-                                <i class="fas fa-filter me-1"></i>Lọc
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm" id="btnReset">
-                                <i class="fas fa-undo me-1"></i>Reset
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <div class="main-content">
+                    <%- include('../../../../views/partials/header', { currentPage: 'return-slips' , user: userObj }) %>
 
-                <!-- Table -->
-                <div class="card">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-returns mb-0" id="returnTable">
-                                <thead>
-                                    <tr>
-                                        <th>Mã Phiếu Trả</th>
-                                        <th>Mã Phiếu Mượn</th>
-                                        <th>Người Trả</th>
-                                        <th>Ngày Trả</th>
-                                        <th>Ca Trả</th>
-                                        <th>Số Thiết Bị</th>
-                                        <th>Ghi Chú</th>
-                                        <th>Thao Tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="returnBody">
-                                    <tr>
-                                        <td colspan="8" class="text-center text-muted py-4">
-                                            <i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="container-fluid py-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h1 class="h3 mb-0">QUẢN LÝ PHIẾU TRẢ THIẾT BỊ</h1>
+                                <p class="text-muted mb-0">Danh sách phiếu mượn đang mượn - Chọn phiếu để tạo phiếu trả
+                                </p>
+                            </div>
+
+                            <!-- Filter Section -->
+                            <div class="filter-section">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-12 col-md-3">
+                                        <label class="form-label small text-muted fw-bold">T\u00ecm kiếm</label>
+                                        <input type="text" class="form-control form-control-sm" id="searchInput"
+                                            placeholder="Mã phiếu mượn...">
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <label class="form-label small text-muted fw-bold">Từ ngày</label>
+                                        <input type="date" class="form-control form-control-sm" id="dateFrom">
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <label class="form-label small text-muted fw-bold">Đến ngày</label>
+                                        <input type="date" class="form-control form-control-sm" id="dateTo">
+                                    </div>
+                                    <div class="col-12 col-md-3 d-flex gap-2">
+                                        <button class="btn btn-primary btn-sm" id="btnFilter">
+                                            <i class="fas fa-filter me-1"></i>Lọc
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm" id="btnReset">
+                                            <i class="fas fa-undo me-1"></i>Reset
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Table -->
+                            <div class="card">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-returns mb-0" id="returnTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mã Phiếu Mượn</th>
+                                                    <th>Giáo Viên</th>
+                                                    <th>Ngày Mượn</th>
+                                                    <th>Ngày Trả Dự Kiến</th>
+                                                    <th>Số Thiết Bị</th>
+                                                    <th>Trạng Thái</th>
+                                                    <th>Thao Tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="returnBody">
+                                                <tr>
+                                                    <td colspan="7" class="text-center text-muted py-4">
+                                                        <i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu...
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+
+                        <%- include('../../../../views/partials/footer', { currentPage: 'return-slips' , user: userObj
+                            }) %>
                 </div>
-            </div>
-            
-            <%- include('../../../../views/partials/footer', { currentPage: 'return-slips', user: userObj }) %>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/javascripts/return-slips.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/javascripts/return-slips.js"></script>
 </body>
+
 </html>

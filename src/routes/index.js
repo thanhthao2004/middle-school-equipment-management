@@ -43,8 +43,6 @@ router.use('/manager/disposal', authenticate, requireRole('ql_thiet_bi'), requir
 // Manager borrow management (duyệt phiếu mượn và quản lý phiếu trả)
 router.use('/manager/borrow', require('../features/borrow/routes/manager-borrow.routes'));
 
-router.use('/manager', require('../features/manager/routes/manager.routes'));
-
 // ==========================
 // TEACHER (Giáo viên bộ môn)
 // ==========================

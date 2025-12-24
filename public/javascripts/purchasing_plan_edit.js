@@ -145,6 +145,49 @@
         selectedDeviceModal.show();
     });
 
+    // Handle add manual device row button
+    const addManualBtn = document.getElementById('add-manual-row');
+    if (addManualBtn) {
+        addManualBtn.addEventListener('click', function () {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <input type="text" class="form-control text-center" placeholder="Danh mục" />
+                    <input type="hidden" name="items[${idx}][category]" />
+                </td>
+                <td>
+                    <input type="text" class="form-control text-center" placeholder="Mã TB" />
+                    <input type="hidden" name="items[${idx}][code]" />
+                </td>
+                <td>
+                    <input type="text" class="form-control text-center" placeholder="Tên thiết bị" />
+                    <input type="hidden" name="items[${idx}][name]" />
+                </td>
+                <td><input name="items[${idx}][quantity]" type="number" min="0" class="form-control quantity-field text-center" value="1" /></td>
+                <td><input name="items[${idx}][uom]" class="form-control text-center" placeholder="ĐVT" /></td>
+                <td><input name="items[${idx}][unitPrice]" type="text" class="form-control price-input text-end" 
+                    data-index="${idx}" value="0" /></td>
+                <td><input name="items[${idx}][source]" class="form-control text-center" placeholder="Nguồn gốc" /></td>
+                <td><input name="items[${idx}][budget]" type="text" class="form-control budget-output text-end" 
+                    data-index="${idx}" value="0" readonly /></td>
+                <td><input name="items[${idx}][expectedAt]" type="date" class="form-control text-center" /></td>
+                <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
+            `;
+            tbody.appendChild(tr);
+
+            // Sync visible inputs with hidden inputs
+            const visibleInputs = tr.querySelectorAll('input[placeholder]');
+            visibleInputs.forEach((input, i) => {
+                const hiddenInput = tr.querySelectorAll('input[type="hidden"]')[i];
+                input.addEventListener('input', function () {
+                    if (hiddenInput) hiddenInput.value = this.value;
+                });
+            });
+
+            idx++;
+        });
+    }
+
     // Handle device search
     document.getElementById('searchDevice').addEventListener('keyup', function (e) {
         const query = e.target.value.toLowerCase();
@@ -282,6 +325,69 @@
         });
     });
 
+    // Initialize year dropdowns
+    function initializeYearDropdowns() {
+        const currentYear = new Date().getFullYear();
+        const startYearSelect = document.getElementById('start-year');
+        const endYearSelect = document.getElementById('end-year');
+        const hiddenYearInput = document.getElementById('plan-year');
+
+        if (startYearSelect && endYearSelect) {
+            // Populate years (current year - 2 to current year + 5)
+            for (let year = currentYear - 2; year <= currentYear + 5; year++) {
+                const optionStart = document.createElement('option');
+                optionStart.value = year;
+                optionStart.textContent = year;
+                startYearSelect.appendChild(optionStart);
+
+                const optionEnd = document.createElement('option');
+                optionEnd.value = year;
+                optionEnd.textContent = year;
+                endYearSelect.appendChild(optionEnd);
+            }
+
+            // Set default to current academic year
+            startYearSelect.value = currentYear;
+            endYearSelect.value = currentYear + 1;
+
+            // Update hidden field
+            function updateHiddenYear() {
+                const startYear = startYearSelect.value;
+                const endYear = endYearSelect.value;
+                if (startYear && endYear) {
+                    hiddenYearInput.value = `${startYear}-${endYear}`;
+                }
+            }
+
+            startYearSelect.addEventListener('change', updateHiddenYear);
+            endYearSelect.addEventListener('change', updateHiddenYear);
+            updateHiddenYear(); // Initial update
+        }
+    }
+
+    // Auto-fetch next plan code
+    async function fetchNextPlanCode() {
+        try {
+            const response = await fetch('/teacher/purchasing-plans/api/next-code');
+            const result = await response.json();
+            if (result.success && result.data) {
+                const displayInput = document.getElementById('plan-code-display');
+                const hiddenInput = document.getElementById('plan-code');
+                if (displayInput) displayInput.value = result.data.code;
+                if (hiddenInput) hiddenInput.value = result.data.code;
+            }
+        } catch (error) {
+            console.error('Error fetching next plan code:', error);
+            const displayInput = document.getElementById('plan-code-display');
+            if (displayInput) displayInput.placeholder = 'Lỗi tải mã';
+        }
+    }
+
     // Load devices and categories on page load
-    Promise.all([loadDevices(), loadCategories()]).then(() => renderDeviceTable(allDevices));
+    Promise.all([
+        loadDevices(),
+        loadCategories(),
+        initializeYearDropdowns(),
+        fetchNextPlanCode()
+    ]).then(() => renderDeviceTable(allDevices));
 })();

@@ -29,6 +29,11 @@
             Danh mục thiết bị
         </a>
 
+        <a class="nav-link <%= currentPage === 'suppliers' ? 'active' : '' %>" href="/manager/suppliers">
+            <i class="fas fa-truck me-2"></i>
+            Quản lý nhà cung cấp
+        </a>
+
         <!-- QUẢN LÝ MƯỢN/TRẢ -->
         <h6 class="sidebar-heading text-muted mt-3 mb-1 px-3">Quản lý mượn/trả</h6>
 
@@ -37,7 +42,7 @@
             Duyệt phiếu mượn
         </a>
 
-        <a class="nav-link <%= currentPage === 'return-slips' ? 'active' : '' %>" href="/manager/borrow/return-slips">
+        <a class="nav-link <%= currentPage === 'return-slips' ? 'active' : '' %>" href="/manager/borrow/returns">
             <i class="fas fa-undo me-2"></i>
             Quản lý phiếu trả
         </a>

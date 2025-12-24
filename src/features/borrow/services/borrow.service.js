@@ -454,6 +454,21 @@ class BorrowService {
         }
     }
 
+    /**
+     * Get active borrow tickets (approved/dang_muon) for return management
+     * @param {Object} filters - Filter options  
+     * @returns {Promise<Array>} - List of active borrow tickets
+     */
+    async getActiveBorrowTicketsForReturn(filters = {}) {
+        try {
+            const tickets = await borrowRepo.getActiveBorrowTicketsForReturn(filters);
+            return tickets;
+        } catch (error) {
+            console.error('Error getting active borrow tickets for return:', error);
+            throw error;
+        }
+    }
+
 }
 
 module.exports = new BorrowService();

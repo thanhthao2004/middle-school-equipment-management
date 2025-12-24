@@ -25,25 +25,32 @@ CategorySchema.pre("save", async function (next) {
 		if (!this.id) {
 			const Category = mongoose.model("Category");
 
-			// Lấy danh mục có id lớn nhất (chỉ lấy những category có id hợp lệ)
-			const lastCategory = await Category.findOne({ 
-				id: { $exists: true, $ne: null, $type: 'string', $regex: /^DM\d+$/ } 
-			}).sort({ id: -1 }).exec();
+			// Lấy TẤT CẢ categories có id hợp lệ
+			const categories = await Category.find({
+				id: { $exists: true, $ne: null, $type: 'string', $regex: /^DM\d+$/ }
+			}).lean().exec();
 
-			if (!lastCategory || !lastCategory.id || typeof lastCategory.id !== 'string') {
+			if (!categories || categories.length === 0) {
 				this.id = "DM01";
+				console.log('[Category] Generated first ID: DM01');
 			} else {
-				const idMatch = lastCategory.id.match(/^DM(\d+)$/);
-				if (!idMatch) {
-					this.id = "DM01";
-				} else {
-					const lastNumber = parseInt(idMatch[1], 10) || 0;
-					this.id = "DM" + String(lastNumber + 1).padStart(2, "0");
-				}
+				// Extract số từ tất cả IDs và tìm max
+				const numbers = categories
+					.map(cat => {
+						const match = cat.id.match(/^DM(\d+)$/);
+						return match ? parseInt(match[1], 10) : 0;
+					})
+					.filter(num => !isNaN(num) && num > 0);
+
+				const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
+				const nextId = "DM" + String(maxNumber + 1).padStart(2, "0");
+				this.id = nextId;
+				console.log(`[Category] Generated ID: ${nextId} (max was ${maxNumber})`);
 			}
 		}
 		next();
 	} catch (err) {
+		console.error('[Category] Error in pre-save hook:', err);
 		next(err);
 	}
 });

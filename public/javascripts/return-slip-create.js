@@ -1,5 +1,5 @@
 // Create Return Slip for QLTB
-(function() {
+(function () {
     'use strict';
 
     const API_BASE = '/manager/borrow/returns';
@@ -7,28 +7,43 @@
     let borrowedItems = [];
 
     // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         setupEventListeners();
         // Set default return date to today
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('returnDate').value = today;
+
+        // Auto-load if maPhieu is in URL query params
+        const urlParams = new URLSearchParams(window.location.search);
+        const maPhieuParam = urlParams.get('maPhieu');
+
+        if (maPhieuParam) {
+            const filterInput = document.getElementById('filterMaPhieu');
+            if (filterInput) {
+                filterInput.value = maPhieuParam;
+                // Automatically trigger load after a short delay to ensure DOM is ready
+                setTimeout(() => {
+                    loadBorrowedItems();
+                }, 100);
+            }
+        }
     });
 
     function setupEventListeners() {
         // Load borrowed items button
-        document.getElementById('btnLoadBorrowedItems')?.addEventListener('click', function() {
+        document.getElementById('btnLoadBorrowedItems')?.addEventListener('click', function () {
             loadBorrowedItems();
         });
 
         // Select all checkbox
-        document.getElementById('selectAll')?.addEventListener('change', function() {
+        document.getElementById('selectAll')?.addEventListener('change', function () {
             const checkboxes = document.querySelectorAll('.item-checkbox input[type="checkbox"]:not(#selectAll)');
             checkboxes.forEach(cb => cb.checked = this.checked);
             updateQuantityInputs();
         });
 
         // Form submit
-        document.getElementById('returnSlipForm')?.addEventListener('submit', function(e) {
+        document.getElementById('returnSlipForm')?.addEventListener('submit', function (e) {
             e.preventDefault();
             createReturnSlip();
         });
@@ -50,8 +65,8 @@
             const result = await response.json();
 
             if (result.success && result.data) {
-                borrowedItems = result.data.filter(item => 
-                    item.remainingQty > 0 && 
+                borrowedItems = result.data.filter(item =>
+                    item.remainingQty > 0 &&
                     (item.trangThai === 'dang_muon' || item.trangThai === 'da_tra_mot_phan')
                 );
                 renderBorrowedItems(borrowedItems);
@@ -112,11 +127,11 @@
 
         // Add event listeners to checkboxes
         document.querySelectorAll('.item-check').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', function () {
                 const itemId = this.dataset.itemId;
                 const qtyInput = document.querySelector(`.return-qty[data-item-id="${itemId}"]`);
                 const conditionSelect = document.querySelector(`.condition-select[data-item-id="${itemId}"]`);
-                
+
                 if (this.checked) {
                     qtyInput.disabled = false;
                     conditionSelect.disabled = false;
@@ -130,7 +145,7 @@
 
         // Add event listeners to quantity inputs
         document.querySelectorAll('.return-qty').forEach(input => {
-            input.addEventListener('change', function() {
+            input.addEventListener('change', function () {
                 const max = parseInt(this.dataset.max);
                 const value = parseInt(this.value) || 0;
                 if (value > max) {
@@ -156,7 +171,7 @@
     // Create return slip
     async function createReturnSlip() {
         const checkedItems = document.querySelectorAll('.item-check:checked');
-        
+
         if (checkedItems.length === 0) {
             alert('Vui lòng chọn ít nhất một thiết bị để trả');
             return;
@@ -183,16 +198,16 @@
 
             const qtyInput = document.querySelector(`.return-qty[data-item-id="${itemId}"]`);
             const conditionSelect = document.querySelector(`.condition-select[data-item-id="${itemId}"]`);
-            
+
             if (qtyInput) {
                 const qty = parseInt(qtyInput.value) || 0;
                 const max = parseInt(qtyInput.dataset.max) || 0;
-                
+
                 if (qty > max) {
                     alert(`Số lượng trả cho thiết bị ${itemId} vượt quá số lượng còn lại`);
                     return;
                 }
-                
+
                 quantities[itemId] = qty;
             }
 
@@ -247,4 +262,3 @@
         }
     }
 })();
-
