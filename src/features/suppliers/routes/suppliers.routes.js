@@ -2,26 +2,36 @@ const express = require("express");
 const router = express.Router();
 const suppliersController = require("../controllers/suppliers.controller");
 
+// =============================
 // NCC NGỪNG HỢP TÁC
+// =============================
 router.get("/inactive", suppliersController.getInactiveListPage);
 router.post("/:id/restore", suppliersController.restoreSupplier);
 
-// GET /manager/suppliers
-router.get("/", suppliersController.getListPage);
-
-// GET /manager/suppliers/add
+// =============================
+// ADD – PHẢI ĐẶT TRƯỚC
+// =============================
 router.get("/add", suppliersController.getAddPage);
 
-// GET /manager/suppliers/edit/:id
+// =============================
+// LIST
+// =============================
+router.get("/", suppliersController.getListPage);
+
+// =============================
+// EDIT
+// =============================
 router.get("/edit/:id", suppliersController.getEditPage);
 
-// POST /manager/suppliers
+// =============================
+// CREATE
+// =============================
 router.post("/", suppliersController.createSupplier);
 
-// POST /manager/suppliers/:id
-router.post("/:id", suppliersController.updateSupplier);
-
-// POST /manager/suppliers/:id/delete
+// =============================
+// UPDATE + DELETE (ROUTE ĐỘNG)
+// =============================
 router.post("/:id/delete", suppliersController.deleteSupplier);
+router.post("/:id", suppliersController.updateSupplier);
 
 module.exports = router;

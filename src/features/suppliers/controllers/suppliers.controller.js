@@ -1,4 +1,5 @@
 const Supplier = require("../models/supplier.model");
+const Category = require("../../categories/models/category.model");
 
 class SuppliersController {
   // =============================
@@ -41,23 +42,26 @@ class SuppliersController {
   // =============================
   async getAddPage(req, res) {
     try {
-      // Lấy NCC có mã lớn nhất (mới nhất)
+      // Lấy NCC có mã lớn nhất
       const lastSupplier = await Supplier.findOne({})
         .sort({ createdAt: -1 })
         .select("maNCC");
 
       let nextNumber = 1;
-
       if (lastSupplier && lastSupplier.maNCC) {
         nextNumber = parseInt(lastSupplier.maNCC.replace("NCC", "")) + 1;
       }
 
       const nextMaNCC = "NCC" + String(nextNumber).padStart(3, "0");
 
+      // 👇 LẤY DANH MỤC THIẾT BỊ
+      const categories = await Category.find({}).sort({ name: 1 });
+
       res.render("suppliers/views/add", {
         currentPage: "suppliers",
         user: req.user,
         nextMaNCC,
+        categories, // 👈 gửi xuống view
       });
     } catch (err) {
       console.error("Add page error:", err);
@@ -68,17 +72,20 @@ class SuppliersController {
 
 
 
+
   // =============================
   // GET /manager/suppliers/edit/:id
   // =============================
   async getEditPage(req, res) {
     try {
       const supplier = await Supplier.findById(req.params.id);
-
       if (!supplier) return res.redirect("/manager/suppliers");
+
+      const categories = await Category.find({}).sort({ name: 1 });
 
       res.render("suppliers/views/edit", {
         supplier,
+        categories, // 👈 BẮT BUỘC
         currentPage: "suppliers",
         user: req.user,
       });
@@ -87,6 +94,7 @@ class SuppliersController {
       res.redirect("/manager/suppliers");
     }
   }
+
 
   // =============================
   // POST /manager/suppliers
