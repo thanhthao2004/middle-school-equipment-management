@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome (CDN) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/purchasing-plans.css" rel="stylesheet">
+</head>
+
+<body class="purchasing-plans-page">
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'to_truong' }; %>
+
+        <!-- Header -->
+        <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans' , user: userObj }) %>
+
+            <div class="app-shell">
+                <div class="sidebar-column">
+                    <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans' , user:
+                        userObj }) %>
+                </div>
+
+                <div class="main-content">
+                    <div class="container py-4">
+                        <main class="page-main">
+                            <div class="page-header">
+                                <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
+                                <div class="page-subtitle">Lập kế hoạch mua sắm mới</div>
+                            </div>
+
+                            <form action="/teacher/purchasing-plans" method="post">
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Mã kế hoạch</label>
+                                        <!-- Mã hiển thị preview, mã thực sẽ tạo mới khi lưu -->
+                                        <input id="plan-code-display" class="form-control" readonly />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Năm học <span class="text-danger">*</span></label>
+                                        <select id="namHoc" name="namHoc" class="form-select" required>
+                                            <option value="">-- Chọn năm học --</option>
+                                            <option value="2025-2026" selected>2025-2026</option>
+                                            <option value="2026-2027" disabled>2026-2027 (Chưa được phép)</option>
+                                            <option value="2027-2028" disabled>2027-2028 (Chưa được phép)</option>
+                                            <option value="2028-2029" disabled>2028-2029 (Chưa được phép)</option>
+                                            <option value="2029-2030" disabled>2029-2030 (Chưa được phép)</option>
+                                        </select>
+                                        <small id="namHocHelp" class="form-text text-muted"></small>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-end justify-content-end">
+                                        <button type="button" id="add-row"
+                                            class="btn-register btn btn-outline-secondary small-btn me-2">
+                                            <i class="fa-solid fa-plus"></i> Thêm nhiều thiết bị
+                                        </button>
+
+                                    </div>
+                                </div>
+
+                                <div class="card card-table mb-3">
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Tên Danh Mục TB</th>
+                                                        <th>Mã TB</th>
+                                                        <th>Tên TB</th>
+                                                        <th>Số lượng dự kiến</th>
+                                                        <th>ĐVT</th>
+                                                        <th>Đơn giá</th>
+                                                        <th>Nguồn gốc</th>
+                                                        <th>Dự toán kinh phí</th>
+                                                        <th>Thời gian dự kiến mua</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="items-tbody">
+                                                    <tr>
+                                                        <td><input name="items[0][category]" class="form-control" />
+                                                        </td>
+                                                        <td><input name="items[0][code]" class="form-control" />
+                                                        </td>
+                                                        <td><input name="items[0][name]" class="form-control" />
+                                                        </td>
+                                                        <td><input name="items[0][quantity]" type="number" min="0"
+                                                                class="form-control" /></td>
+                                                        <td><input name="items[0][uom]" class="form-control" />
+                                                        </td>
+                                                        <td><input name="items[0][unitPrice]" type="text"
+                                                                class="form-control price-input" data-index="0" />
+                                                        </td>
+                                                        <td><input name="items[0][source]" class="form-control" /></td>
+                                                        <td><input name="items[0][budget]" type="text"
+                                                                class="form-control budget-input" data-index="0" /></td>
+                                                        <td><input name="items[0][expectedAt]" type="date"
+                                                                class="form-control" />
+                                                        </td>
+                                                        <td class="text-end"><button type="button"
+                                                                class="btn btn-sm btn-outline-danger remove-row">✖</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end gap-3">
+                                    <a href="/teacher/purchasing-plans" class="btn btn-secondary">Đóng</a>
+                                    <button type="submit" class="btn btn-danger">Lưu và gửi Phê duyệt</button>
+                                </div>
+                            </form>
+
+                            <template id="row-template">
+                                <tr>
+                                    <td><input name="__NAME__" class="form-control" /></td>
+                                </tr>
+                            </template>
+
+                        </main>
+                    </div>
+                </div>
+            </div>
+            </div>
+            </div>
+
+            <!-- Modal chọn thiết bị -->
+            <div class="modal fade" id="selectDeviceModal" tabindex="-1" aria-labelledby="selectDeviceModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header bg-light">
+                            <h5 class="modal-title d-flex align-items-center" id="selectDeviceModalLabel">
+                                <i class="fa-solid fa-box me-2 text-primary"></i>
+                                Chọn thiết bị
+                                <span id="selectedCountBadge" class="badge bg-primary ms-3 px-3 py-2">Đã chọn: 0</span>
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" style="max-height: 70vh;">
+                            <div class="row g-3 mb-4 p-3 bg-light rounded">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold"><i class="fa-solid fa-filter me-1"></i>Danh
+                                        mục thiết bị</label>
+                                    <select id="categoryFilter" class="form-select">
+                                        <option value="">Tất cả danh mục</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label fw-semibold"><i
+                                            class="fa-solid fa-magnifying-glass me-1"></i>Tìm kiếm</label>
+                                    <div class="input-group">
+                                        <input type="text" id="searchDevice" class="form-control"
+                                            placeholder="Nhập mã hoặc tên thiết bị để tìm kiếm...">
+                                        <button class="btn btn-primary" type="button" id="searchBtn">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="max-height: 50vh; overflow-y: auto;">
+                                <table class="table table-hover table-bordered align-middle mb-0">
+                                    <thead class="table-primary position-sticky top-0" style="z-index: 2;">
+                                        <tr>
+                                            <th style="width: 50px;" class="text-center">
+                                                <input type="checkbox" id="selectAllDevices" class="form-check-input"
+                                                    title="Chọn tất cả" style="cursor: pointer;">
+                                            </th>
+                                            <th style="width: 100px;" class="text-center">Mã TB</th>
+                                            <th>Tên thiết bị</th>
+                                            <th style="width: 150px;" class="text-center">Số lượng</th>
+                                            <th style="width: 80px;" class="text-center">ĐVT</th>
+                                            <th style="width: 130px;" class="text-end">Đơn giá</th>
+                                            <th style="width: 120px;" class="text-center">Nguồn gốc</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="deviceTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fa-solid fa-times me-1"></i>Đóng
+                            </button>
+                            <button type="button" id="confirmSelectDevice" class="btn btn-danger">
+                                <i class="fa-solid fa-check me-1"></i>Chọn (0)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script>
+                (function () {
+                    // Hiển thị preview mã kế hoạch tiếp theo (VD: KH001, KH002...)
+                    // LƯU Ý: Đây chỉ là preview, mã thực sẽ được tạo khi nhấn "Lưu và gửi Phê duyệt"
+                    // Mã chỉ tăng trong database khi lưu thành công
+                    const codeDisplay = document.getElementById('plan-code-display');
+                    // Validation năm học
+                    const namHocSelect = document.getElementById('namHoc');
+                    const namHocHelp = document.getElementById('namHocHelp');
+                    const allowedYears = ['2025-2026']; // Các năm học được phép
+
+                    if (namHocSelect) {
+                        namHocSelect.addEventListener('change', function (e) {
+                            const selectedYear = e.target.value;
+                            if (selectedYear && !allowedYears.includes(selectedYear)) {
+                                namHocHelp.textContent = 'Năm học này chưa được phép tạo kế hoạch';
+                                namHocHelp.classList.add('text-danger');
+                                namHocHelp.classList.remove('text-muted');
+                            } else {
+                                namHocHelp.textContent = '';
+                                namHocHelp.classList.remove('text-danger');
+                                namHocHelp.classList.add('text-muted');
+                            }
+                        });
+                    }
+
+                    // Validate trước khi submit
+                    const formElement = document.querySelector('form');
+                    const originalSubmit = formElement.onsubmit;
+                    formElement.addEventListener('submit', function (e) {
+                        const selectedYear = namHocSelect.value;
+                        if (!selectedYear) {
+                            e.preventDefault();
+                            alert('Vui lòng chọn năm học!');
+                            return false;
+                        }
+                        if (!allowedYears.includes(selectedYear)) {
+                            e.preventDefault();
+                            alert('Năm học này chưa được phép tạo kế hoạch. Vui lòng chọn năm học 2025-2026.');
+                            return false;
+                        }
+                    });
+
+                    if (codeDisplay && !codeDisplay.value) {
+                        fetch('/teacher/purchasing-plans/api/next-code')
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.success) {
+                                    codeDisplay.value = result.data.code;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching next plan code:', error);
+                                codeDisplay.value = 'KH???';
+                            });
+                    }
+
+                    const addBtn = document.getElementById('add-row');
+                    const tbody = document.getElementById('items-tbody');
+                    let idx = 1; // already have 0
+                    let allDevices = [];
+                    let allCategories = [];
+                    let selectedDeviceModal = new bootstrap.Modal(document.getElementById('selectDeviceModal'));
+
+                    // Utility: Format currency
+                    function formatCurrency(value) {
+                        if (!value) return '';
+                        return new Intl.NumberFormat('vi-VN').format(Math.round(value));
+                    }
+
+                    // Utility: Parse currency (remove dots)
+                    function parseCurrency(str) {
+                        if (!str) return 0;
+                        return parseInt(str.replace(/\./g, ''), 10);
+                    }
+
+                    // Load categories from API
+                    async function loadCategories() {
+                        try {
+                            const response = await fetch('/teacher/purchasing-plans/api/categories', {
+                                headers: { 'Accept': 'application/json' }
+                            });
+                            if (!response.ok) {
+                                throw new Error(`API trả về lỗi ${response.status}`);
+                            }
+                            const result = await response.json();
+                            if (result && result.success) {
+                                allCategories = Array.isArray(result.data) ? result.data : [];
+                                populateCategoryFilter();
+                            } else {
+                                allCategories = [];
+                            }
+                        } catch (error) {
+                            console.error('Error loading categories:', error);
+                            allCategories = [];
+                        }
+                    }
+
+                    // Populate category filter dropdown
+                    function populateCategoryFilter() {
+                        const categoryFilter = document.getElementById('categoryFilter');
+                        if (!categoryFilter) return;
+
+                        // Keep the default option
+                        categoryFilter.innerHTML = '<option value="">Tất cả danh mục</option>';
+
+                        allCategories.forEach(category => {
+                            const option = document.createElement('option');
+                            option.value = category._id;
+                            option.textContent = category.name;
+                            categoryFilter.appendChild(option);
+                        });
+                    }
+
+                    // Load devices from API
+                    async function loadDevices() {
+                        try {
+                            const response = await fetch('/teacher/purchasing-plans/api/devices', {
+                                headers: { 'Accept': 'application/json' }
+                            });
+                            if (!response.ok) {
+                                throw new Error(`API trả về lỗi ${response.status}`);
+                            }
+                            const result = await response.json();
+                            if (result && result.success) {
+                                allDevices = Array.isArray(result.data) ? result.data : [];
+                            } else {
+                                allDevices = [];
+                                const msg = (result && result.message) ? result.message : 'Không thể tải danh sách thiết bị.';
+                                console.warn('Device API warning:', msg);
+                            }
+                        } catch (error) {
+                            console.error('Error loading devices:', error);
+                            allDevices = [];
+                        }
+                    }
+
+                    // Render device table in modal
+                    function renderDeviceTable(devices) {
+                        const tbody = document.getElementById('deviceTableBody');
+                        tbody.innerHTML = '';
+                        if (!devices || devices.length === 0) {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td colspan="7" class="text-center py-5">
+                                    <i class="fa-solid fa-box-open fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted mb-0">Chưa có thiết bị nào.</p>
+                                    <small class="text-muted">Vui lòng thêm ở mục Quản lý thiết bị.</small>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                            return;
+                        }
+                        // Reset select-all
+                        const selectAll = document.getElementById('selectAllDevices');
+                        if (selectAll) selectAll.checked = false;
+
+                        devices.forEach((device, idx) => {
+                            const tr = document.createElement('tr');
+                            tr.classList.add('device-row');
+                            tr.style.cursor = 'pointer';
+                            // Find category name from allCategories
+                            const categoryName = device.category ?
+                                (allCategories.find(c => c._id === device.category)?.name || '') : '';
+                            tr.innerHTML = `
+                        <td class="text-center">
+                            <input type="checkbox" class="form-check-input device-checkbox" value="${device.id}" 
+                                data-code="${device.code}" data-name="${device.name}" data-price="${device.price}" 
+                                data-source="${device.source || ''}" data-category="${categoryName}" style="cursor: pointer;">
+                        </td>
+                        <td class="text-center fw-semibold">${device.code}</td>
+                        <td>${device.name}</td>
+                        <td class="text-center">
+                            <div class="d-flex align-items-center justify-content-center gap-1">
+                                <button class="btn btn-sm btn-outline-secondary qty-decrease" type="button" style="width: 30px; height: 30px; padding: 0;">−</button>
+                                <input type="number" class="form-control form-control-sm text-center device-quantity" min="1" value="1" style="width: 50px; height: 30px;">
+                                <button class="btn btn-sm btn-outline-secondary qty-increase" type="button" style="width: 30px; height: 30px; padding: 0;">+</button>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <input type="text" class="form-control form-control-sm text-center device-uom" value="${device.uom || 'Cái'}" style="max-width: 70px;">
+                        </td>
+                        <td class="text-end">
+                            <input type="text" class="form-control form-control-sm text-end device-unit-price fw-semibold" value="${formatCurrency(device.price || 0)}" style="background-color: #f8f9fa;">
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-info text-dark">${device.source || 'Mua mới'}</span>
+                        </td>
+                    `;
+                            tbody.appendChild(tr);
+
+                            // Allow clicking entire row to toggle checkbox
+                            tr.addEventListener('click', function (e) {
+                                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && !e.target.closest('.input-group')) {
+                                    const checkbox = tr.querySelector('.device-checkbox');
+                                    if (checkbox) {
+                                        checkbox.checked = !checkbox.checked;
+                                        checkbox.dispatchEvent(new Event('change'));
+                                    }
+                                }
+                            });
+                        });
+
+                        // Add quantity adjustment listeners
+                        document.querySelectorAll('.qty-decrease').forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const input = this.nextElementSibling;
+                                let val = parseInt(input.value) || 0;
+                                if (val > 0) input.value = val - 1;
+                            });
+                        });
+
+                        document.querySelectorAll('.qty-increase').forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const input = this.previousElementSibling;
+                                let val = parseInt(input.value) || 0;
+                                input.value = val + 1;
+                            });
+                        });
+
+                        // Checkbox selection handlers
+                        function updateSelectedCount() {
+                            const checked = document.querySelectorAll('.device-checkbox:checked').length;
+                            const badge = document.getElementById('selectedCountBadge');
+                            const btn = document.getElementById('confirmSelectDevice');
+                            if (badge) badge.textContent = `Đã chọn: ${checked}`;
+                            if (btn) btn.textContent = `Chọn (${checked})`;
+                        }
+
+                        document.querySelectorAll('.device-checkbox').forEach(cb => {
+                            cb.addEventListener('change', function () {
+                                const row = this.closest('tr');
+                                if (row) {
+                                    if (this.checked) row.classList.add('table-active');
+                                    else row.classList.remove('table-active');
+                                }
+                                updateSelectedCount();
+                            });
+                        });
+
+                        const selectAllCb = document.getElementById('selectAllDevices');
+                        if (selectAllCb) {
+                            selectAllCb.addEventListener('change', function () {
+                                const all = document.querySelectorAll('.device-checkbox');
+                                all.forEach(cb => {
+                                    cb.checked = selectAllCb.checked;
+                                    const row = cb.closest('tr');
+                                    if (row) {
+                                        if (cb.checked) row.classList.add('table-active');
+                                        else row.classList.remove('table-active');
+                                    }
+                                });
+                                updateSelectedCount();
+                            });
+                        }
+
+                        // Initialize count on render
+                        updateSelectedCount();
+                    }
+
+                    // Handle add devices button (ensure devices are loaded)
+                    addBtn.addEventListener('click', async function () {
+                        try {
+                            if (!allDevices || allDevices.length === 0) {
+                                await loadDevices();
+                            }
+                            renderDeviceTable(allDevices);
+                        } catch (err) {
+                            console.error('Unable to load devices:', err);
+                            renderDeviceTable([]);
+                        }
+                        selectedDeviceModal.show();
+                    });
+
+                    // Handle device search
+                    document.getElementById('searchDevice').addEventListener('keyup', function (e) {
+                        const query = e.target.value.toLowerCase();
+                        const categoryId = document.getElementById('categoryFilter').value;
+                        let filtered = allDevices.filter(device =>
+                            device.code.toLowerCase().includes(query) ||
+                            device.name.toLowerCase().includes(query)
+                        );
+                        if (categoryId) {
+                            filtered = filtered.filter(device => {
+                                // Compare with string version of category._id
+                                return device.category && device.category.toString() === categoryId;
+                            });
+                        }
+                        renderDeviceTable(filtered);
+                    });
+
+                    document.getElementById('searchBtn').addEventListener('click', function () {
+                        document.getElementById('searchDevice').dispatchEvent(new Event('keyup'));
+                    });
+
+                    // Handle category filter
+                    document.getElementById('categoryFilter').addEventListener('change', function (e) {
+                        document.getElementById('searchDevice').dispatchEvent(new Event('keyup'));
+                    });
+
+                    // Handle confirm device selection
+                    document.getElementById('confirmSelectDevice').addEventListener('click', function () {
+                        const rows = document.querySelectorAll('#deviceTableBody tr');
+                        let selectedCount = 0;
+
+                        rows.forEach(row => {
+                            const checkbox = row.querySelector('.device-checkbox:checked');
+                            if (checkbox) {
+                                const quantity = parseInt(row.querySelector('.device-quantity').value) || 1;
+                                const uom = row.querySelector('.device-uom').value || '';
+                                const unitPrice = parseCurrency(row.querySelector('.device-unit-price').value) || 0;
+                                const source = checkbox.dataset.source || '';
+                                const categoryName = checkbox.dataset.category || '';
+                                const totalBudget = unitPrice * quantity;
+
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `
+                            <td><input name="items[${idx}][category]" class="form-control" value="${categoryName}" readonly /></td>
+                            <td><input name="items[${idx}][code]" class="form-control" value="${checkbox.dataset.code}" readonly /></td>
+                            <td><input name="items[${idx}][name]" class="form-control" value="${checkbox.dataset.name}" readonly /></td>
+                            <td><input name="items[${idx}][quantity]" type="number" min="0" class="form-control quantity-field" value="${quantity}" /></td>
+                            <td><input name="items[${idx}][uom]" class="form-control" value="${uom}" /></td>
+                            <td><input name="items[${idx}][unitPrice]" type="text" class="form-control price-input" 
+                                data-index="${idx}" value="${formatCurrency(unitPrice)}" /></td>
+                            <td><input name="items[${idx}][source]" class="form-control" value="${source}" /></td>
+                            <td><input name="items[${idx}][budget]" type="text" class="form-control budget-output" 
+                                data-index="${idx}" value="${formatCurrency(totalBudget)}" readonly /></td>
+                            <td><input name="items[${idx}][expectedAt]" type="date" class="form-control" /></td>
+                            <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
+                        `;
+                                tbody.appendChild(tr);
+                                idx++;
+                                selectedCount++;
+                            }
+                        });
+
+                        // Show notification
+                        if (selectedCount > 0) {
+                            alert(`Đã thêm ${selectedCount} thiết bị vào bảng.`);
+                        } else {
+                            alert('Vui lòng chọn ít nhất một thiết bị.');
+                            return;
+                        }
+
+                        selectedDeviceModal.hide();
+
+                        // Reset search and filter
+                        document.getElementById('searchDevice').value = '';
+                        document.getElementById('categoryFilter').value = '';
+
+                        // Reset selected count in modal
+                        const badge = document.getElementById('selectedCountBadge');
+                        const btn = document.getElementById('confirmSelectDevice');
+                        if (badge) badge.textContent = 'Đã chọn: 0';
+                        if (btn) btn.textContent = 'Chọn (0)';
+                    });
+
+                    // Handle budget input formatting
+                    // Auto calculate budget when quantity or unit price changes
+                    document.addEventListener('input', function (e) {
+                        if (e.target.classList.contains('quantity-field') || e.target.classList.contains('price-input')) {
+                            const row = e.target.closest('tr');
+                            const quantityInput = row.querySelector('.quantity-field');
+                            const priceInput = row.querySelector('.price-input');
+                            const budgetOutput = row.querySelector('.budget-output');
+
+                            if (quantityInput && priceInput && budgetOutput) {
+                                const quantity = parseInt(quantityInput.value) || 0;
+                                const unitPrice = parseCurrency(priceInput.value) || 0;
+                                const total = quantity * unitPrice;
+                                budgetOutput.value = formatCurrency(total);
+                            }
+                        }
+
+                        if (e.target.classList.contains('price-input')) {
+                            let value = e.target.value.replace(/\./g, '');
+                            if (value) {
+                                value = formatCurrency(value);
+                                e.target.value = value;
+                            }
+                        }
+                    });
+
+                    // Handle remove row
+                    document.addEventListener('click', function (e) {
+                        if (e.target && e.target.classList.contains('remove-row')) {
+                            const tr = e.target.closest('tr');
+                            if (tr) tr.remove();
+                        }
+                    });
+
+                    // Handle form submit - convert currency to number
+                    document.querySelector('form').addEventListener('submit', function (e) {
+                        const priceInputs = document.querySelectorAll('.price-input');
+                        const budgetOutputs = document.querySelectorAll('.budget-output');
+                        priceInputs.forEach(input => {
+                            const value = parseCurrency(input.value);
+                            input.value = value || '';
+                        });
+                        budgetOutputs.forEach(input => {
+                            const value = parseCurrency(input.value);
+                            input.value = value || '';
+                        });
+                    });
+
+                    // Load categories and devices on page load
+                    loadCategories();
+                    loadDevices();
+                })();
+            </script>
+
+            <%- include('../../../views/partials/footer') %>
+</body>
+
+</html>

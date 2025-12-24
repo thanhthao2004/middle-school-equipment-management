@@ -1,5 +1,5 @@
 const express = require('express');
-const multer  = require('multer');
+const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
@@ -32,7 +32,7 @@ const upload = multer({ storage });
 // ==========================
 
 
-const upload = multer({ storage });
+
 
 // LIST
 router.get('/', controller.getReportListPage);
@@ -41,27 +41,16 @@ router.get('/', controller.getReportListPage);
 router.get('/create', controller.getCreateReportPage);
 router.post('/', upload.single('file'), controller.createReport);
 
-// EXPORT đặt trước /:id
-router.get('/export', controller.exportReport);
+// DETAIL
+router.get('/:id', controller.getReportDetailPage);
 
-// Tạo báo cáo mới
-// POST /periodic-reports
-router.post(
-  '/',
-  upload.single('reportFile'),          // name="reportFile" trong form
-  periodicReportController.createReport
-);
-// Cập nhật báo cáo
-// POST /periodic-reports/:id
-router.post('/:id', periodicReportController.updateReport);
+// UPDATE
+router.post('/:id/update', controller.updateReport);
 
 // DELETE
 router.post('/:id/delete', controller.deleteReport);
 
 // DOWNLOAD
 router.get('/:id/download', controller.downloadReportFile);
-
-// PLACEHOLDER
-router.post('/:id/item/:itemId/status', controller.updateItemStatus);
 
 module.exports = router;

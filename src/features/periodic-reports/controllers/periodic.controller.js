@@ -78,16 +78,16 @@ class PeriodicReportController {
       res.status(500).send(error.message);
     }
   }
-//    // POST /periodic-reports/:id
-//   async updateReport(req, res) {
-//     try {
-//       await periodicReportService.updateReport(req.params.id, req.body);
-//       res.redirect(`/manager/periodic-reports/${req.params.id}`);
-//     } catch (error) {
-//       console.error("Error updating report:", error);
-//       res.status(500).send(error.message);
-//     }
-//   }
+  //    // POST /periodic-reports/:id
+  //   async updateReport(req, res) {
+  //     try {
+  //       await periodicReportService.updateReport(req.params.id, req.body);
+  //       res.redirect(`/manager/periodic-reports/${req.params.id}`);
+  //     } catch (error) {
+  //       console.error("Error updating report:", error);
+  //       res.status(500).send(error.message);
+  //     }
+  //   }
 
   // POST /periodic-reports/:id/delete
   async deleteReport(req, res) {
