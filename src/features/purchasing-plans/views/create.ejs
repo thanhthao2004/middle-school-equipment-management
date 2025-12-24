@@ -68,40 +68,49 @@
                                             <table class="table table-hover align-middle">
                                                 <thead>
                                                     <tr>
-                                                        <th>Tên Danh Mục TB</th>
-                                                        <th>Mã TB</th>
-                                                        <th>Tên TB</th>
-                                                        <th>Số lượng dự kiến</th>
-                                                        <th>ĐVT</th>
-                                                        <th>Đơn giá</th>
-                                                        <th>Nguồn gốc</th>
-                                                        <th>Dự toán kinh phí</th>
-                                                        <th>Thời gian dự kiến mua</th>
-                                                        <th></th>
+                                                        <th style="width: 220px;">Tên Danh Mục TB</th>
+                                                        <th style="width: 110px;">Mã TB</th>
+                                                        <th style="width: 250px;">Tên TB</th>
+                                                        <th style="width: 140px;" class="text-center">Số lượng dự kiến
+                                                        </th>
+                                                        <th style="width: 160px;" class="text-center">ĐVT</th>
+                                                        <th style="width: 200px;" class="text-end">Đơn giá</th>
+                                                        <th style="width: 150px;" class="text-center">Nguồn gốc</th>
+                                                        <th style="width: 200px;" class="text-end">Dự toán kinh phí</th>
+                                                        <th style="width: 170px;" class="text-center">Thời gian dự kiến
+                                                            mua</th>
+                                                        <th style="width: 50px;"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="items-tbody">
                                                     <tr>
-                                                        <td><input name="items[0][category]" class="form-control" />
-                                                        </td>
-                                                        <td><input name="items[0][code]" class="form-control" />
-                                                        </td>
-                                                        <td><input name="items[0][name]" class="form-control" />
-                                                        </td>
-                                                        <td><input name="items[0][quantity]" type="number" min="0"
-                                                                class="form-control" /></td>
-                                                        <td><input name="items[0][uom]" class="form-control" />
-                                                        </td>
-                                                        <td><input name="items[0][unitPrice]" type="text"
-                                                                class="form-control price-input" data-index="0" />
-                                                        </td>
-                                                        <td><input name="items[0][source]" class="form-control" /></td>
-                                                        <td><input name="items[0][budget]" type="text"
-                                                                class="form-control budget-input" data-index="0" /></td>
-                                                        <td><input name="items[0][expectedAt]" type="date"
+                                                        <td style="width: 220px;"><input name="items[0][category]"
                                                                 class="form-control" />
                                                         </td>
-                                                        <td class="text-end"><button type="button"
+                                                        <td style="width: 110px;"><input name="items[0][code]"
+                                                                class="form-control" />
+                                                        </td>
+                                                        <td style="width: 250px;"><input name="items[0][name]"
+                                                                class="form-control" />
+                                                        </td>
+                                                        <td style="width: 140px;"><input name="items[0][quantity]"
+                                                                type="number" min="0" class="form-control" /></td>
+                                                        <td style="width: 160px;"><input name="items[0][uom]"
+                                                                class="form-control" />
+                                                        </td>
+                                                        <td style="width: 200px;"><input name="items[0][unitPrice]"
+                                                                type="text" class="form-control price-input"
+                                                                data-index="0" />
+                                                        </td>
+                                                        <td style="width: 150px;"><input name="items[0][source]"
+                                                                class="form-control" /></td>
+                                                        <td style="width: 200px;"><input name="items[0][budget]"
+                                                                type="text" class="form-control budget-input"
+                                                                data-index="0" /></td>
+                                                        <td style="width: 170px;"><input name="items[0][expectedAt]"
+                                                                type="date" class="form-control" />
+                                                        </td>
+                                                        <td style="width: 50px;" class="text-end"><button type="button"
                                                                 class="btn btn-sm btn-outline-danger remove-row">✖</button>
                                                         </td>
                                                     </tr>
@@ -172,12 +181,12 @@
                                                 <input type="checkbox" id="selectAllDevices" class="form-check-input"
                                                     title="Chọn tất cả" style="cursor: pointer;">
                                             </th>
-                                            <th style="width: 100px;" class="text-center">Mã TB</th>
+                                            <th style="width: 80px;" class="text-center">Mã TB</th>
                                             <th>Tên thiết bị</th>
-                                            <th style="width: 150px;" class="text-center">Số lượng</th>
-                                            <th style="width: 80px;" class="text-center">ĐVT</th>
-                                            <th style="width: 130px;" class="text-end">Đơn giá</th>
-                                            <th style="width: 120px;" class="text-center">Nguồn gốc</th>
+                                            <th style="width: 50px;" class="text-center">Số lượng</th>
+                                            <th style="width: 70px;" class="text-center">ĐVT</th>
+                                            <th style="width: 150px;" class="text-end">Đơn giá</th>
+                                            <th style="width: 100px;" class="text-center">Nguồn gốc</th>
                                         </tr>
                                     </thead>
                                     <tbody id="deviceTableBody">
@@ -257,7 +266,7 @@
 
                     const addBtn = document.getElementById('add-row');
                     const tbody = document.getElementById('items-tbody');
-                    let idx = 1; // already have 0
+                    let idx = 0;
                     let allDevices = [];
                     let allCategories = [];
                     let selectedDeviceModal = new bootstrap.Modal(document.getElementById('selectDeviceModal'));
@@ -363,27 +372,27 @@
                             const categoryName = device.category ?
                                 (allCategories.find(c => c._id === device.category)?.name || '') : '';
                             tr.innerHTML = `
-                        <td class="text-center">
+                        <td style="width: 50px;" class="text-center">
                             <input type="checkbox" class="form-check-input device-checkbox" value="${device.id}" 
                                 data-code="${device.code}" data-name="${device.name}" data-price="${device.price}" 
-                                data-source="${device.source || ''}" data-category="${categoryName}" style="cursor: pointer;">
+                                data-source="${device.source || ''}" data-category="${categoryName}" style="cursor: pointer; width: 1.2em; height: 1.2em;">
                         </td>
-                        <td class="text-center fw-semibold">${device.code}</td>
+                        <td style="width: 80px;" class="text-center fw-semibold">${device.code}</td>
                         <td>${device.name}</td>
-                        <td class="text-center">
+                        <td style="width: 110px;" class="text-center">
                             <div class="d-flex align-items-center justify-content-center gap-1">
                                 <button class="btn btn-sm btn-outline-secondary qty-decrease" type="button" style="width: 30px; height: 30px; padding: 0;">−</button>
                                 <input type="number" class="form-control form-control-sm text-center device-quantity" min="1" value="1" style="width: 50px; height: 30px;">
                                 <button class="btn btn-sm btn-outline-secondary qty-increase" type="button" style="width: 30px; height: 30px; padding: 0;">+</button>
                             </div>
                         </td>
-                        <td class="text-center">
-                            <input type="text" class="form-control form-control-sm text-center device-uom" value="${device.uom || 'Cái'}" style="max-width: 70px;">
+                        <td style="width: 80px;" class="text-center">
+                            <input type="text" class="form-control form-control-sm text-center device-uom" value="${device.uom || 'Cái'}" style="max-width: 60px;">
                         </td>
-                        <td class="text-end">
+                        <td style="width: 150px;" class="text-end">
                             <input type="text" class="form-control form-control-sm text-end device-unit-price fw-semibold" value="${formatCurrency(device.price || 0)}" style="background-color: #f8f9fa;">
                         </td>
-                        <td class="text-center">
+                        <td style="width: 100px;" class="text-center">
                             <span class="badge bg-info text-dark">${device.source || 'Mua mới'}</span>
                         </td>
                     `;
@@ -503,6 +512,22 @@
                         const rows = document.querySelectorAll('#deviceTableBody tr');
                         let selectedCount = 0;
 
+                        // Xóa row mẫu nếu đây là lần thêm đầu tiên
+                        if (idx === 0 && tbody.children.length === 1) {
+                            const firstRow = tbody.children[0];
+                            // Kiểm tra nếu row đầu tiên rỗng
+                            const inputs = firstRow.querySelectorAll('input');
+                            let isEmpty = true;
+                            inputs.forEach(input => {
+                                if (input.value && input.value.trim() !== '') {
+                                    isEmpty = false;
+                                }
+                            });
+                            if (isEmpty) {
+                                firstRow.remove();
+                            }
+                        }
+
                         rows.forEach(row => {
                             const checkbox = row.querySelector('.device-checkbox:checked');
                             if (checkbox) {
@@ -515,18 +540,18 @@
 
                                 const tr = document.createElement('tr');
                                 tr.innerHTML = `
-                            <td><input name="items[${idx}][category]" class="form-control" value="${categoryName}" readonly /></td>
-                            <td><input name="items[${idx}][code]" class="form-control" value="${checkbox.dataset.code}" readonly /></td>
-                            <td><input name="items[${idx}][name]" class="form-control" value="${checkbox.dataset.name}" readonly /></td>
-                            <td><input name="items[${idx}][quantity]" type="number" min="0" class="form-control quantity-field" value="${quantity}" /></td>
-                            <td><input name="items[${idx}][uom]" class="form-control" value="${uom}" /></td>
-                            <td><input name="items[${idx}][unitPrice]" type="text" class="form-control price-input" 
+                            <td style="width: 220px;"><input name="items[${idx}][category]" class="form-control" value="${categoryName}" readonly /></td>
+                            <td style="width: 110px;"><input name="items[${idx}][code]" class="form-control" value="${checkbox.dataset.code}" readonly /></td>
+                            <td style="width: 250px;"><input name="items[${idx}][name]" class="form-control" value="${checkbox.dataset.name}" readonly /></td>
+                            <td style="width: 140px;"><input name="items[${idx}][quantity]" type="number" min="0" class="form-control quantity-field" value="${quantity}" /></td>
+                            <td style="width: 160px;"><input name="items[${idx}][uom]" class="form-control" value="${uom}" /></td>
+                            <td style="width: 200px;"><input name="items[${idx}][unitPrice]" type="text" class="form-control price-input" 
                                 data-index="${idx}" value="${formatCurrency(unitPrice)}" /></td>
-                            <td><input name="items[${idx}][source]" class="form-control" value="${source}" /></td>
-                            <td><input name="items[${idx}][budget]" type="text" class="form-control budget-output" 
+                            <td style="width: 150px;"><input name="items[${idx}][source]" class="form-control" value="${source}" /></td>
+                            <td style="width: 200px;"><input name="items[${idx}][budget]" type="text" class="form-control budget-output" 
                                 data-index="${idx}" value="${formatCurrency(totalBudget)}" readonly /></td>
-                            <td><input name="items[${idx}][expectedAt]" type="date" class="form-control" /></td>
-                            <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
+                            <td style="width: 170px;"><input name="items[${idx}][expectedAt]" type="date" class="form-control" /></td>
+                            <td style="width: 50px;" class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
                         `;
                                 tbody.appendChild(tr);
                                 idx++;
@@ -534,10 +559,8 @@
                             }
                         });
 
-                        // Show notification
-                        if (selectedCount > 0) {
-                            alert(`Đã thêm ${selectedCount} thiết bị vào bảng.`);
-                        } else {
+                        // Check if any device was selected
+                        if (selectedCount === 0) {
                             alert('Vui lòng chọn ít nhất một thiết bị.');
                             return;
                         }
