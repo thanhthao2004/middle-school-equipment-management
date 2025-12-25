@@ -58,6 +58,16 @@
     font-weight: 500;
 }
 
+.condition-fair {
+    color: #fd7e14; /* Orange color for "Khá" */
+    font-weight: 500;
+}
+
+.condition-average {
+    color: #ffc107; /* Yellow color for "Trung bình" */
+    font-weight: 500;
+}
+
 .condition-damaged {
     color: var(--error-red);
     font-weight: 500;

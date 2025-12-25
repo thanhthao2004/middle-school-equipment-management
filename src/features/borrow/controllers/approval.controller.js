@@ -6,7 +6,7 @@ class BorrowController {
     async getRegisterPage(req, res) {
         try {
             // FIX: Sử dụng đường dẫn tương đối từ views root (src/views)
-            res.render('borrow/register', { 
+            res.render('borrow/register', {
                 title: 'Đăng ký mượn thiết bị',
                 currentPage: 'register',
                 sidebarType: 'borrow-sidebar',
@@ -16,7 +16,7 @@ class BorrowController {
         } catch (error) {
             console.error('Error rendering register page:', error);
             // Sửa lỗi render
-            res.status(500).send(error.message); 
+            res.status(500).send(error.message);
         }
     }
 
@@ -26,7 +26,7 @@ class BorrowController {
             const userId = req.user?.id || 1;
             const slips = await borrowService.getPendingApprovals(userId, {});
             // FIX: Sử dụng đường dẫn tương đối từ views root (src/views)
-            res.render('borrow/pending-approvals', { 
+            res.render('borrow/pending-approvals', {
                 title: 'Phiếu mượn chờ duyệt',
                 currentPage: 'status',
                 sidebarType: 'borrow-sidebar',
@@ -36,7 +36,7 @@ class BorrowController {
         } catch (error) {
             console.error('Error rendering pending approvals page:', error);
             // Sửa lỗi render
-            res.status(500).send(error.message); 
+            res.status(500).send(error.message);
         }
     }
 
@@ -69,7 +69,7 @@ class BorrowController {
     async getHistoryPage(req, res) {
         try {
             // FIX: Sử dụng đường dẫn tương đối từ views root (src/views)
-            res.render('borrow/history', { 
+            res.render('borrow/history', {
                 title: 'Lịch sử mượn/trả',
                 currentPage: 'history',
                 sidebarType: 'borrow-sidebar',
@@ -79,7 +79,7 @@ class BorrowController {
         } catch (error) {
             console.error('Error rendering history page:', error);
             // Sửa lỗi render
-            res.status(500).send(error.message); 
+            res.status(500).send(error.message);
         }
     }
 
@@ -88,7 +88,7 @@ class BorrowController {
         try {
             // Tạm thời render trang 'pending-approvals'
             // FIX: Sử dụng đường dẫn tương đối từ views root (src/views)
-            res.render('borrow/pending-approvals', { 
+            res.render('borrow/pending-approvals', {
                 title: 'Tình trạng phiếu mượn',
                 currentPage: 'status',
                 sidebarType: 'borrow-sidebar',
@@ -98,7 +98,7 @@ class BorrowController {
         } catch (error) {
             console.error('Error rendering status page:', error);
             // Sửa lỗi render
-            res.status(500).send(error.message); 
+            res.status(500).send(error.message);
         }
     }
 
@@ -106,7 +106,7 @@ class BorrowController {
     async getTeacherHomePage(req, res) {
         try {
             // FIX: Sử dụng đường dẫn tương đối từ views root (src/views)
-            res.render('borrow/teacher-home', { 
+            res.render('borrow/teacher-home', {
                 title: 'Trang chủ giáo viên',
                 currentPage: 'teacher-home',
                 sidebarType: 'borrow-sidebar',
@@ -116,7 +116,7 @@ class BorrowController {
         } catch (error) {
             console.error('Error rendering teacher home page:', error);
             // Sửa lỗi render
-            res.status(500).send(error.message); 
+            res.status(500).send(error.message);
         }
     }
 
@@ -124,10 +124,10 @@ class BorrowController {
     async createBorrowRequest(req, res) {
         try {
             const borrowData = req.body;
-            const userId = req.user?.id || 1; // Mock user ID
-            
+            const userId = req.user?.id;
+
             const result = await borrowService.createBorrowRequest(userId, borrowData);
-            
+
             res.json({
                 success: true,
                 message: 'Đăng ký mượn thành công!',
@@ -148,9 +148,9 @@ class BorrowController {
         try {
             const slipId = req.params.id;
             const slip = await borrowService.getBorrowSlip(slipId);
-            
+
             // FIX: Sử dụng đường dẫn tương đối từ views root (src/views)
-            res.render('borrow/slip', { 
+            res.render('borrow/slip', {
                 title: `Phiếu mượn ${slipId}`,
                 currentPage: 'slip',
                 sidebarType: 'borrow-sidebar',
@@ -161,7 +161,7 @@ class BorrowController {
         } catch (error) {
             console.error('Error rendering borrow slip:', error);
             // Sửa lỗi render
-            res.status(500).send(error.message); 
+            res.status(500).send(error.message);
         }
     }
 
@@ -181,7 +181,7 @@ class BorrowController {
     async getDevices(req, res) {
         try {
             const { category, class: classFilter, status, condition, location, origin, search } = req.query;
-            
+
             const devices = await borrowService.getDevices({
                 category,
                 class: classFilter,
@@ -191,7 +191,7 @@ class BorrowController {
                 origin,
                 search
             });
-            
+
             res.json({
                 success: true,
                 data: devices
@@ -205,7 +205,7 @@ class BorrowController {
             });
         }
     }
-    
+
     // =================================================================
     // QLTB (Equipment Manager) - Các hàm được thêm ở bước trước 
     // =================================================================
@@ -221,7 +221,7 @@ class BorrowController {
             });
         } catch (error) {
             console.error('Error rendering admin borrow approvals page:', error);
-            res.status(500).send(error.message); 
+            res.status(500).send(error.message);
         }
     }
 
@@ -236,7 +236,7 @@ class BorrowController {
             });
         } catch (error) {
             console.error('Error rendering admin return approvals page:', error);
-            res.status(500).send(error.message); 
+            res.status(500).send(error.message);
         }
     }
 
@@ -244,8 +244,7 @@ class BorrowController {
     async approveBorrowSlip(req, res) {
         try {
             const slipId = req.params.id;
-            // req.user?.name is mock until auth is implemented
-            const approvedBy = req.user?.name || 'QLTB (Mock)'; 
+            const approvedBy = req.user?.hoTen || req.user?.name;
             await borrowService.approveBorrow(slipId, approvedBy);
             res.json({ success: true, message: `Đã duyệt thành công phiếu mượn ${slipId}` });
         } catch (error) {
@@ -271,9 +270,9 @@ class BorrowController {
     async confirmReturnSlip(req, res) {
         try {
             const slipId = req.params.id;
-            const confirmedBy = req.user?.name || 'QLTB (Mock)';
+            const confirmedBy = req.user?.hoTen || req.user?.name;
             // Giả lập chi tiết trả từ body req.body.returnDetails
-            await borrowService.confirmReturn(slipId, confirmedBy, req.body.details); 
+            await borrowService.confirmReturn(slipId, confirmedBy, req.body.details);
             res.json({ success: true, message: `Đã xác nhận trả thiết bị cho phiếu ${slipId}` });
         } catch (error) {
             console.error('Error confirming return slip:', error);

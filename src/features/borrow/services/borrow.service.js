@@ -21,14 +21,8 @@ class BorrowService {
 
             // Map MongoDB format sang format mà frontend mong đợi
             const mappedDevices = await Promise.all(devices.map(async (device) => {
-                // Sử dụng soLuongSanSang từ repository (đã được tính từ DeviceUnit với điều kiện tinhTrang: Tốt/Khá và trangThai: san_sang)
-                // Điều này đảm bảo chỉ đếm thiết bị sẵn sàng cho mượn (không hỏng)
+                // Sử dụng soLuongSanSang từ repository
                 let soLuongConLai = device.soLuongSanSang || 0;
-
-                // Nếu là mockup device, dùng soLuong gốc
-                if (device._id && device._id.toString().startsWith('mock')) {
-                    soLuongConLai = device.soLuong || 0;
-                }
 
                 // Map category name
                 let categoryName = '';
@@ -43,9 +37,19 @@ class BorrowService {
                 }
 
                 // Map condition to frontend format
+                // Cho phép mượn: Tốt, Khá, Trung bình
                 let condition = 'good';
                 if (device.tinhTrangThietBi) {
-                    condition = device.tinhTrangThietBi === 'Tốt' ? 'good' : 'damaged';
+                    if (device.tinhTrangThietBi === 'Tốt') {
+                        condition = 'good';
+                    } else if (device.tinhTrangThietBi === 'Khá') {
+                        condition = 'fair';
+                    } else if (device.tinhTrangThietBi === 'Trung bình') {
+                        condition = 'average';
+                    } else {
+                        // Hỏng, Hỏng nặng, etc.
+                        condition = 'damaged';
+                    }
                 }
 
                 // Map category name to frontend format
@@ -78,8 +82,11 @@ class BorrowService {
                 };
             }));
 
-            // Lọc bỏ thiết bị không có số lượng sẵn sàng (soLuongConLai = 0) hoặc bị hỏng
-            const availableDevices = mappedDevices.filter(device => device.quantity > 0 && device.condition !== 'damaged');
+            // Lọc bỏ thiết bị không có số lượng sẵn sàng (soLuongConLai = 0) hoặc bị hỏng nặng
+            // Cho phép mượn: Tốt (good), Khá (fair), Trung bình (average)
+            const availableDevices = mappedDevices.filter(device =>
+                device.quantity > 0 && device.condition !== 'damaged'
+            );
 
             // Lưu vào cache (TTL 2 phút cho dữ liệu thiết bị)
             cache.set(cacheKey, availableDevices, 120000);
@@ -164,55 +171,13 @@ class BorrowService {
         try {
             const slip = await borrowRepo.getBorrowSlipById(slipId);
             if (!slip) {
-                // Nếu không tìm thấy, trả về mockup data để test
-                console.warn(`Borrow slip ${slipId} not found, returning mockup data`);
-                return this.getMockupBorrowSlip(slipId);
+                throw new Error('Phiếu mượn không tồn tại');
             }
             return slip;
         } catch (error) {
             console.error('Error in getBorrowSlip service:', error);
-            // Nếu có lỗi, trả về mockup data
-            console.warn('Returning mockup borrow slip due to error');
-            return this.getMockupBorrowSlip(slipId);
+            throw error;
         }
-    }
-
-    // Mockup borrow slip for testing
-    getMockupBorrowSlip(slipId) {
-        const mongoose = require('mongoose');
-        return {
-            _id: new mongoose.Types.ObjectId(),
-            maPhieu: slipId,
-            ngayMuon: new Date(),
-            ngayDuKienTra: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            lyDo: 'Dạy học môn Hóa học',
-            nguoiLapPhieuId: {
-                _id: new mongoose.Types.ObjectId(),
-                hoTen: 'Nguyễn Văn A',
-                email: 'nguyenvana@example.com',
-                role: 'giao_vien'
-            },
-            trangThai: 'dang_muon',
-            sessionTime: 'sang',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            details: [
-                {
-                    maPhieu: slipId,
-                    maTB: 'TB001',
-                    soLuongMuon: 3,
-                    ngayTraDuKien: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                    tinhTrangLucMuon: 'Bình thường',
-                    device: {
-                        maTB: 'TB001',
-                        tenTB: 'Ống nghiệm thủy tinh',
-                        category: { tenDM: 'Hóa học' },
-                        viTriLuuTru: 'Phòng thiết bị 2',
-                        nguonGoc: 'CC'
-                    }
-                }
-            ]
-        };
     }
 
     // Lấy chi tiết phiếu trả theo ID
@@ -271,23 +236,6 @@ class BorrowService {
             console.error('Error in cancelBorrow service:', error);
             throw error;
         }
-    }
-    // API cho QLTB: Lấy danh sách phiếu mượn đang chờ duyệt
-    async getPendingBorrows() {
-        // Mock data
-        return [
-            { id: 'PM001', createdAt: '15/11/2025', note: 'Dạy Tin học 7A', status: 'pending' },
-            { id: 'PM002', createdAt: '16/11/2025', note: 'Bộ thí nghiệm Hóa 9B', status: 'pending' }
-        ];
-    }
-
-    // API cho QLTB: Lấy danh sách phiếu trả đang chờ duyệt
-    async getPendingReturns() {
-        // Mock data
-        return [
-            { id: 'PT001', maPhieuMuon: 'PM001', ngayTra: '18/11/2025', status: 'pending' },
-            { id: 'PT002', maPhieuMuon: 'PM003', ngayTra: '19/11/2025', status: 'pending' }
-        ];
     }
 
     // API cho QLTB: Duyệt phiếu mượn

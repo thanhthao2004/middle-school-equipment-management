@@ -106,6 +106,8 @@ async function loadDevicesFromApi() {
 
         const conditionLabels = {
             good: 'Tốt',
+            fair: 'Khá',
+            average: 'Trung bình',
             damaged: 'Hỏng'
         };
 
@@ -133,7 +135,7 @@ async function loadDevicesFromApi() {
                 <td>${device.class || ''}</td>
                 <td><span class="fw-bold text-success">${device.quantity ?? ''}</span></td>
                 <td><span class="${device.status === 'available' ? 'status-available' : 'status-borrowed'}">${statusLabel}</span></td>
-                <td><span class="${device.condition === 'good' ? 'condition-good' : 'condition-damaged'}">${conditionLabel}</span></td>
+                <td><span class="condition-${device.condition}">${conditionLabel}</span></td>
                 <td>${device.location || ''}</td>
                 <td>${device.origin || ''}</td>
                 <td>

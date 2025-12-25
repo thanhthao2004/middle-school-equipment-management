@@ -328,7 +328,7 @@ class BorrowController {
         res.render("borrow/views/manager/manager-home", {
             title: "Trang chủ QLTB",
             currentPage: "manager-home",
-            user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
+            user: req.user,
         });
     }
 
@@ -337,7 +337,7 @@ class BorrowController {
         res.render("borrow/views/manager/borrow-approvals", {
             title: "Danh sách phiếu mượn",
             currentPage: "borrow-approvals",
-            user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
+            user: req.user,
         });
     }
 
@@ -348,7 +348,7 @@ class BorrowController {
             title: `Phiếu mượn ${slipId}`,
             id: slipId,
             currentPage: "borrow-approvals",
-            user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
+            user: req.user,
         });
     }
 
@@ -358,7 +358,7 @@ class BorrowController {
             title: "Danh sách phiếu trả",
             slips: [],
             currentPage: "return-slips",
-            user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
+            user: req.user,
         });
     }
 
@@ -369,7 +369,7 @@ class BorrowController {
             title: `Phiếu trả ${slipId}`,
             id: slipId,
             currentPage: "return-slips",
-            user: req.user || { name: "QLTB (mock)", role: 'ql_thiet_bi' },
+            user: req.user,
         });
     }
 
