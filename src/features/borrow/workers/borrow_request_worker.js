@@ -70,7 +70,7 @@ async function processBorrowRequest(msgPayload) {
 
         const slots = generateSlots(startDate, startShift, endDate, endShift);
 
-        logger.info(`📅 Need to validate ${slots.length} time slots for ${borrowData.devices.length} device(s)`);
+        logger.info(`Need to validate ${slots.length} time slots for ${borrowData.devices.length} device(s)`);
 
         // Step 2: For each device, check inventory across ALL slots
         for (const deviceRequest of borrowData.devices) {
@@ -93,7 +93,7 @@ async function processBorrowRequest(msgPayload) {
                 const availableQty = device.soLuong - borrowedQty;
 
                 logger.info(
-                    `  📊 Slot [${slot.displayDate} - ${slot.displayShift}]: ` +
+                    `  Slot [${slot.displayDate} - ${slot.displayShift}]: ` +
                     `Borrowed=${borrowedQty}, Available=${availableQty}, Requested=${deviceRequest.quantity}`
                 );
 
@@ -157,7 +157,7 @@ async function startWorker() {
 
                 try {
                     msgPayload = JSON.parse(msgContent);
-                    logger.info('📨 Received new borrow request:', msgPayload);
+                    logger.info('Received new borrow request:', msgPayload);
 
                     // Gọi hàm xử lý nghiệp vụ
                     await processBorrowRequest(msgPayload);

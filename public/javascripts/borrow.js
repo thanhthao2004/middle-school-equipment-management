@@ -889,23 +889,28 @@ function submitBorrowForm() {
                 }
 
                 // Show appropriate message based on status
-                const maPhieu = data.data?.maPhieu || data.data?.ticket?.maPhieu || 'N/A';
-                const trangThai = data.data?.trangThai;
+                const maPhieu = data.data?.maPhieu || data.data?.ticket?.maPhieu;
+                const isAsyncProcessing = data.data?.status === 'processing' || !maPhieu;
 
-                if (trangThai === 'pending' || res.status === 202) {
-                    // Async processing message
+                if (isAsyncProcessing) {
+                    // Async processing message - no maPhieu yet
                     showSuccessMessage(
-                        `Đăng ký mượn thành công! Yêu cầu đang được xử lý.\n\nMã yêu cầu tạm thời: ${maPhieu}\n\nBạn sẽ nhận được thông báo khi yêu cầu được phê duyệt.`
+                        data.message || 'Yêu cầu mượn đã được gửi! Vui lòng chờ xử lý.\n\nPhiếu mượn đang được xử lý bởi hệ thống. Bạn có thể kiểm tra trong mục "Phiếu chờ duyệt".'
                     );
-                } else {
-                    // Direct processing message (fallback)
-                    showSuccessModal(maPhieu);
-                }
 
-                // Refresh the page after 5s to allow user to see success modal
-                setTimeout(() => {
-                    window.location.reload();
-                }, 5000);
+                    // Redirect to pending page after 3s
+                    setTimeout(() => {
+                        window.location.href = '/teacher/borrow/pending';
+                    }, 3000);
+                } else {
+                    // Direct processing message (fallback) - has maPhieu
+                    showSuccessModal(maPhieu);
+
+                    // Refresh after 5s
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 5000);
+                }
             } else {
                 // Show actual error message from server
                 const errorMsg = data.message || data.error || 'Có lỗi xảy ra khi đăng ký mượn';

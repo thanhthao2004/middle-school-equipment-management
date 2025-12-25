@@ -133,32 +133,51 @@ class BorrowService {
                 throw new Error('Cần đăng ký sớm hơn (≥1 ngày) trước buổi dạy');
             }
 
-            // --- Phần 2: Publish Message to RabbitMQ ---
+            // --- Phần 2: Publish Message to RabbitMQ (ASYNC MODE) ---
             const messagePayload = {
                 userId: userId,
                 borrowData: borrowData,
                 requestedAt: new Date().toISOString()
             };
 
-            // Direct DB creation - SYNC MODE (RabbitMQ disabled for reliability)
+            // Try RabbitMQ first (ASYNC MODE)
             try {
-                const ticket = await borrowRepo.createBorrowRequest(userId, borrowData);
+                await publishMessage(messagePayload);
 
                 // Clear cache to refresh device availability
                 cache.clear();
 
                 return {
                     success: true,
-                    message: 'Đăng ký mượn thành công!',
+                    message: 'Yêu cầu mượn đã được gửi! Vui lòng chờ xử lý.',
                     data: {
-                        maPhieu: ticket.maPhieu,
-                        trangThai: ticket.trangThai || 'cho_duyet',
-                        ticket: ticket
+                        status: 'processing',
+                        message: 'Phiếu mượn đang được xử lý bởi hệ thống. Bạn sẽ nhận được thông báo khi hoàn tất.'
                     }
                 };
-            } catch (dbError) {
-                console.error('Error creating borrow request:', dbError.message);
-                throw new Error(dbError.message || 'Không thể xử lý yêu cầu mượn. Vui lòng thử lại sau.');
+            } catch (rabbitError) {
+                // Fallback to SYNC MODE if RabbitMQ fails
+                console.warn('RabbitMQ unavailable, falling back to sync mode:', rabbitError.message);
+
+                try {
+                    const ticket = await borrowRepo.createBorrowRequest(userId, borrowData);
+
+                    // Clear cache to refresh device availability
+                    cache.clear();
+
+                    return {
+                        success: true,
+                        message: 'Đăng ký mượn thành công!',
+                        data: {
+                            maPhieu: ticket.maPhieu,
+                            trangThai: ticket.trangThai || 'cho_duyet',
+                            ticket: ticket
+                        }
+                    };
+                } catch (dbError) {
+                    console.error('Error creating borrow request:', dbError.message);
+                    throw new Error(dbError.message || 'Không thể xử lý yêu cầu mượn. Vui lòng thử lại sau.');
+                }
             }
         } catch (error) {
             console.error('Error in createBorrowRequest service:', error);
