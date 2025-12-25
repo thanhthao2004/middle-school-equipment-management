@@ -381,6 +381,57 @@ class PurchasingController {
             res.status(500).send(`<h1>Lỗi</h1><p>${error.message}</p>`);
         }
     }
+    /**
+     * Hiển thị trang duyệt kế hoạch (Dành cho Hiệu trưởng)
+     */
+    async getApprovePage(req, res) {
+        try {
+            // Lấy các kế hoạch đang chờ phê duyệt
+            const plans = await PurchasingRepository.getPlansByStatus('cho_phe_duyet');
+            const years = [...new Set(plans.map(p => p.namHoc).filter(y => y))];
+
+            res.render('purchasing-plans/views/approve', {
+                title: 'Duyệt kế hoạch mua sắm',
+                plans,
+                years,
+                user: req.user || { role: 'hieu_truong' }
+            });
+        } catch (error) {
+            console.error('Error fetching plans for approval:', error);
+            res.status(500).send(`<h1>Lỗi</h1><p>${error.message}</p>`);
+        }
+    }
+
+    /**
+     * Phê duyệt kế hoạch
+     */
+    async approvePlan(req, res) {
+        try {
+            const { id } = req.params;
+            await PurchasingRepository.updateStatus(id, 'da_duyet');
+
+            // Thông báo thành công và chuyển hướng về trang danh sách chính
+            res.redirect('/principal/purchasing-plans?status=approved');
+        } catch (error) {
+            console.error('Error approving plan:', error);
+            res.status(500).send(`<h1>Lỗi</h1><p>${error.message}</p>`);
+        }
+    }
+
+    /**
+     * Từ chối kế hoạch
+     */
+    async rejectPlan(req, res) {
+        try {
+            const { id } = req.params;
+            await PurchasingRepository.updateStatus(id, 'tu_choi');
+
+            res.redirect('/principal/purchasing-plans?status=rejected');
+        } catch (error) {
+            console.error('Error rejecting plan:', error);
+            res.status(500).send(`<h1>Lỗi</h1><p>${error.message}</p>`);
+        }
+    }
 }
 
 module.exports = new PurchasingController();

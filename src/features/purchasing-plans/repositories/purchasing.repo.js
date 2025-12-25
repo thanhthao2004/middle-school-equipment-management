@@ -201,6 +201,24 @@ class PurchasingRepository {
 			throw error;
 		}
 	}
+
+	/**
+	 * Cập nhật trạng thái kế hoạch
+	 * @param {string} id ID kế hoạch
+	 * @param {string} trangThai Trạng thái mới
+	 */
+	async updateStatus(id, trangThai) {
+		try {
+			const plan = await PurchasingPlan.findByIdAndUpdate(
+				id,
+				{ trangThai },
+				{ new: true }
+			);
+			return plan;
+		} catch (error) {
+			throw error;
+		}
+	}
 }
 
 module.exports = new PurchasingRepository();

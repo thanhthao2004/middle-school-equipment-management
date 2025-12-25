@@ -6,30 +6,39 @@
 
     <nav class="nav flex-column mt-3">
         <!-- TRANG CHỦ -->
-        <a class="nav-link <%= currentPage === 'principal-home' ? 'active' : '' %>" 
-           href="/principal">
+        <a class="nav-link <%= currentPage === 'principal-home' ? 'active' : '' %>" href="/principal">
             <i class="fas fa-home me-2"></i>
             Trang chủ
         </a>
 
         <!-- DUYỆT VÀ PHÊ DUYỆT -->
         <h6 class="sidebar-heading text-muted mt-3 mb-1 px-3">Duyệt và Phê duyệt</h6>
-        
-        <a class="nav-link <%= currentPage === 'trainingPlans' ? 'active' : '' %>" 
-           href="/principal/training-plans">
+
+        <a class="nav-link <%= currentPage === 'trainingPlans' ? 'active' : '' %>" href="/principal/training-plans">
             <i class="fas fa-calendar-days me-2"></i>
             Kế hoạch đào tạo
         </a>
 
-        <a class="nav-link <%= currentPage === 'purchasing-approve' ? 'active' : '' %>" 
-           href="/principal/purchasing-plans/approve">
+        <a class="nav-link <%= currentPage === 'purchasing-plans' ? 'active' : '' %>"
+            href="/principal/purchasing-plans">
+            <i class="fas fa-list-check me-2"></i>
+            Kế hoạch mua sắm
+        </a>
+
+        <a class="nav-link <%= currentPage === 'purchasing-approve' ? 'active' : '' %>"
+            href="/principal/purchasing-plans/approve">
             <i class="fas fa-check-circle me-2"></i>
             Duyệt kế hoạch mua sắm
         </a>
 
-        <a class="nav-link <%= currentPage === 'disposal-approve' ? 'active' : '' %>" 
-           href="/principal/disposal/approve">
-            <i class="fas fa-trash-alt me-2"></i>
+        <a class="nav-link <%= currentPage === 'disposal' ? 'active' : '' %>" href="/principal/disposal">
+            <i class="fas fa-file-invoice me-2"></i>
+            Báo cáo thanh lý
+        </a>
+
+        <a class="nav-link <%= currentPage === 'disposal-approve' ? 'active' : '' %>"
+            href="/principal/disposal/approve">
+            <i class="fas fa-clipboard-check me-2"></i>
             Duyệt báo cáo thanh lý
         </a>
     </nav>
@@ -43,6 +52,7 @@
         font-weight: 700;
         color: #94a3b8 !important;
     }
+
     .sidebar {
         background-color: #1e3a8a;
         position: fixed !important;
@@ -54,18 +64,20 @@
         padding: 0;
         z-index: 1000;
     }
+
     .sidebar .nav-link {
         color: white;
         padding: 10px 15px;
         transition: background-color 0.2s;
         font-size: 0.95rem;
     }
+
     .sidebar .nav-link:hover {
         background-color: #3b82f6;
     }
+
     .sidebar .nav-link.active {
         background-color: #3b82f6;
         font-weight: bold;
     }
 </style>
-
