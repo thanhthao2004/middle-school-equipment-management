@@ -45,4 +45,9 @@ router.put('/:id', PurchasingController.updatePlan);
 // Delete action
 router.delete('/:id', PurchasingController.deletePlan);
 
+// Principal Approval routes
+router.get('/approve', PurchasingController.getApprovePage);
+router.post('/:id/approve', PurchasingController.approvePlan);
+router.post('/:id/reject', PurchasingController.rejectPlan);
+
 module.exports = router;

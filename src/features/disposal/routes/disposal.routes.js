@@ -29,4 +29,9 @@ router.post("/edit/:id", disposalController.update);
 // DELETE
 router.post("/delete/:id", disposalController.delete);
 
+// PRINCIPAL APPROVAL
+router.get("/approve", disposalController.approveIndex);
+router.post("/approve/:id", disposalController.approveReport);
+router.post("/reject/:id", disposalController.rejectReport);
+
 module.exports = router;

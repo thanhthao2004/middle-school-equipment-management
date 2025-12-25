@@ -21,8 +21,13 @@
 
             <div class="app-shell">
                 <div class="sidebar-column">
-                    <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans' , user:
-                        userObj }) %>
+                    <% if (userObj.role==='hieu_truong' ) { %>
+                        <%- include('../../../views/partials/principal-sidebar', { currentPage: 'purchasing-plans' ,
+                            user: userObj }) %>
+                            <% } else { %>
+                                <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans'
+                                    , user: userObj }) %>
+                                    <% } %>
                 </div>
 
                 <div class="main-content">
@@ -50,9 +55,11 @@
                                 </div>
 
                                 <div>
-                                    <a href="/teacher/purchasing-plans/create" class="btn-register">
-                                        <i class="fa-solid fa-plus"></i> Lập kế hoạch mua sắm mới
-                                    </a>
+                                    <% if (userObj.role !=='hieu_truong' ) { %>
+                                        <a href="/teacher/purchasing-plans/create" class="btn-register">
+                                            <i class="fa-solid fa-plus"></i> Lập kế hoạch mua sắm mới
+                                        </a>
+                                        <% } %>
                                 </div>
                             </div>
 
@@ -99,7 +106,7 @@
                                                                                 <% } %>
                                                             </td>
                                                             <td class="text-center">
-                                                                <a href="/teacher/purchasing-plans/<%= plan.maKeHoachMuaSam || plan.code %>/detail"
+                                                                <a href="<%= userObj.role === 'hieu_truong' ? '/principal/purchasing-plans' : '/teacher/purchasing-plans' %>/<%= plan.maKeHoachMuaSam || plan.code %>/detail"
                                                                     class="action-btn btn-view" title="Xem chi tiết">
                                                                     <i class="fa-solid fa-eye"></i>
                                                                 </a>

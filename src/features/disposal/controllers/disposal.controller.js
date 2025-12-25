@@ -322,3 +322,42 @@ exports.delete = async (req, res) => {
     }
 };
 
+/* ======================
+   PRINCIPAL APPROVAL
+====================== */
+exports.approveIndex = async (req, res) => {
+    try {
+        // Lấy báo cáo "Hoạt động" để duyệt
+        const reports = await DisposalReport.find({ status: "Hoạt động" }).sort({ createdAt: -1 });
+
+        res.render("disposal/views/approve", {
+            disposal: reports,
+            currentPage: "disposal-approve",
+            user: req.user || { role: "hieu_truong" }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(`<h1>Lỗi</h1><p>${err.message}</p>`);
+    }
+};
+
+exports.approveReport = async (req, res) => {
+    try {
+        await DisposalReport.findByIdAndUpdate(req.params.id, { status: "Đã duyệt" });
+        res.redirect("/principal/disposal?status=approved");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(`<h1>Lỗi</h1><p>${err.message}</p>`);
+    }
+};
+
+exports.rejectReport = async (req, res) => {
+    try {
+        await DisposalReport.findByIdAndUpdate(req.params.id, { status: "Hủy" });
+        res.redirect("/principal/disposal?status=rejected");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(`<h1>Lỗi</h1><p>${err.message}</p>`);
+    }
+};
+

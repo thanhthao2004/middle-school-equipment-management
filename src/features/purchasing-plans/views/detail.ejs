@@ -20,8 +20,13 @@
 
             <div class="app-shell">
                 <div class="sidebar-column">
-                    <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans' , user:
-                        userObj }) %>
+                    <% if (userObj.role==='hieu_truong' ) { %>
+                        <%- include('../../../views/partials/principal-sidebar', { currentPage: 'purchasing-approve' ,
+                            user: userObj }) %>
+                            <% } else { %>
+                                <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans'
+                                    , user: userObj }) %>
+                                    <% } %>
                 </div>
 
                 <div class="main-content">
@@ -160,7 +165,8 @@
                             </div>
 
                             <div class="mt-4 d-flex gap-2 justify-content-between align-items-center">
-                                <a href="/teacher/purchasing-plans" class="btn btn-secondary">
+                                <a href="<%= userObj.role === 'hieu_truong' ? '/principal/purchasing-plans/approve' : '/teacher/purchasing-plans' %>"
+                                    class="btn btn-secondary">
                                     <i class="fa-solid fa-arrow-left"></i> Quay lại
                                 </a>
                                 <button class="btn btn-danger" id="exportBtn">
