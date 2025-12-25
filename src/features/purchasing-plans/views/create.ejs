@@ -14,169 +14,373 @@
     <link href="/stylesheets/purchasing-plans.css" rel="stylesheet">
 </head>
 
-<body>
-    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'to_truong' }; %>
-    <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans', user: userObj }) %>
+<body class="purchasing-plans-page">
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'to_truong' }; %>
+        <!-- Header -->
+        <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans' , user: userObj }) %>
 
-    <div class="container-fluid p-0">
-      <div class="row g-0">
-        <div class="col-md-3 col-lg-2">
-          <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans', user: userObj }) %>
-        </div>
-
-        <div class="col-md-9 col-lg-10 main-content">
-          <div class="container py-4">
             <div class="app-shell">
-                <main class="main-content">
-                <div class="page-header">
-                    <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
-                    <div class="page-subtitle">Lập kế hoạch mua sắm mới</div>
+                <div class="sidebar-column">
+                    <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans' , user:
+                        userObj }) %>
                 </div>
 
-                <form action="/teacher/purchasing-plans" method="post">
-                    <div class="row mb-3">
-                        <div class="col-md-3">
-                            <label class="form-label">Mã kế hoạch</label>
-                            <!-- show generated code read-only; submit via hidden input -->
-                            <input id="plan-code-display" class="form-control" readonly
-                                value="<%= (plan && plan.code) ? plan.code : '' %>" />
-                            <input type="hidden" id="plan-code" name="code"
-                                value="<%= (plan && plan.code) ? plan.code : '' %>" />
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Ngày lập</label>
-                            <!-- show generated date read-only; submit via hidden input -->
-                            <input id="plan-date-display" class="form-control" readonly
-                                value="<%= (plan && plan.date) ? plan.date : '' %>" />
-                            <input type="hidden" id="plan-date" name="date"
-                                value="<%= (plan && plan.date) ? plan.date : '' %>" />
-                        </div>
-                        <div class="col-md-6 d-flex align-items-end justify-content-end">
-                            <button type="button" id="add-row"
-                                class="btn-register btn btn-outline-secondary small-btn me-2">
-                                <i class="fa-solid fa-plus"></i> Thêm nhiều thiết bị
-                            </button>
+                <div class="main-content">
+                    <div class="container py-4">
+                        <main class="page-main">
+                            <div class="page-header">
+                                <h1>Quản lý kế hoạch mua sắm thiết bị</h1>
+                                <div class="page-subtitle">Tạo kế hoạch mua sắm mới</div>
+                            </div>
 
-                        </div>
+                            <form id="editForm" action="/teacher/purchasing-plans" method="post">
+                                <input type="hidden" name="trangThai" value="cho_phe_duyet" />
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Mã kế hoạch</label>
+                                        <input id="plan-code-display" class="form-control" readonly
+                                            placeholder="Đang tải..." style="background-color: #f8f9fa;" />
+                                        <input type="hidden" id="plan-code" name="code" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Năm học</label>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <select id="start-year" class="form-select" required>
+                                                <option value="">Từ năm</option>
+                                            </select>
+                                            <span>-</span>
+                                            <select id="end-year" class="form-select" required>
+                                                <option value="">Đến năm</option>
+                                            </select>
+                                        </div>
+                                        <input type="hidden" id="plan-year" name="namHoc" />
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-end justify-content-end gap-2">
+                                        <div class="me-3">
+                                            <label class="form-label">Trạng thái</label>
+                                            <input type="text" class="form-control" readonly value="Chưa phê duyệt"
+                                                style="background-color: #fff3cd; border-color: #ffc107;" />
+                                        </div>
+                                        <button type="button" id="add-manual-row"
+                                            class="btn btn-outline-primary small-btn mb-0"
+                                            style="margin-bottom: 0 !important;">
+                                            <i class="fa-solid fa-pencil"></i> Nhập thiết bị khác
+                                        </button>
+                                        <button type="button" id="add-row"
+                                            class="btn btn-outline-secondary small-btn mb-0"
+                                            style="margin-bottom: 0 !important;">
+                                            <i class="fa-solid fa-plus"></i> Thêm nhiều thiết bị
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="card card-table mb-3">
+                                    <div class="card-body">
+                                        <style>
+                                            .table-detail th,
+                                            .table-detail td {
+                                                vertical-align: middle;
+                                                padding: 10px 12px;
+                                                font-size: 14px;
+                                            }
+
+                                            .table-detail input {
+                                                font-size: 14px;
+                                                min-height: 38px;
+                                            }
+
+                                            /* Modal device table inputs */
+                                            #deviceTableBody input.form-control-sm,
+                                            #deviceTableBody input.device-uom,
+                                            #deviceTableBody input.device-unit-price {
+                                                font-size: 14px !important;
+                                                min-height: 36px !important;
+                                                padding: 6px 10px !important;
+                                            }
+
+                                            #deviceTableBody input.device-quantity {
+                                                min-width: 60px;
+                                            }
+
+                                            #deviceTableBody input.device-uom {
+                                                min-width: 80px;
+                                            }
+
+                                            #deviceTableBody input.device-unit-price {
+                                                min-width: 120px;
+                                            }
+
+                                            .table-detail th:nth-child(1) {
+                                                width: 12%;
+                                                text-align: center;
+                                            }
+
+                                            .table-detail th:nth-child(2) {
+                                                width: 10%;
+                                                text-align: center;
+                                            }
+
+                                            .table-detail th:nth-child(3) {
+                                                width: 18%;
+                                                text-align: center;
+                                            }
+
+                                            .table-detail th:nth-child(4) {
+                                                width: 10%;
+                                                text-align: center;
+                                            }
+
+                                            .table-detail th:nth-child(5) {
+                                                width: 8%;
+                                                text-align: center;
+                                            }
+
+                                            .table-detail th:nth-child(6) {
+                                                width: 11%;
+                                                text-align: right;
+                                            }
+
+                                            .table-detail th:nth-child(7) {
+                                                width: 10%;
+                                                text-align: center;
+                                            }
+
+                                            .table-detail th:nth-child(8) {
+                                                width: 12%;
+                                                text-align: right;
+                                            }
+
+                                            .table-detail th:nth-child(9) {
+                                                width: 13%;
+                                                text-align: center;
+                                            }
+
+                                            .table-detail th:nth-child(3),
+                                            .table-detail td:nth-child(3) {
+                                                min-width: 200px;
+                                            }
+
+                                            .table-detail td:nth-child(3) {
+                                                white-space: nowrap;
+                                                overflow: hidden;
+                                                text-overflow: ellipsis;
+                                            }
+                                        </style>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle table-detail">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="text-align: center;">Tên Danh Mục TB</th>
+                                                        <th style="text-align: center;">Mã TB</th>
+                                                        <th style="text-align: center;">Tên TB</th>
+                                                        <th style="text-align: center;">Số lượng dự kiến</th>
+                                                        <th style="text-align: center;">ĐVT</th>
+                                                        <th style="text-align: right;">Đơn giá</th>
+                                                        <th style="text-align: center;">Nguồn gốc</th>
+                                                        <th style="text-align: right;">Dự toán kinh phí</th>
+                                                        <th style="text-align: center;">Thời gian dự kiến mua</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="items-tbody">
+                                                    <% if (plan.details && plan.details.length> 0) { %>
+                                                        <% plan.details.forEach((detail, index)=> { %>
+                                                            <tr>
+                                                                <td>
+                                                                    <input type="text" class="form-control text-center"
+                                                                        value="<%= detail.tenDanhMuc || '' %>"
+                                                                        readonly />
+                                                                    <input type="hidden"
+                                                                        name="items[<%= index %>][category]"
+                                                                        value="<%= detail.tenDanhMuc || '' %>" />
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" class="form-control text-center"
+                                                                        value="<%= detail.maTB %>" readonly />
+                                                                    <input type="hidden"
+                                                                        name="items[<%= index %>][code]"
+                                                                        value="<%= detail.maTB %>" />
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" class="form-control text-center"
+                                                                        value="<%= detail.tenTB || '' %>" readonly />
+                                                                    <input type="hidden"
+                                                                        name="items[<%= index %>][name]"
+                                                                        value="<%= detail.tenTB || '' %>" />
+                                                                </td>
+                                                                <td><input name="items[<%= index %>][quantity]"
+                                                                        type="number" min="0"
+                                                                        class="form-control quantity-field text-center"
+                                                                        value="<%= detail.soLuongDuKienMua %>" />
+                                                                </td>
+                                                                <td><input name="items[<%= index %>][uom]"
+                                                                        class="form-control text-center"
+                                                                        value="<%= detail.donViTinh %>" />
+                                                                </td>
+                                                                <td><input name="items[<%= index %>][unitPrice]"
+                                                                        type="text"
+                                                                        class="form-control price-input text-end"
+                                                                        data-index="<%= index %>"
+                                                                        value="<%= detail.donGia ? new Intl.NumberFormat('vi-VN').format(detail.donGia) : 0 %>" />
+                                                                </td>
+                                                                <td><input name="items[<%= index %>][source]"
+                                                                        class="form-control text-center"
+                                                                        value="<%= detail.nguonGoc || '' %>" /></td>
+                                                                <td><input name="items[<%= index %>][budget]"
+                                                                        type="text"
+                                                                        class="form-control budget-output text-end"
+                                                                        data-index="<%= index %>"
+                                                                        value="<%= detail.duToanKinhPhi ? new Intl.NumberFormat('vi-VN').format(detail.duToanKinhPhi) : 0 %>"
+                                                                        readonly /></td>
+                                                                <td><input name="items[<%= index %>][expectedAt]"
+                                                                        type="date" class="form-control text-center"
+                                                                        value="<%= detail.thoiGianDuKienMua ? new Date(detail.thoiGianDuKienMua).toISOString().split('T')[0] : '' %>" />
+                                                                </td>
+                                                                <td class="text-end"><button type="button"
+                                                                        class="btn btn-sm btn-outline-danger remove-row">✖</button>
+                                                                </td>
+                                                            </tr>
+                                                            <% }); %>
+                                                                <% } else { %>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                class="form-control text-center"
+                                                                                readonly />
+                                                                            <input type="hidden"
+                                                                                name="items[0][category]" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                class="form-control text-center"
+                                                                                readonly />
+                                                                            <input type="hidden"
+                                                                                name="items[0][code]" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                class="form-control text-center"
+                                                                                readonly />
+                                                                            <input type="hidden"
+                                                                                name="items[0][name]" />
+                                                                        </td>
+                                                                        <td><input name="items[0][quantity]"
+                                                                                type="number" min="0"
+                                                                                class="form-control quantity-field text-center" />
+                                                                        </td>
+                                                                        <td><input name="items[0][uom]"
+                                                                                class="form-control text-center" />
+                                                                        </td>
+                                                                        <td><input name="items[0][unitPrice]"
+                                                                                type="text"
+                                                                                class="form-control price-input text-end"
+                                                                                data-index="0" />
+                                                                        </td>
+                                                                        <td><input name="items[0][source]"
+                                                                                class="form-control text-center" /></td>
+                                                                        <td><input name="items[0][budget]" type="text"
+                                                                                class="form-control budget-output text-end"
+                                                                                data-index="0" readonly /></td>
+                                                                        <td><input name="items[0][expectedAt]"
+                                                                                type="date"
+                                                                                class="form-control text-center" />
+                                                                        </td>
+                                                                        <td class="text-end"><button type="button"
+                                                                                class="btn btn-sm btn-outline-danger remove-row">✖</button>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end gap-3">
+                                    <a href="/teacher/purchasing-plans" class="btn btn-secondary">Đóng</a>
+                                    <button type="submit" class="btn btn-danger">Lưu và gửi Phê duyệt</button>
+                                </div>
+                            </form>
+
+                        </main>
                     </div>
+                </div>
+            </div>
 
-                    <div class="card card-table mb-3">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Tên Danh Mục TB</th>
-                                            <th>Mã TB</th>
-                                            <th>Tên TB</th>
-                                            <th>Số lượng dự kiến</th>
-                                            <th>ĐVT</th>
-                                            <th>Dự toán kinh phí</th>
-                                            <th>Thời gian dự kiến mua</th>
-                                            <th>Lý do</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="items-tbody">
-                                        <tr>
-                                            <td><input name="items[0][category]" class="form-control" /></td>
-                                            <td><input name="items[0][code]" class="form-control" /></td>
-                                            <td><input name="items[0][name]" class="form-control" /></td>
-                                            <td><input name="items[0][quantity]" type="number" min="0"
-                                                    class="form-control" /></td>
-                                            <td><input name="items[0][uom]" class="form-control" /></td>
-                                            <td><input name="items[0][budget]" type="number" step="0.01"
-                                                    class="form-control" /></td>
-                                            <td><input name="items[0][expectedAt]" type="date" class="form-control" />
-                                            </td>
-                                            <td><input name="items[0][reason]" class="form-control" /></td>
-                                            <td class="text-end"><button type="button"
-                                                    class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+            <%- include('../../../views/partials/footer') %>
+
+                <!-- Modal chọn thiết bị -->
+                <div class="modal fade" id="selectDeviceModal" tabindex="-1" aria-labelledby="selectDeviceModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header bg-light">
+                                <h5 class="modal-title d-flex align-items-center" id="selectDeviceModalLabel">
+                                    <i class="fa-solid fa-box me-2 text-primary"></i>
+                                    Chọn thiết bị
+                                    <span id="selectedCountBadge" class="badge bg-primary ms-3 px-3 py-2">Đã chọn:
+                                        0</span>
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" style="max-height: 70vh;">
+                                <div class="row g-3 mb-4 p-3 bg-light rounded">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold"><i
+                                                class="fa-solid fa-filter me-1"></i>Danh mục thiết bị</label>
+                                        <select id="categoryFilter" class="form-select">
+                                            <option value="">Tất cả danh mục</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-semibold"><i
+                                                class="fa-solid fa-magnifying-glass me-1"></i>Tìm kiếm</label>
+                                        <div class="input-group">
+                                            <input type="text" id="searchDevice" class="form-control"
+                                                placeholder="Nhập mã hoặc tên thiết bị để tìm kiếm...">
+                                            <button class="btn btn-primary" type="button" id="searchBtn">
+                                                <i class="fa-solid fa-magnifying-glass"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive" style="max-height: 50vh; overflow-y: auto;">
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+                                        <thead class="table-primary position-sticky top-0" style="z-index: 2;">
+                                            <tr>
+                                                <th style="width: 50px;" class="text-center">
+                                                    <input type="checkbox" id="selectAllDevices"
+                                                        class="form-check-input" title="Chọn tất cả"
+                                                        style="cursor: pointer;">
+                                                </th>
+                                                <th style="width: 100px;" class="text-center">Mã TB</th>
+                                                <th>Tên thiết bị</th>
+                                                <th style="width: 150px;" class="text-center">Số lượng</th>
+                                                <th style="width: 80px;" class="text-center">ĐVT</th>
+                                                <th style="width: 130px;" class="text-end">Đơn giá</th>
+                                                <th style="width: 120px;" class="text-center">Nguồn gốc</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="deviceTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-times me-1"></i>Đóng
+                                </button>
+                                <button type="button" id="confirmSelectDevice" class="btn btn-danger">
+                                    <i class="fa-solid fa-check me-1"></i>Chọn (0)
+                                </button>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="d-flex justify-content-end gap-3">
-                        <a href="/teacher/purchasing-plans" class="btn btn-secondary">Đóng</a>
-                        <button type="submit" class="btn btn-danger">Lưu và gửi Phê duyệt</button>
-                    </div>
-                </form>
-
-                <template id="row-template">
-                    <tr>
-                        <td><input name="__NAME__" class="form-control" /></td>
-                    </tr>
-                </template>
-
-                </main>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <%- include('../../../views/partials/footer') %>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        (function () {
-            // Auto-generate plan code and date on page load when not provided by server
-            const codeInput = document.getElementById('plan-code');
-            const codeDisplay = document.getElementById('plan-code-display');
-            const dateInput = document.getElementById('plan-date');
-            const dateDisplay = document.getElementById('plan-date-display');
-
-            if (codeInput && dateInput) {
-                if (!codeInput.value) {
-                    // Generate code in format: KHXXX where XXX is a 3-digit number (001-999)
-                    const rand = Math.floor(Math.random() * 999) + 1; // 1..999
-                    const num = String(rand).padStart(3, '0');
-                    const genCode = `KH${num}`;
-                    codeInput.value = genCode;
-                    if (codeDisplay) codeDisplay.value = genCode;
-                }
-
-                if (!dateInput.value) {
-                    const today = new Date();
-                    const iso = today.toISOString().slice(0, 10); // YYYY-MM-DD
-                    dateInput.value = iso;
-                    if (dateDisplay) dateDisplay.value = iso;
-                }
-            }
-
-            const addBtn = document.getElementById('add-row');
-            const tbody = document.getElementById('items-tbody');
-            let idx = 1; // already have 0
-
-            addBtn.addEventListener('click', function () {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><input name="items[${idx}][category]" class="form-control" /></td>
-                    <td><input name="items[${idx}][code]" class="form-control" /></td>
-                    <td><input name="items[${idx}][name]" class="form-control" /></td>
-                    <td><input name="items[${idx}][quantity]" type="number" min="0" class="form-control" /></td>
-                    <td><input name="items[${idx}][uom]" class="form-control" /></td>
-                    <td><input name="items[${idx}][budget]" type="number" step="0.01" class="form-control" /></td>
-                    <td><input name="items[${idx}][expectedAt]" type="text" class="form-control" placeholder="Ví dụ: 2026-01" /></td>
-                    <td><input name="items[${idx}][reason]" class="form-control" /></td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-row">✖</button></td>
-                `;
-                tbody.appendChild(tr);
-                idx++;
-            });
-
-            document.addEventListener('click', function (e) {
-                if (e.target && e.target.classList.contains('remove-row')) {
-                    const tr = e.target.closest('tr');
-                    if (tr) tr.remove();
-                }
-            });
-        })();
-    </script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="/javascripts/purchasing_plan_edit.js"></script>
 
 </body>
 

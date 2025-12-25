@@ -1,5 +1,6 @@
 const devicesService = require('../services/devices.service');
 const path = require('path');
+const fs = require('fs');
 const { deleteOldFile, deleteMultipleFiles } = require('../../../config/upload');
 
 // Devices Controller
@@ -47,6 +48,15 @@ class DevicesController {
             const categories = await devicesService.getCategories();
             const filterOptions = await devicesService.getFilterOptions();
 
+            // Load suppliers
+            let suppliers = [];
+            try {
+                const Supplier = require('../../suppliers/models/supplier.model');
+                suppliers = await Supplier.find({}).sort({ name: 1 }).lean();
+            } catch (err) {
+                console.warn('Could not load suppliers:', err.message);
+            }
+
             // Lấy formData từ session nếu có (sau validation fail)
             const formData = req.session?.flash?.formData || {};
 
@@ -55,6 +65,7 @@ class DevicesController {
                 currentPage: 'devices',
                 sidebarType: 'qltb-sidebar',
                 categories,
+                suppliers,
                 filterOptions,
                 formData, // Truyền dữ liệu form cũ
                 user: req.user || { role: 'ql_thiet_bi' },
@@ -82,6 +93,7 @@ class DevicesController {
 
             // Validate image uploads (max 5 files, check type and size)
             if (req.files && req.files.length > 0) {
+                console.log('[UPLOAD] Received files:', req.files.length);
                 const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
                 const maxSize = 5 * 1024 * 1024; // 5MB
 
@@ -94,6 +106,7 @@ class DevicesController {
 
                 // Validate each file
                 for (const file of req.files) {
+                    console.log('[UPLOAD] File:', file.filename, 'Path:', file.path, 'Size:', file.size);
                     if (!allowedTypes.includes(file.mimetype)) {
                         req.files.forEach(f => deleteOldFile(`/uploads/devices/${f.filename}`));
                         throw new Error(`File "${file.originalname}" không phải định dạng ảnh hợp lệ (JPG/PNG/GIF/WEBP)`);
@@ -105,14 +118,24 @@ class DevicesController {
                 }
 
                 deviceData.hinhAnh = req.files.map(file => `/uploads/devices/${file.filename}`);
+                console.log('[UPLOAD] Saved image paths:', deviceData.hinhAnh);
             }
+
+            // Xử lý vị trí lưu trữ tùy chỉnh
+            if (deviceData.viTriLuuTru === '__custom__' && deviceData.customViTriLuuTru) {
+                deviceData.viTriLuuTru = deviceData.customViTriLuuTru;
+            }
+            delete deviceData.customViTriLuuTru; // Không lưu field tạm này vào DB
 
             // Convert empty strings to null/undefined for optional fields
             if (deviceData.ngayNhap === '') delete deviceData.ngayNhap;
             if (deviceData.category === '') delete deviceData.category;
+            if (deviceData.supplier === '') delete deviceData.supplier;
+            if (deviceData.viTriLuuTru === '' || deviceData.viTriLuuTru === '__custom__') delete deviceData.viTriLuuTru;
             if (deviceData.soLuong === '') deviceData.soLuong = 0;
             else deviceData.soLuong = parseInt(deviceData.soLuong) || 0;
 
+            console.log('[CREATE] Device data before save:', JSON.stringify(deviceData, null, 2));
             const device = await devicesService.createDevice(deviceData);
             if (!req.session.flash) req.session.flash = {};
             req.session.flash.success = 'Thêm thiết bị thành công';
@@ -174,14 +197,40 @@ class DevicesController {
             // Lấy formData từ session nếu có (sau validation fail)
             const formData = req.session?.flash?.formData || {};
 
+            // Lấy danh sách kỳ báo cáo cho filter (nếu có)
+            let periods = [];
+            try {
+                const PeriodicReport = require('../../periodic-reports/models/periodic-report.model');
+                periods = await PeriodicReport.distinct('kyBaoCao');
+                if (!Array.isArray(periods)) {
+                    periods = [];
+                }
+            } catch (err) {
+                // Nếu không lấy được, để mảng rỗng
+                console.warn('Could not load periods for filter:', err.message);
+                periods = [];
+            }
+
+            // Load suppliers
+            let suppliers = [];
+            try {
+                const Supplier = require('../../suppliers/models/supplier.model');
+                suppliers = await Supplier.find({}).sort({ name: 1 }).lean();
+            } catch (err) {
+                console.warn('Could not load suppliers:', err.message);
+            }
+
             res.render('devices/views/edit', {
                 title: 'Sửa thiết bị',
                 currentPage: 'devices',
                 sidebarType: 'qltb-sidebar',
                 device,
                 categories,
+                suppliers,
                 filterOptions,
                 formData,
+                periods: periods || [],
+                reports: [], // Empty array for reports table in edit view
                 user: req.user || { role: 'ql_thiet_bi' },
                 messages: {
                     success: req.session?.flash?.success || null,
@@ -212,6 +261,29 @@ class DevicesController {
             const oldDevice = await devicesService.getDeviceById(deviceId);
             let oldImagePaths = Array.isArray(oldDevice.hinhAnh) ? oldDevice.hinhAnh :
                 (oldDevice.hinhAnh ? [oldDevice.hinhAnh] : []);
+
+            // KIỂM TRA VÀ LOẠI BỎ ẢNH KHÔNG TỒN TẠI TRÊN DISK
+            // Điều này xử lý trường hợp ảnh đã bị xóa khỏi disk nhưng vẫn còn trong database
+            const originalImageCount = oldImagePaths.length;
+            oldImagePaths = oldImagePaths.filter(imgPath => {
+                if (!imgPath) return false;
+                // Chỉ kiểm tra file trong thư mục uploads
+                if (imgPath.startsWith('/uploads/')) {
+                    const fullPath = path.join(__dirname, '../../../public', imgPath);
+                    const exists = fs.existsSync(fullPath);
+                    if (!exists) {
+                        console.log(`[UPDATE] Image file not found on disk, removing from list: ${imgPath}`);
+                    }
+                    return exists;
+                }
+                return true; // Giữ lại nếu không phải đường dẫn uploads
+            });
+
+            // Nếu có ảnh bị loại bỏ do không tồn tại, log để theo dõi
+            if (oldImagePaths.length < originalImageCount) {
+                console.log(`[UPDATE] Removed ${originalImageCount - oldImagePaths.length} missing image(s) from database`);
+            }
+            console.log('[UPDATE] Valid images after checking disk:', oldImagePaths);
 
             // XỬ LÝ XÓA ảnh (nếu user click nút X)
             let imagesToDelete = [];
@@ -264,8 +336,22 @@ class DevicesController {
             // Convert empty strings to null/undefined for optional fields
             if (deviceData.ngayNhap === '') delete deviceData.ngayNhap;
             if (deviceData.category === '') delete deviceData.category;
+            if (deviceData.supplier === '') delete deviceData.supplier; // Handle empty supplier
             if (deviceData.soLuong === '') deviceData.soLuong = 0;
             else deviceData.soLuong = parseInt(deviceData.soLuong) || 0;
+
+            // Xử lý trường lop (multi-select)
+            if (deviceData.lop) {
+                // Nếu là array (từ multi-select), giữ nguyên
+                // Nếu là string (từ single select), chuyển thành array
+                if (typeof deviceData.lop === 'string') {
+                    deviceData.lop = deviceData.lop ? [deviceData.lop] : [];
+                } else if (!Array.isArray(deviceData.lop)) {
+                    deviceData.lop = [];
+                }
+            } else {
+                deviceData.lop = [];
+            }
 
             await devicesService.updateDevice(deviceId, deviceData);
 
@@ -315,10 +401,10 @@ class DevicesController {
             });
         } catch (error) {
             console.error('Error rendering delete device page:', error);
-            if (!req.session.flash) req.session.flash = {};
+            req.session.flash = req.session.flash || {};
             req.session.flash.error = error.message;
             res.redirect('/manager/devices');
-        }
+        };
     }
 
     // POST /devices/delete/:id - Xóa thiết bị
@@ -326,33 +412,33 @@ class DevicesController {
         try {
             const deviceId = req.params.id;
 
-            // Lấy thông tin device để xóa TẤT CẢ ảnh
+            // Lấy device để xóa ảnh
             const device = await devicesService.getDeviceById(deviceId);
-            const imagePaths = device.hinhAnh; // Array of image paths
+            const images = Array.isArray(device.hinhAnh)
+                ? device.hinhAnh
+                : device.hinhAnh ? [device.hinhAnh] : [];
 
             await devicesService.deleteDevice(deviceId);
 
-            // Xóa TẤT CẢ ảnh sau khi xóa device thành công
-            if (imagePaths && imagePaths.length > 0) {
-                deleteMultipleFiles(imagePaths);
+            // Xóa ảnh trên disk
+            if (images.length > 0) {
+                deleteMultipleFiles(images);
             }
 
-            if (!req.session.flash) req.session.flash = {};
+            req.session.flash = req.session.flash || {};
             req.session.flash.success = 'Xóa thiết bị thành công';
-
-            // Clear formData
-            delete req.session.flash.formData;
-            delete req.session.flash.validationErrors;
 
             res.redirect('/manager/devices');
         } catch (error) {
             console.error('Error deleting device:', error);
-            if (!req.session.flash) req.session.flash = {};
+            req.session.flash = req.session.flash || {};
             req.session.flash.error = error.message;
-            res.redirect(`/manager/devices/delete/${req.params.id}`);
+            res.redirect('/manager/devices');
         }
     }
+
 }
 
-module.exports = new DevicesController();
 
+
+module.exports = new DevicesController();

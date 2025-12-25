@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duyệt báo cáo thanh lý</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/stylesheets/disposal.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <!-- ===== HEADER ===== -->
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'hieu_truong' }; %>
+        <%- include('../../../views/partials/header', { currentPage: 'disposal-approve' , user: userObj }) %>
+
+            <!-- ===== MAIN LAYOUT ===== -->
+            <div class="container-fluid p-0">
+                <div class="row g-0">
+                    <!-- ===== SIDEBAR ===== -->
+                    <%- include('../../../views/partials/principal-sidebar', { currentPage: 'disposal-approve' , user:
+                        userObj }) %>
+
+                        <!-- ===== MAIN CONTENT ===== -->
+                        <div class="col-md-9 col-lg-10 main-content">
+                            <div class="container-fluid py-4">
+
+                                <!-- Page Header -->
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h1 class="h3 mb-0">DUYỆT BÁO CÁO THANH LÝ THIẾT BỊ HỎNG</h1>
+                                </div>
+
+                                <% if (typeof query !=='undefined' && query.status) { %>
+                                    <% if (query.status==='approved' ) { %>
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            Đã phê duyệt báo cáo thành công.
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <% } else if (query.status==='rejected' ) { %>
+                                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                                Đã từ chối (hủy) báo cáo.
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <% } %>
+                                                <% } %>
+
+                                                    <!-- Table -->
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="table-responsive">
+                                                                <table class="table table-hover align-middle">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Mã biên bản</th>
+                                                                            <th>Năm học</th>
+                                                                            <th>Ngày lập</th>
+                                                                            <th class="text-center">Trạng thái</th>
+                                                                            <th class="text-center">Thao tác</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <% if (disposal && disposal.length> 0) { %>
+                                                                            <% disposal.forEach(r=> { %>
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        <span class="code-box">
+                                                                                            <%= r.code %>
+                                                                                        </span>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <%= r.year %>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <%= new
+                                                                                            Date(r.created_at).toLocaleDateString("vi-VN")
+                                                                                            %>
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <span
+                                                                                            class="badge bg-warning text-dark">Chờ
+                                                                                            duyệt</span>
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <div
+                                                                                            class="d-flex justify-content-center gap-2">
+                                                                                            <a href="/principal/disposal/view/<%= r._id %>"
+                                                                                                class="btn btn-sm btn-outline-primary"
+                                                                                                title="Xem chi tiết">
+                                                                                                <i
+                                                                                                    class="fas fa-eye"></i>
+                                                                                            </a>
+                                                                                            <form
+                                                                                                action="/principal/disposal/approve/<%= r._id %>"
+                                                                                                method="POST"
+                                                                                                style="display:inline;">
+                                                                                                <button type="submit"
+                                                                                                    class="btn btn-sm btn-success">
+                                                                                                    <i
+                                                                                                        class="fas fa-check"></i>
+                                                                                                    Duyệt
+                                                                                                </button>
+                                                                                            </form>
+                                                                                            <form
+                                                                                                action="/principal/disposal/reject/<%= r._id %>"
+                                                                                                method="POST"
+                                                                                                style="display:inline;">
+                                                                                                <button type="submit"
+                                                                                                    class="btn btn-sm btn-danger">
+                                                                                                    <i
+                                                                                                        class="fas fa-times"></i>
+                                                                                                    Từ chối
+                                                                                                </button>
+                                                                                            </form>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <% }) %>
+                                                                                    <% } else { %>
+                                                                                        <tr>
+                                                                                            <td colspan="5"
+                                                                                                class="text-center text-muted py-4 italic">
+                                                                                                Hiện không có báo cáo
+                                                                                                nào đang chờ duyệt.
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                        <% } %>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+            <!-- ===== FOOTER ===== -->
+            <%- include('../../../views/partials/footer') %>
+
+                <!-- JS -->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

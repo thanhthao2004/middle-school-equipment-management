@@ -76,8 +76,13 @@ function confirmCancel() {
         renderTable();
         showSuccess();
       } else {
-        alert('Không thể hủy phiếu.');
+        console.error('Failed to cancel borrow:', res.message || 'Unknown error');
+        alert(res.message || 'Không thể hủy phiếu.');
       }
+    })
+    .catch(err => {
+      console.error('Error confirming cancel:', err);
+      alert('Có lỗi xảy ra khi hủy phiếu.');
     });
 }
 

@@ -1,5 +1,4 @@
 const { Schema, model } = require('mongoose');
-const { getNextCode } = require('../../../core/libs/sequence');
 
 // KeHoachMuaSamThietBi
 const PurchasingPlanSchema = new Schema(
@@ -18,8 +17,12 @@ const PurchasingPlanDetailSchema = new Schema(
 	{
 		maKeHoachMuaSam: { type: String, required: true, index: true },
 		maTB: { type: String, required: true },
+		tenTB: { type: String, default: '' },           // Tên thiết bị
+		tenDanhMuc: { type: String, default: '' },     // Tên danh mục
 		soLuongDuKienMua: { type: Number, default: 0 },
 		donViTinh: { type: String, trim: true },
+		donGia: { type: Number, default: 0 },           // Thêm cột đơn giá
+		nguonGoc: { type: String, default: '' },        // Nguồn gốc
 		thoiGianDuKienMua: { type: Date },
 		duToanKinhPhi: { type: Number, default: 0 },
 		lyDoMua: { type: String, default: '' },
@@ -30,15 +33,7 @@ const PurchasingPlanDetailSchema = new Schema(
 const PurchasingPlan = model('PurchasingPlan', PurchasingPlanSchema);
 const PurchasingPlanDetail = model('PurchasingPlanDetail', PurchasingPlanDetailSchema);
 
-PurchasingPlanSchema.pre('validate', async function ensureMaKH(next) {
-	try {
-		if (!this.maKeHoachMuaSam) {
-			this.maKeHoachMuaSam = await getNextCode('KH', 3); // KH001
-		}
-		next();
-	} catch (e) {
-		next(e);
-	}
-});
+// Note: Không cần pre-validate hook vì mã kế hoạch được tạo ở repository layer
+// để đảm bảo tính nhất quán và dễ quản lý trong transaction
 
 module.exports = { PurchasingPlan, PurchasingPlanDetail };

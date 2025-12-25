@@ -208,6 +208,39 @@ class AuthService {
         delete userObj.registrationTokenExpiry;
         return userObj;
     }
+    /**
+     * Create password reset token for user
+     * @param {String} username - Username
+     * @returns {String} Registration/Reset token
+     * @throws {Error} If user not found
+     */
+    async createPasswordResetToken(username) {
+        // Clean input
+        const cleanUsername = username.trim().toLowerCase();
+
+        // Find user by username
+        const user = await User.findOne({ username: cleanUsername });
+
+        if (!user) {
+            throw new Error('Tên đăng nhập không tồn tại');
+        }
+
+        const token = this.generateRegistrationToken();
+        const expiry = new Date();
+        expiry.setHours(expiry.getHours() + REGISTRATION_TOKEN_EXPIRY_HOURS);
+
+        user.registrationToken = token;
+        user.registrationTokenExpiry = expiry;
+        // Do not set isActive=false here, as they might be an active user just resetting password.
+        // But the original createRegistrationTokenForUser sets it to false. 
+        // For password reset flow, we should probably keep their status as is, 
+        // but set-password flow might expect a certain state. 
+        // Checking getRegisterWithToken logic... it just verifies token.
+
+        await user.save();
+
+        return token;
+    }
 }
 
 module.exports = new AuthService();

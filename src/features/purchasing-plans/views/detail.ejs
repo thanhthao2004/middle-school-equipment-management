@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/purchasing-plans.css" rel="stylesheet">
+</head>
+
+<body class="purchasing-plans-page">
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'to_truong' }; %>
+        <!-- Header -->
+        <%- include('../../../views/partials/header', { currentPage: 'purchasing-plans' , user: userObj }) %>
+
+            <div class="app-shell">
+                <div class="sidebar-column">
+                    <% if (userObj.role==='hieu_truong' ) { %>
+                        <%- include('../../../views/partials/principal-sidebar', { currentPage: 'purchasing-approve' ,
+                            user: userObj }) %>
+                            <% } else { %>
+                                <%- include('../../../views/partials/teacher-sidebar', { currentPage: 'purchasing-plans'
+                                    , user: userObj }) %>
+                                    <% } %>
+                </div>
+
+                <div class="main-content">
+                    <div class="container py-4">
+                        <main class="page-main">
+                            <div class="page-header mb-4">
+                                <h1>Chi tiết kế hoạch mua sắm</h1>
+                                <div class="page-subtitle">Xem thông tin chi tiết</div>
+                            </div>
+
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Mã kế hoạch</label>
+                                                <input type="text" class="form-control"
+                                                    value="<%= plan.maKeHoachMuaSam %>" readonly />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Ngày lập</label>
+                                                <input type="text" class="form-control"
+                                                    value="<%= new Date(plan.createdAt).toLocaleDateString('vi-VN') %>"
+                                                    readonly />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Trạng thái</label>
+                                                <input type="text" class="form-control"
+                                                    value="<%= plan.trangThai === 'cho_phe_duyet' ? 'Đang chờ duyệt' : plan.trangThai === 'da_duyet' ? 'Đã duyệt' : 'Khác' %>"
+                                                    readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card card-table">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Danh sách thiết bị</h5>
+                                </div>
+                                <div class="card-body">
+                                    <style>
+                                        .table-detail th,
+                                        .table-detail td {
+                                            vertical-align: middle;
+                                            padding: 10px 12px;
+                                        }
+
+                                        .table-detail th:nth-child(3),
+                                        .table-detail td:nth-child(3) {
+                                            min-width: 180px;
+                                        }
+
+                                        .table-detail td:nth-child(3) {
+                                            white-space: nowrap;
+                                            overflow: hidden;
+                                            text-overflow: ellipsis;
+                                        }
+                                    </style>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle table-detail">
+                                            <thead style="background-color: #f8f9fa;">
+                                                <tr>
+                                                    <th style="width: 12%; text-align: center;">Tên Danh Mục TB</th>
+                                                    <th style="width: 10%; text-align: center;">Mã TB</th>
+                                                    <th style="width: 18%;text-align: center;">Tên TB</th>
+                                                    <th style="width: 10%; text-align: center;">Số lượng dự kiến</th>
+                                                    <th style="width: 8%; text-align: center;">ĐVT</th>
+                                                    <th style="width: 11%; text-align: right;">Đơn giá</th>
+                                                    <th style="width: 10%; text-align: center;">Nguồn gốc</th>
+                                                    <th style="width: 12%; text-align: right;">Dự toán kinh phí</th>
+                                                    <th style="width: 13%; text-align: center;">Thời gian dự kiến mua
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (plan.details && plan.details.length> 0) { %>
+                                                    <% plan.details.forEach(detail=> { %>
+                                                        <tr>
+                                                            <td class="text-center">
+                                                                <%= detail.tenDanhMuc || '-' %>
+                                                            </td>
+                                                            <td class="text-center fw-semibold">
+                                                                <%= detail.maTB || '-' %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <%= detail.tenTB || '-' %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <%= detail.soLuongDuKienMua || 0 %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <%= detail.donViTinh || 'Cái' %>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <%= detail.donGia ? new
+                                                                    Intl.NumberFormat('vi-VN').format(detail.donGia)
+                                                                    : '0' %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <span class="badge bg-info text-dark">
+                                                                    <%= detail.nguonGoc || 'Mua mới' %>
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-end fw-semibold">
+                                                                <% const budgetValue=detail.duToanKinhPhi ??
+                                                                    ((detail.soLuongDuKienMua || 0) * (detail.donGia ||
+                                                                    0)); %>
+                                                                    <%= new
+                                                                        Intl.NumberFormat('vi-VN').format(budgetValue ||
+                                                                        0) %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <% const expectedAt=detail.thoiGianDuKienMua ||
+                                                                    detail.createdAt; %>
+                                                                    <%= expectedAt ? new
+                                                                        Date(expectedAt).toLocaleDateString('vi-VN')
+                                                                        : '-' %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }); %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="9" class="text-center text-muted py-4">
+                                                                        Không có thiết bị nào</td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 d-flex gap-2 justify-content-between align-items-center">
+                                <a href="<%= userObj.role === 'hieu_truong' ? '/principal/purchasing-plans/approve' : '/teacher/purchasing-plans' %>"
+                                    class="btn btn-secondary">
+                                    <i class="fa-solid fa-arrow-left"></i> Quay lại
+                                </a>
+                                <button class="btn btn-danger" id="exportBtn">
+                                    <i class="fa-solid fa-download"></i> Xuất File Excel
+                                </button>
+                            </div>
+
+                            <!-- Hidden element to store plan data -->
+                            <div id="planDataContainer" style="display: none;" data-plan='<%- JSON.stringify(plan) %>'>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <%- include('../../../views/partials/footer') %>
+
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+                <script src="/javascripts/purchasing_plan_detail.js"></script>
+
+</body>
+
+</html>

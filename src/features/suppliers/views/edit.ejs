@@ -40,9 +40,10 @@
                   <form action="/manager/suppliers/<%= supplier.id %>" method="POST">
                     <div class="row g-3">
                       <div class="col-12 col-md-6">
-                        <label for="id" class="form-label">Mã Nhà Cung Cấp</label>
-                        <input type="text" id="id" name="id" class="form-control" value="<%= supplier.id %>" readonly>
+                        <label class="form-label">Mã Nhà Cung Cấp</label>
+                        <input type="text" class="form-control" value="<%= supplier.maNCC %>" readonly>
                       </div>
+
 
                       <div class="col-12 col-md-6">
                         <label for="name" class="form-label">Tên Nhà Cung Cấp</label>
@@ -66,20 +67,33 @@
                       </div>
 
                       <div class="col-12 col-md-6">
-                        <label for="type" class="form-label">Loại Thiết Bị</label>
-                        <input type="text" id="type" name="type" class="form-control" value="<%= supplier.type %>">
+                        <label for="type" class="form-label">
+                          Loại Thiết Bị <span class="text-danger">*</span>
+                        </label>
+
+                        <select id="type" name="type" class="form-select" required>
+                          <option value="">-- Chọn loại thiết bị --</option>
+
+                          <% categories.forEach(c=> { %>
+                            <option value="<%= c.name %>" <%=supplier.type===c.name ? 'selected' : '' %>>
+                              <%= c.name %>
+                            </option>
+                            <% }) %>
+                        </select>
                       </div>
+
 
                       <div class="col-12 col-md-6">
                         <label for="contractDate" class="form-label">Ngày Hợp Tác</label>
-                        <input type="date" id="contractDate" name="contractDate" class="form-control"
-                          value="<%= supplier.contractDate %>">
+                        <input type="date" name="contractDate" class="form-control" value="<%= supplier.contractDate 
+    ? supplier.contractDate.toISOString().substring(0, 10) 
+    : '' %>">
+
                       </div>
 
                       <div class="col-12">
                         <label for="status" class="form-label">Trạng Thái</label>
                         <select id="status" name="status" class="form-select">
-                          <option value="" <%=supplier.status==='' ? 'selected' : '' %>>Chọn</option>
                           <option value="Hoạt động" <%=supplier.status==='Hoạt động' ? 'selected' : '' %>>Hoạt động
                           </option>
                           <option value="Ngừng hợp tác" <%=supplier.status==='Ngừng hợp tác' ? 'selected' : '' %>>Ngừng
@@ -108,7 +122,7 @@
 
       <!-- Bootstrap JS -->
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-      <script src="/public/javascripts/suppliers.js"></script>
+      <script src="/javascripts/suppliers.js"></script>
 </body>
 
 </html>

@@ -1,96 +1,134 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Xem chi tiết báo cáo</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/stylesheets/style.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/stylesheets/style.css" rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <style>
-        .form-label { font-weight:600 }
-        .app-shell { display: flex; }
-        .main-content { margin-left: 230px; padding: 20px; width: 100%; }
-        .page-header { border-bottom: 1px solid #dee2e6; margin-bottom: 20px; padding-bottom: 10px; }
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.85em; }
-        .status-completed { background: #d1e7dd; color: #0f5132; }
+      .form-label {
+        font-weight: 600;
+      }
+      .app-shell {
+        display: flex;
+      }
+      .main-content {
+        margin-left: 230px;
+        padding: 20px;
+        width: 100%;
+      }
+      .page-header {
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+      }
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85em;
+      }
+      .status-completed {
+        background: #d1e7dd;
+        color: #0f5132;
+      }
     </style>
-</head>
-<body>
-    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'ql_thiet_bi' }; %>
+  </head>
+  <body>
+    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role:
+    'ql_thiet_bi' }; %>
     <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'periodic-reports', user: userObj }) %>
+    <%- include('../../../views/partials/header', { currentPage:
+    'periodic-reports', user: userObj }) %>
 
     <div class="container-fluid p-0">
       <div class="row g-0">
-        <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'periodic-reports', user: userObj }) %>
+        <%- include('../../../views/partials/qltb-sidebar', { currentPage:
+        'periodic-reports', user: userObj }) %>
 
         <div class="col-md-9 col-lg-10 main-content">
           <div class="container py-4">
-            <div class="app-shell">
-
-        <main class="main-content">
-            
-            <% 
-                // FIX LỖI: Khai báo biến mock an toàn ngay từ đầu
-                const mockReport = {
-                    code: 'BC00X',
-                    period: 'Kỳ báo cáo (Mock)',
-                    date: '00/00/0000',
-                    status: 'completed',
-                    fileName: 'Untitled.pdf',
-                    fileUrl: '#',
-                };
-                const report = typeof report !== 'undefined' ? report : mockReport;
-                // Mặc định cho trang detail là chỉ xem (readOnly = true)
-                const readOnly = true; 
-            %>
+            <% // FIX LỖI: Khai báo biến mock an toàn ngay từ đầu const
+            mockReport = { code: 'BC00X', period: 'Kỳ báo cáo (Mock)', date:
+            '00/00/0000', status: 'completed', fileName: 'Untitled.pdf',
+            fileUrl: '#', }; const report = typeof report !== 'undefined' ?
+            report : mockReport; // Mặc định cho trang detail là chỉ xem
+            (readOnly = true) const readOnly = true; %>
 
             <div class="page-header">
-                <h1>Chi tiết báo cáo định kỳ</h1>
-                <div style="font-size:14px; margin-top:6px;">Mã báo cáo: <%= report.code %></div>
+              <h1>Chi tiết báo cáo định kỳ</h1>
+              <div style="font-size: 14px; margin-top: 6px">
+                Mã báo cáo: <%= report.code %>
+              </div>
             </div>
-            
-            <div class="card p-4 mx-auto" style="max-width: 700px;">
-                <h5 class="card-title mb-4">Thông tin báo cáo</h5>
-                
-                <!-- Sử dụng POST action mock để giữ cấu trúc -->
-                <form action="/manager/periodic-reports/<%= report.id || report.code %>" method="post">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">Mã báo cáo</label>
-                            <input class="form-control" value="<%= report.code %>" readonly />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Ngày lập</label>
-                            <input class="form-control" value="<%= report.date %>" readonly />
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Kỳ báo cáo</label>
-                            <input type="text" class="form-control" value="<%= report.period %>" readonly>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Trạng thái</label>
-                            <input class="form-control" 
-                                value="<%= report.status === 'completed' ? 'Đã hoàn thành' : (report.status === 'pending' ? 'Đang chờ duyệt' : 'Từ chối') %>" 
-                                readonly />
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">File đính kèm</label>
-                            <p class="form-control-static"><%= report.fileName %></p>
-                            <a href="/manager/periodic-reports/<%= report.id %>/download" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-file-download me-1"></i>Tải xuống/Xem file
-                            </a>
-                        </div>
-                    </div>
 
-                    <div class="d-flex justify-content-end gap-3">
-                        <a href="/manager/periodic-reports" class="btn btn-secondary">Quay lại</a>
-                        <!-- Không có nút cập nhật vì đây là trang chi tiết (readOnly) -->
-                    </div>
-                </form>
-            </div>
-        </main>
+            <div class="card p-4 mx-auto" style="max-width: 700px">
+              <h5 class="card-title mb-4">Thông tin báo cáo</h5>
+              <form
+                action="/manager/periodic-reports/<%= report.id %>"
+                method="post"
+              >
+                <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                    <label class="form-label">Mã báo cáo</label>
+                    <input
+                      class="form-control"
+                      value="<%= report.code %>"
+                      readonly
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Ngày lập</label>
+                    <input
+                      class="form-control"
+                      value="<%= report.date %>"
+                      readonly
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Kỳ báo cáo</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="<%= report.period %>"
+                      readonly
+                    />
+                  </div>
+                  <div class="col-12 disabled">
+                    <label class="form-label ">Trạng thái</label>
+                    <input
+                      class="form-control"
+                      value="<%= report.status === 'completed' ? 'Đã hoàn thành' : (report.status === 'pending' ? 'Đang chờ duyệt' : 'Từ chối') %>"
+                      readonly
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">File đính kèm</label>
+                    <p class="form-control-static"><%= report.fileName %></p>
+                    <a
+                      href="/manager/periodic-reports/<%= report.id %>/download"
+                      class="btn btn-sm btn-outline-primary"
+                    >
+                      <i class="fas fa-file-download me-1"></i>Tải xuống/Xem
+                      file
+                    </a>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3">
+                  <a href="/manager/periodic-reports" class="btn btn-secondary"
+                    >Quay lại</a
+                  >
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -100,5 +138,5 @@
     <%- include('../../../views/partials/footer') %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+  </body>
 </html>

@@ -4,6 +4,7 @@
  */
 
 require('dotenv').config();
+const path = require('path');
 
 const express = require('express');
 const config = require('./src/config/env');
@@ -24,7 +25,7 @@ const app = express();
 // ==========================
 configureViewEngine(app);
 configureMiddleware(app);
-
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 // ==========================
 // Database Connection
 // ==========================

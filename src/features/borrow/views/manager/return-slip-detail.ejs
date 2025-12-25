@@ -3,120 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác nhận Trả Thiết Bị</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/stylesheets/style.css" rel="stylesheet">
+    <title><%= typeof title !== 'undefined' ? title : (mode === 'create' ? 'Tạo Phiếu Trả' : 'Chi tiết Phiếu Trả') %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
     <style>
-        .slip-container { border: 1px solid #1e3a8a; padding: 25px; border-radius: 8px; max-width: 900px; margin: 20px auto; }
-        .slip-header-info { border: 1px solid #ccc; padding: 15px; margin-bottom: 25px; }
-        .equipment-table th, .equipment-table td { font-size: 0.9rem; padding: 8px; }
-        .equipment-table th { background-color: #e9ecef; }
-        .btn-confirm { background-color: #28a745; color: white; }
-        .btn-issue { background-color: #dc3545; color: white; }
+        .slip-box { 
+            border: 1px solid #ddd; 
+            padding: 20px; 
+            border-radius: 8px; 
+            background-color: #f9f9f9; 
+            max-width: 1200px; 
+            margin: 20px auto; 
+        }
+        .slip-info { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            font-size: 1.1rem; 
+            background-color: white;
+            border-radius: 4px;
+        }
+        .equipment-table th { 
+            background-color: #e9ecef; 
+        }
+        .item-checkbox {
+            width: 40px;
+        }
+        .quantity-input {
+            width: 80px;
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <%- include('../../../../views/partials/header', { currentPage: 'return-slips', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+    <% const userObj = (typeof user !== 'undefined' && user) ? user : { role: 'ql_thiet_bi' }; %>
+    <div class="app-shell">
+        <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'return-slips', user: userObj }) %>
+        
+        <div class="main-content">
+            <%- include('../../../../views/partials/header', { currentPage: 'return-slips', user: userObj }) %>
+            
+            <div class="container-fluid py-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0"><%= mode === 'create' ? 'TẠO PHIẾU TRẢ THIẾT BỊ' : 'CHI TIẾT PHIẾU TRẢ' %></h1>
+                    <a href="/manager/borrow/returns" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Quay lại
+                    </a>
+                </div>
 
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <!-- Sidebar QLTB -->
-            <%- include('../../../../views/partials/qltb-sidebar', { currentPage: 'return-slips', user: typeof user !== 'undefined' ? user : { role: 'ql_thiet_bi' } }) %>
-
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 main-content">
-                <div class="container py-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1 class="h3 mb-0">XÁC NHẬN TRẢ THIẾT BỊ</h1>
-                        <div class="d-flex align-items-center">
-                            <span class="text-muted small">QLTB</span>
+                <% if (mode === 'create') { %>
+                <!-- Form tạo phiếu trả -->
+                <div class="slip-box">
+                    <form id="returnSlipForm">
+                        <!-- Thông tin phiếu trả -->
+                        <div class="slip-info mb-3">
+                            <h5 class="mb-3">Thông tin phiếu trả</h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Ngày trả <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="returnDate" name="returnDate" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Ca trả <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="returnShift" name="returnShift" required>
+                                        <option value="sang">Sáng</option>
+                                        <option value="chieu">Chiều</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Mã phiếu mượn (lọc)</label>
+                                    <input type="text" class="form-control" id="filterMaPhieu" placeholder="PM0001">
+                                </div>
+                            </div>
+                            <div class="row g-3 mt-2">
+                                <div class="col-12">
+                                    <label class="form-label">Ghi chú</label>
+                                    <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" id="btnLoadBorrowedItems">
+                                    <i class="fas fa-search me-1"></i>Tải danh sách thiết bị đang mượn
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="slip-container">
-                        <!-- Thông tin Phiếu Trả (Theo mockup) -->
-                        <div class="slip-header-info">
-                            <p class="mb-1"><strong>Mã PM:</strong> PM_105</p>
-                            <p class="mb-1"><strong>GV:</strong> Hoàng Văn E</p>
-                            <p class="mb-1"><strong>Ngày mượn:</strong> 05/09/2025</p>
-                            <p class="mb-0"><strong>Ngày trả dự kiến:</strong> 15/09/2025</p>
-                        </div>
-
-                        <!-- Chi tiết Thiết bị trả (Theo mockup) -->
-                        <div class="table-responsive">
-                            <table class="table table-bordered equipment-table">
-                                <thead>
-                                    <tr>
-                                        <th>S</th>
-                                        <th>Tên Thiết Bị</th>
-                                        <th>Đơn vị</th>
-                                        <th>Vị trí</th>
-                                        <th>Nguồn</th>
-                                        <th>Ngày mượn</th>
-                                        <th>Ngày trả</th>
-                                        <th>SL trả</th>
-                                        <th>SL lỗi/thiếu</th>
-                                        <th>Nội dung</th>
-                                        <th>Tình trạng trả</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Bộ dụng cụ thí nghiệm</td>
-                                        <td>cái</td>
-                                        <td>Phòng TN</td>
-                                        <td>NCC</td>
-                                        <td>05/09/2025</td>
-                                        <td>30/09/2025</td>
-                                        <td>3</td>
-                                        <td>0</td>
-                                        <td>Hóa học</td>
-                                        <td><span class="badge bg-success">Tốt</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Laptop Dell</td>
-                                        <td>cái</td>
-                                        <td>Phòng IT</td>
-                                        <td>NCC</td>
-                                        <td>10/09/2025</td>
-                                        <td>10/10/2025</td>
-                                        <td>2</td>
-                                        <td>1</td>
-                                        <td>Sách AI</td>
-                                        <td><span class="badge bg-danger">Bị mất</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <!-- Danh sách thiết bị đang mượn -->
+                        <div class="mb-3">
+                            <h5 class="mb-3">Chọn thiết bị cần trả</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered equipment-table" id="borrowedItemsTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="item-checkbox">
+                                                <input type="checkbox" id="selectAll">
+                                            </th>
+                                            <th>Mã Phiếu Mượn</th>
+                                            <th>Mã TB</th>
+                                            <th>Tên Thiết Bị</th>
+                                            <th>SL Mượn</th>
+                                            <th>SL Đã Trả</th>
+                                            <th>SL Còn Lại</th>
+                                            <th>SL Trả</th>
+                                            <th>Tình Trạng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="borrowedItemsBody">
+                                        <tr>
+                                            <td colspan="9" class="text-center text-muted py-4">
+                                                Nhấn "Tải danh sách thiết bị đang mượn" để xem danh sách
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         <!-- Action Buttons -->
                         <div class="text-center mt-4 d-flex justify-content-center gap-3">
-                            <button class="btn btn-confirm px-4" onclick="handleConfirm('ok')">Xác nhận trả đủ</button>
-                            <button class="btn btn-issue px-4" onclick="handleConfirm('issue')">Xác nhận hỏng/thiếu</button>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-1"></i>Tạo phiếu trả
+                            </button>
+                            <button type="button" class="btn btn-secondary px-4" onclick="window.history.back()">
+                                <i class="fas fa-times me-1"></i>Hủy
+                            </button>
                         </div>
+                    </form>
+                </div>
+                <% } else { %>
+                <!-- Xem chi tiết phiếu trả -->
+                <% if (typeof slip !== 'undefined' && slip) { %>
+                <div class="slip-box">
+                    <h4 class="text-center mb-4">Phiếu Trả</h4>
+                    
+                    <!-- Thông tin Phiếu Trả -->
+                    <div class="slip-info mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Mã Phiếu Trả:</strong> <%= slip.maPhieuTra %></p>
+                                <p><strong>Mã Phiếu Mượn:</strong> <%= slip.maPhieuMuon %></p>
+                                <p><strong>Người trả:</strong> <%= slip.nguoiTraId?.hoTen || 'N/A' %></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Ngày trả:</strong> <%= slip.ngayTra ? new Date(slip.ngayTra).toLocaleDateString('vi-VN') : '-' %></p>
+                                <p><strong>Ca trả:</strong> <%= slip.caTraThucTe === 'sang' ? 'Sáng' : 'Chiều' %></p>
+                                <p><strong>Ngày tạo:</strong> <%= slip.createdAt ? new Date(slip.createdAt).toLocaleString('vi-VN') : '-' %></p>
+                            </div>
+                        </div>
+                        <% if (slip.ghiChu) { %>
+                        <p><strong>Ghi chú:</strong> <%= slip.ghiChu %></p>
+                        <% } %>
+                    </div>
+
+                    <!-- Thông tin phiếu mượn liên quan -->
+                    <% if (slip.borrowTicket) { %>
+                    <div class="slip-info mb-3">
+                        <h6>Thông tin phiếu mượn:</h6>
+                        <p><strong>Giáo viên:</strong> <%= slip.borrowTicket.nguoiLapPhieuId?.hoTen || 'N/A' %></p>
+                        <p><strong>Ngày mượn:</strong> <%= slip.borrowTicket.ngayMuon ? new Date(slip.borrowTicket.ngayMuon).toLocaleDateString('vi-VN') : '-' %></p>
+                        <p><strong>Lý do:</strong> <%= slip.borrowTicket.lyDo || '-' %></p>
+                    </div>
+                    <% } %>
+
+                    <!-- Chi tiết thiết bị trả -->
+                    <h6>Thiết bị đã trả:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered equipment-table">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã TB</th>
+                                    <th>Tên Thiết Bị</th>
+                                    <th>Số lượng trả</th>
+                                    <th>Tình trạng lúc trả</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (slip.details && slip.details.length > 0) { %>
+                                    <% slip.details.forEach((detail, index) => { %>
+                                    <tr>
+                                        <td><%= index + 1 %></td>
+                                        <td><%= detail.maTB %></td>
+                                        <td><%= detail.device?.tenTB || detail.maTB %></td>
+                                        <td><%= detail.soLuongTra %></td>
+                                        <td><%= detail.tinhTrangLucTra || '-' %></td>
+                                        <td><%= detail.ghiChu || '-' %></td>
+                                    </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Không có thiết bị nào</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-secondary px-4" onclick="window.history.back()">
+                            <i class="fas fa-arrow-left me-1"></i>Quay lại
+                        </button>
                     </div>
                 </div>
+                <% } else { %>
+                <div class="alert alert-warning">
+                    Không tìm thấy phiếu trả
+                </div>
+                <% } %>
+                <% } %>
             </div>
+            
+            <%- include('../../../../views/partials/footer', { currentPage: 'return-slips', user: userObj }) %>
         </div>
     </div>
 
-    <!-- Footer -->
-    <%- include('../../../../views/partials/footer') %>
-
-    <script src="/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function handleConfirm(type) {
-            const actionText = type === 'ok' ? 'Xác nhận trả đủ' : 'Xác nhận có hỏng/thiếu';
-            if (confirm(`Bạn có chắc chắn muốn thực hiện hành động: ${actionText} không?`)) {
-                // Trong thực tế, gọi API POST /borrow/api/return/approve/:id hoặc API khác
-                alert(`Đã thực hiện: ${actionText}. (MOCK)`);
-                window.location.href = '/manager/return-slips'; // Chuyển hướng về danh sách phiếu trả
-            }
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <% if (mode === 'create') { %>
+    <script src="/javascripts/return-slip-create.js"></script>
+    <% } %>
 </body>
 </html>

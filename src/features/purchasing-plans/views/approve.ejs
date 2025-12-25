@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/purchasing-plans.css" rel="stylesheet">
+</head>
+
+<body class="purchasing-plans-page">
+    <% const userObj=(typeof user !=='undefined' && user) ? user : { role: 'hieu_truong' }; %>
+
+        <!-- Header -->
+        <%- include('../../../views/partials/header', { currentPage: 'purchasing-approve' , user: userObj }) %>
+
+            <div class="app-shell">
+                <div class="sidebar-column">
+                    <%- include('../../../views/partials/principal-sidebar', { currentPage: 'purchasing-approve' , user:
+                        userObj }) %>
+                </div>
+
+                <div class="main-content">
+                    <div class="container py-4">
+                        <main class="page-main">
+                            <div class="page-header">
+                                <h1>Duyệt kế hoạch mua sắm thiết bị</h1>
+                            </div>
+
+                            <% if (typeof query !=='undefined' && query.status) { %>
+                                <% if (query.status==='approved' ) { %>
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        Đã phê duyệt kế hoạch thành công.
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <% } else if (query.status==='rejected' ) { %>
+                                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                            Đã từ chối kế hoạch.
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <% } %>
+                                            <% } %>
+
+                                                <div class="card card-table">
+                                                    <div class="card-body">
+                                                        <div class="table-responsive">
+                                                            <table class="table align-middle">
+                                                                <thead
+                                                                    style="font-weight: bold; background-color: #f8f9fa;">
+                                                                    <tr>
+                                                                        <th class="text-center">Mã kế hoạch</th>
+                                                                        <th class="text-center">Năm học</th>
+                                                                        <th class="text-center">Trạng thái</th>
+                                                                        <th class="text-center">Thao tác</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <% if (plans && plans.length) { %>
+                                                                        <% plans.forEach(function(plan){ %>
+                                                                            <tr>
+                                                                                <td class="text-center fw-semibold">
+                                                                                    <%= plan.maKeHoachMuaSam ||
+                                                                                        plan.code %>
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <%= plan.namHoc || plan.schoolYear
+                                                                                        %>
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <span
+                                                                                        class="status-badge status-pending">Đang
+                                                                                        chờ duyệt</span>
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <div
+                                                                                        class="d-flex justify-content-center gap-2">
+                                                                                        <a href="/principal/purchasing-plans/<%= plan.maKeHoachMuaSam || plan.code %>/detail"
+                                                                                            class="btn btn-sm btn-outline-info"
+                                                                                            title="Xem chi tiết">
+                                                                                            <i
+                                                                                                class="fa-solid fa-eye"></i>
+                                                                                        </a>
+                                                                                        <form
+                                                                                            action="/principal/purchasing-plans/<%= plan._id %>/approve"
+                                                                                            method="POST"
+                                                                                            style="display:inline;">
+                                                                                            <button type="submit"
+                                                                                                class="btn btn-sm btn-success"
+                                                                                                title="Phê duyệt">
+                                                                                                <i
+                                                                                                    class="fa-solid fa-check"></i>
+                                                                                                Duyệt
+                                                                                            </button>
+                                                                                        </form>
+                                                                                        <form
+                                                                                            action="/principal/purchasing-plans/<%= plan._id %>/reject"
+                                                                                            method="POST"
+                                                                                            style="display:inline;">
+                                                                                            <button type="submit"
+                                                                                                class="btn btn-sm btn-danger"
+                                                                                                title="Từ chối">
+                                                                                                <i
+                                                                                                    class="fa-solid fa-xmark"></i>
+                                                                                                Từ chối
+                                                                                            </button>
+                                                                                        </form>
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <% }); %>
+                                                                                <% } else { %>
+                                                                                    <tr style="font-style: italic;">
+                                                                                        <td colspan="4"
+                                                                                            class="text-center text-muted py-4">
+                                                                                            Hiện không có kế hoạch nào
+                                                                                            đang chờ duyệt.</td>
+                                                                                    </tr>
+                                                                                    <% } %>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                        </main>
+                    </div>
+                </div>
+            </div>
+
+            <%- include('../../../views/partials/footer') %>
+
+                <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -173,8 +173,8 @@ const createBorrowRequest = [
 
     body('content')
         .trim()
-        .isLength({ min: 10, max: 500 })
-        .withMessage('Nội dung dạy học phải từ 10-500 ký tự')
+        .isLength({ min: 3, max: 500 })
+        .withMessage('Nội dung dạy học phải từ 3-500 ký tự')
 ];
 
 const getBorrowSlip = [

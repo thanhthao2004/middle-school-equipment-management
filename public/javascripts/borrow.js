@@ -52,7 +52,7 @@ async function loadDevicesFromApi() {
         const category = document.getElementById('categoryFilter')?.value;
         const classFilter = document.getElementById('classFilter')?.value;
         const status = document.getElementById('statusFilter')?.value;
-        const condition = document.getElementById('conditionFilter')?.value;
+        // Bỏ filter condition - chỉ hiển thị thiết bị sẵn sàng cho mượn
         const location = document.getElementById('locationFilter')?.value;
         const origin = document.getElementById('originFilter')?.value;
         const search = document.getElementById('searchInput')?.value;
@@ -60,7 +60,7 @@ async function loadDevicesFromApi() {
         if (category) params.append('category', category);
         if (classFilter) params.append('class', classFilter);
         if (status) params.append('status', status);
-        if (condition) params.append('condition', condition);
+        // Không gửi condition filter
         if (location) params.append('location', location);
         if (origin) params.append('origin', origin);
         if (search) params.append('search', search);
@@ -106,6 +106,8 @@ async function loadDevicesFromApi() {
 
         const conditionLabels = {
             good: 'Tốt',
+            fair: 'Khá',
+            average: 'Trung bình',
             damaged: 'Hỏng'
         };
 
@@ -133,7 +135,7 @@ async function loadDevicesFromApi() {
                 <td>${device.class || ''}</td>
                 <td><span class="fw-bold text-success">${device.quantity ?? ''}</span></td>
                 <td><span class="${device.status === 'available' ? 'status-available' : 'status-borrowed'}">${statusLabel}</span></td>
-                <td><span class="${device.condition === 'good' ? 'condition-good' : 'condition-damaged'}">${conditionLabel}</span></td>
+                <td><span class="condition-${device.condition}">${conditionLabel}</span></td>
                 <td>${device.location || ''}</td>
                 <td>${device.origin || ''}</td>
                 <td>
@@ -176,7 +178,7 @@ function setupEventListeners() {
     }
 
     // Filter selects
-    const filterIds = ['categoryFilter', 'classFilter', 'statusFilter', 'conditionFilter', 'locationFilter', 'originFilter'];
+    const filterIds = ['categoryFilter', 'classFilter', 'statusFilter', 'locationFilter', 'originFilter'];
     filterIds.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
@@ -327,7 +329,7 @@ function applyFilters() {
     const categoryFilter = document.getElementById('categoryFilter')?.value || '';
     const classFilter = document.getElementById('classFilter')?.value || '';
     const statusFilter = document.getElementById('statusFilter')?.value || '';
-    const conditionFilter = document.getElementById('conditionFilter')?.value || '';
+    // Bỏ conditionFilter - không cần thiết cho đăng ký mượn
     const locationFilter = document.getElementById('locationFilter')?.value || '';
     const originFilter = document.getElementById('originFilter')?.value || '';
     const searchTerm = document.getElementById('searchInput')?.value?.toLowerCase() || '';
@@ -349,10 +351,7 @@ function applyFilters() {
                 return;
             }
 
-            if (conditionFilter && row.dataset.condition !== conditionFilter) {
-                row.style.display = 'none';
-                return;
-            }
+            // Bỏ filter condition - chỉ hiển thị thiết bị sẵn sàng
 
             // Class filter - tối ưu với Set nếu có nhiều classes
             if (classFilter) {
@@ -402,7 +401,7 @@ function applyFilters() {
 }
 
 function resetFilters() {
-    const filterIds = ['categoryFilter', 'classFilter', 'statusFilter', 'conditionFilter', 'locationFilter', 'originFilter', 'searchInput', 'borrowDateFrom', 'borrowDateTo'];
+    const filterIds = ['categoryFilter', 'classFilter', 'statusFilter', 'locationFilter', 'originFilter', 'searchInput', 'borrowDateFrom', 'borrowDateTo'];
 
     filterIds.forEach(id => {
         const element = document.getElementById(id);
@@ -437,7 +436,7 @@ function toggleAdvancedFilters() {
 }
 
 function clearAdvancedFilters() {
-    const advancedFilterIds = ['statusFilter', 'conditionFilter', 'locationFilter', 'originFilter'];
+    const advancedFilterIds = ['statusFilter', 'locationFilter', 'originFilter'];
 
     advancedFilterIds.forEach(id => {
         const element = document.getElementById(id);
@@ -890,23 +889,28 @@ function submitBorrowForm() {
                 }
 
                 // Show appropriate message based on status
-                const maPhieu = data.data?.maPhieu || data.data?.ticket?.maPhieu || 'N/A';
-                const trangThai = data.data?.trangThai;
+                const maPhieu = data.data?.maPhieu || data.data?.ticket?.maPhieu;
+                const isAsyncProcessing = data.data?.status === 'processing' || !maPhieu;
 
-                if (trangThai === 'pending' || res.status === 202) {
-                    // Async processing message
+                if (isAsyncProcessing) {
+                    // Async processing message - no maPhieu yet
                     showSuccessMessage(
-                        `Đăng ký mượn thành công! Yêu cầu đang được xử lý.\n\nMã yêu cầu tạm thời: ${maPhieu}\n\nBạn sẽ nhận được thông báo khi yêu cầu được phê duyệt.`
+                        data.message || 'Yêu cầu mượn đã được gửi! Vui lòng chờ xử lý.\n\nPhiếu mượn đang được xử lý bởi hệ thống. Bạn có thể kiểm tra trong mục "Phiếu chờ duyệt".'
                     );
-                } else {
-                    // Direct processing message (fallback)
-                    showSuccessModal(maPhieu);
-                }
 
-                // Refresh the page after 2s
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
+                    // Redirect to pending page after 3s
+                    setTimeout(() => {
+                        window.location.href = '/teacher/borrow/pending';
+                    }, 3000);
+                } else {
+                    // Direct processing message (fallback) - has maPhieu
+                    showSuccessModal(maPhieu);
+
+                    // Refresh after 5s
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 5000);
+                }
             } else {
                 // Show actual error message from server
                 const errorMsg = data.message || data.error || 'Có lỗi xảy ra khi đăng ký mượn';
@@ -1022,4 +1026,18 @@ function showErrorModal(message) {
     document.getElementById('errorModal').addEventListener('hidden.bs.modal', function () {
         this.remove();
     });
+}
+
+function viewBorrowSlip(maPhieu) {
+    if (!maPhieu && maPhieu !== 'N/A') {
+        window.location.href = '/teacher/borrow/history';
+        return;
+    }
+    // Chuyển hướng đến trang chi tiết phiếu mượn
+    // Giả sử URL là /teacher/borrow/slip?id=MA_PHIEU hoặc /teacher/borrow/history?open=MA_PHIEU
+    // Dựa vào slip.ejs, nó lấy thông tin từ render, nên ta có thể redirect về history với param để mở modal hoặc trang slip riêng
+    // Tuy nhiên, slip.ejs là một page riêng (route /teacher/borrow/slip/:id hoặc similar)
+    // Check controller routes:
+    // GET /teacher/borrow/:id -> chi tiết (see borrow.routes.js line 43)
+    window.location.href = `/teacher/borrow/${maPhieu}?from=register`;
 }

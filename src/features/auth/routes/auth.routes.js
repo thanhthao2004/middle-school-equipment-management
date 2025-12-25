@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
+const { authenticate } = require('../../../core/middlewares/auth.middleware');
 // const { validate } = require('../../../core/middlewares/validation.middleware');
 // const authValidators = require('../validators/auth.validators'); // Tương lai sẽ thêm validator
 
@@ -13,11 +14,11 @@ router.post('/login', authController.handleLogin);
 // GET /auth/logout - Xử lý đăng xuất
 router.get('/logout', authController.handleLogout);
 
-// GET /auth/password/change - Hiển thị form đổi mật khẩu
-router.get('/password/change', authController.getChangePasswordPage);
+// GET /auth/password/change - Hiển thị form đổi mật khẩu (yêu cầu đã đăng nhập để req.user tồn tại)
+router.get('/password/change', authenticate, authController.getChangePasswordPage);
 
 // POST /auth/password/change - Xử lý đổi mật khẩu
-router.post('/password/change', authController.handleChangePassword);
+router.post('/password/change', authenticate, authController.handleChangePassword);
 
 // GET /auth/password/forgot - Hiển thị form quên mật khẩu
 router.get('/password/forgot', authController.getForgotPasswordPage);

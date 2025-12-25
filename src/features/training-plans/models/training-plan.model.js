@@ -8,6 +8,7 @@ const TrainingPlanSchema = new Schema(
 		namHoc: { type: String, trim: true },
 		ngayLap: { type: Date },
 		tenFile: { type: String, trim: true },
+		tenHienThi: { type: String, trim: true },
 		duongDanFile: { type: String, default: '' },
 	},
 	{ timestamps: true }

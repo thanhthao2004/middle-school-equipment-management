@@ -1,8 +1,8 @@
-<%
+<% 
 // Xác định role của user
 const userRole = typeof user !== 'undefined' && user.role ? user.role : 'giao_vien';
 const isDepartmentHead = userRole === 'to_truong';
-const isTeacher = userRole === 'giao_vien' || isDepartmentHead; // Tổ trưởng cũng là giáo viên
+const isTeacher = userRole === 'giao_vien' || isDepartmentHead;
 %>
 
 <aside class="sidebar" role="navigation" aria-label="Teacher menu">
@@ -13,22 +13,23 @@ const isTeacher = userRole === 'giao_vien' || isDepartmentHead; // Tổ trưởn
             <% const isRegister = (typeof currentPage !== 'undefined' && currentPage === 'register'); %>
             <% const isHistory = (typeof currentPage !== 'undefined' && currentPage === 'history'); %>
             <% const isStatus = (typeof currentPage !== 'undefined' && currentPage === 'status'); %>
+            
             <a class="nav-link <%= isTeacherHome ? 'active' : '' %>" href="/teacher/borrow/teacher-home">
-            <i class="fas fa-home me-2"></i>
-            Trang chủ giáo viên
-        </a>
+                <i class="fas fa-home me-2"></i>
+                Trang chủ giáo viên
+            </a>
             <a class="nav-link <%= isRegister ? 'active' : '' %>" href="/teacher/borrow/register">
-            <i class="fas fa-clipboard-list me-2"></i>
-            Đăng ký mượn thiết bị
-        </a>
+                <i class="fas fa-clipboard-list me-2"></i>
+                Đăng ký mượn thiết bị
+            </a>
             <a class="nav-link <%= isHistory ? 'active' : '' %>" href="/teacher/borrow/history">
-            <i class="fas fa-history me-2"></i>
-            Xem lịch sử mượn/trả
-        </a>
+                <i class="fas fa-history me-2"></i>
+                Xem lịch sử mượn/trả
+            </a>
             <a class="nav-link <%= isStatus ? 'active' : '' %>" href="/teacher/borrow/pending">
-            <i class="fas fa-star me-2"></i>
-            Xem tình trạng phiếu mượn
-        </a>
+                <i class="fas fa-star me-2"></i>
+                Xem tình trạng phiếu mượn
+            </a>
         <% } %>
 
         <% if (isDepartmentHead) { %>
@@ -37,9 +38,11 @@ const isTeacher = userRole === 'giao_vien' || isDepartmentHead; // Tổ trưởn
             <div class="sidebar-section-title px-3 py-2 text-white-50" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05rem;">
                 <i class="fas fa-user-tie me-2"></i>Tổ trưởng chuyên môn
             </div>
+            
             <% const isReports = (typeof currentPage !== 'undefined' && currentPage === 'reports'); %>
             <% const isTrainingPlans = (typeof currentPage !== 'undefined' && (currentPage === 'trainingPlans' || currentPage === 'training-plans')); %>
             <% const isPurchasingPlans = (typeof currentPage !== 'undefined' && (currentPage === 'purchasing' || currentPage === 'purchasing-plans')); %>
+            
             <a class="nav-link <%= isReports ? 'active' : '' %>" href="/teacher/reports">
                 <i class="fas fa-chart-bar me-2"></i>
                 Xem báo cáo
@@ -55,30 +58,3 @@ const isTeacher = userRole === 'giao_vien' || isDepartmentHead; // Tổ trưởn
         <% } %>
     </nav>
 </aside>
-
-<style>
-    .sidebar {
-        background-color: #1e3a8a;
-        min-height: 100vh;
-        padding: 0;
-    }
-    .sidebar .nav-link {
-        color: white;
-        padding: 10px 15px;
-        transition: background-color 0.2s;
-        font-size: 0.95rem;
-    }
-    .sidebar .nav-link:hover {
-        background-color: #3b82f6;
-    }
-    .sidebar .nav-link.active {
-        background-color: #3b82f6;
-        font-weight: bold;
-    }
-    .sidebar-divider {
-        margin: 0.5rem 1rem;
-    }
-    .sidebar-section-title {
-        font-weight: 600;
-    }
-</style>

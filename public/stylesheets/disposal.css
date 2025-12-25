@@ -1,860 +1,452 @@
-/* ---------------------------- */
-/* disposal.css - Full styles */
-/* ---------------------------- */
+/* ============================
+   DISPOSAL
+   ============================ */
 
-/* --- Reset & Global --- */
+/* ---------- Global ---------- */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+
 body {
     background: #f8fafc;
-    color: #0f172a;
-    line-height: 1.5;
-}
-
-/* --- Sidebar --- */
-.sidebar {
-    box-shadow: 3px 0 12px rgba(0, 0, 0, 0.12);
-    display: flex;
-    flex-direction: column;
-    transition: 0.3s;
-}
-
-.sidebar h3 {
-    padding: 20px;
-    font-size: 18px;
-    font-weight: 700;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: white;
-}
-
-.sidebar ul {
-    list-style: none;
-    margin-top: 10px;
-    padding-left: 0;
-    flex-grow: 1;
-}
-
-.sidebar ul li {
-    width: 100%;
-    padding: 12px 20px;
-    transition: background-color 0.3s, transform 0.2s, border-left 0.3s;
-    border-left: 4px solid transparent;
-    border-radius: 0 8px 8px 0;
-}
-
-.sidebar ul li a {
-    color: #fff;
-    text-decoration: none;
-    display: block;
-    font-size: 15px;
-    font-weight: 500;
-}
-
-.sidebar ul li:hover {
-    background-color: rgba(37, 99, 235, 0.2);
-    border-left: 4px solid #93c5fd;
-    transform: translateX(3px);
-
-}
-
-.sidebar ul li.active {
-    background-color: rgba(37, 99, 235, 0.3);
-    border-left: 4px solid #60a5fa;
-}
-
-/* --- Sidebar toggle --- */
-.btn-menu {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    margin-right: 15px;
-}
-
-/* Sidebar collapse */
-.sidebar-collapsed {
-    left: -250px !important;
-    transition: left 0.3s ease;
-}
-
-/* Modal animation */
-#deleteModal {
-    display: none;
-    /* ẩn mặc định */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-#deleteModal.active {
-    display: flex;
-    /* hiện khi có class active */
-}
-
-#deleteModal .modal-box {
-    background: #fff;
-    padding: 20px 25px;
-    border-radius: 8px;
-    width: 400px;
-    max-width: 90%;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-#deleteModal .modal-box h3 {
-    margin-bottom: 15px;
-    color: #e74c3c;
-}
-
-#deleteModal .modal-box p {
-    margin-bottom: 20px;
-}
-
-#deleteModal .modal-box .confirm {
-    background-color: #e74c3c;
-    color: #fff;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#deleteModal .modal-box .cancel {
-    background-color: #bdc3c7;
-    color: #fff;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-
-
-/* --- Main --- */
-.main {
-    margin-left: 250px;
-    padding: 32px 40px;
-    min-height: 100vh;
-    transition: 0.3s;
-}
-
-.main-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    border-bottom: 2px solid rgba(226, 232, 240, 0.6);
-    padding-bottom: 12px;
-}
-
-.main-header h2 {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1e3a8a;
-    letter-spacing: 0.3px;
-}
-
-
-/* --- Main content --- */
-.main {
-    margin-left: 0px;
-    padding: 32px 40px;
-    background-color: #f8fafc;
-    min-height: 100vh;
-    transition: 0.3s;
-}
-
-.main-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 12px;
-}
-
-.main-header h2 {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1e3a8a;
-    letter-spacing: 0.3px;
-}
-
-
-/* --- Search box --- */
-.search-box {
-    width: 80%;          /* bằng đúng width của bảng */
-    margin: 20px;   /* căn giữa + nằm trên bảng */
-    display: flex;
-    justify-content: flex-end;
-    margin-left: 480px;
-}
-
-.search-box input {
-    flex: 1;
-    padding: 10px 16px;
-    border: none;
-    outline: none;
-    font-size: 15px;
-    color: #0f172a;
-}
-
-.search-box input::placeholder {
-    color: #94a3b8;
-    /* màu placeholder nhẹ */
-}
-
-.search-box button {
-    padding: 10px 18px;
-    border: none;
-    background-color: #1e3a8a;
-    color: #fff;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.25s ease;
-}
-
-.search-box button:hover {
-    background-color: #2563eb;
-}
-
-
-
-/* --- Table modern --- */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
-}
-
-th,
-td {
-    padding: 12px;
-    font-size: 15px;
-    border: 1px solid #e2e8f0;
-    text-align: left;
-}
-
-th {
-    background: #f1f5f9;
-    text-align: center;
-    font-weight: 600;
-    color: #0f172a;
-}
-
-tr:nth-child(even) {
-    background: #f8fafc;
-}
-
-tr:hover {
-    background: linear-gradient(to right, #e0e7ff, #dbeafe);
-    transition: 0.3s ease;
-}
-
-td a {
-    text-decoration: none;
-    color: #1e3a8a;
-    font-weight: 500;
-}
-
-td a:hover {
-    color: #1d4ed8;
-    text-decoration: underline;
-}
-
-table td:last-child {
-    max-width: 100px;
-    white-space: normal;
-}
-
-/* TABLE STYLING */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-radius: 10px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-thead th {
-    background: #f1f5f9;
-    padding: 12px;
-    font-weight: 700;
-    color: #1e293b;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-tbody td {
-    padding: 12px;
-    border-bottom: 1px solid #e2e8f0;
     color: #334155;
-    vertical-align: middle;
-}
-
-tbody tr:hover {
-    background: #f8fafc;
-}
-
-/* ==============================
-   ADD DEVICES – CHỌN THIẾT BỊ
-   Styled theo đúng disposal.css
-============================== */
-
-.disposal-table {
-    width: 80%;
-    border-collapse: collapse;
-    border-radius: 12px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
-    margin-top: 10px;
-    margin: 0 auto;    /* căn giữa */
-}
-
-/* HEADER */
-.disposal-table thead th {
-    background: #f1f5f9;
-    color: #1e293b;
-    font-weight: 700;
-    text-align: center;
-    padding: 12px;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 15px;
-}
-
-/* BODY */
-.disposal-table tbody td {
-    padding: 12px;
-    font-size: 15px;
-    border-bottom: 1px solid #e2e8f0;
-    color: #334155;
-    vertical-align: middle;
-    text-align: center;
-
-}
-
-/* Hover giống table chính */
-.disposal-table tbody tr:hover {
-    background: linear-gradient(to right, #e0e7ff, #dbeafe);
-    transition: 0.25s ease;
-}
-
-/* Hàng cuối bỏ border */
-.disposal-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-/* Cột checkbox */
-.disposal-table td input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    margin: 0 auto;
-    display: block;
-    cursor: pointer;
-}
-
-.disposal-table th:first-child {
-    width: 45px;
-    text-align: center;
-}
-
-/* Cột dữ liệu */
-.disposal-table tbody td:nth-child(2),
-.disposal-table tbody td:nth-child(3),
-.disposal-table tbody td:nth-child(4) {
-    font-weight: 500;
-    color: #0f172a;
-}
-
-/* Hàng không có dữ liệu */
-.disposal-table tbody .text-muted {
-    padding: 20px;
-    font-size: 16px;
-    color: #94a3b8;
-}
-
-
-
-/* ==============================
-   NÚT CHỌN – QUAY LẠI
-============================== */
-
-.disposal-btn {
-    background: #1e3a8a;
-    color: #fff !important;
-    border: 2px solid #1e40af;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.25s ease;
-}
-
-.disposal-btn:hover {
-    background: #1d4ed8;
-    transform: translateY(-2px);
-}
-
-.disposal-btn-secondary {
-    background: #e0e7ff;
-    color: #1e3a8a !important;
-    border: 2px solid #c7d2fe;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.25s ease;
-}
-
-.disposal-btn-secondary:hover {
-    background: #c7d2fe;
-    transform: translateY(-2px);
-}
-
-
-/* INFO BOXES IN TABLE */
-.info-box {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 600;
     font-size: 14px;
 }
 
+/* ---------- Main Content ---------- */
+.main-content {
+    min-height: 100vh;
+    padding: 24px 28px;
+    background: #f8fafc;
+}
+
+/* ---------- Page Title ---------- */
+.main-content h1 {
+    font-weight: 700;
+    font-size: 22px;
+    color: #1e293b;
+}
+
+/* ---------- Card ---------- */
+.main-content .card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.main-content .card+.card {
+    margin-top: 20px;
+}
+
+/* ---------- Primary Button ---------- */
+.main-content .btn-primary {
+    height: 42px;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    background: #2563eb;
+    border: 1px solid #2563eb;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    transition: all 0.2s ease;
+}
+
+.main-content .btn-primary:hover {
+    background: #1e40af;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+    transform: translateY(-1px);
+}
+
+.main-content .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* ---------- Search Box (Suppliers-style) ---------- */
+.search-box {
+    display: flex;
+    align-items: stretch;
+    max-width: 320px;
+}
+
+.search-box input {
+    height: 42px;
+    flex: 1;
+    border-radius: 8px 0 0 8px;
+    border: 1px solid #e2e8f0;
+    border-right: none;
+    padding: 0 14px;
+    font-size: 14px;
+}
+
+.search-box input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+.search-box .search-btn {
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 0 8px 8px 0;
+    border: 1px solid #2563eb;
+
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    transition: all 0.2s ease;
+}
+
+.search-box .search-btn:hover {
+    background: #1e40af;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .search-box {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .search-box input,
+    .search-box .search-btn {
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+}
+
+/* ===== FILTER BADGE ===== */
+.filter-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.filter-badge i {
+    font-size: 12px;
+}
+
+
+
+/* ---------- Table ---------- */
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    vertical-align: middle;
+    text-align: center;
+    color: #334155;
+}
+
+.table-hover tbody tr:hover {
+    background: #f1f5f9;
+}
+
+/* =========================
+   INFO BOX – DISPOSAL
+   ========================= */
+.info-box {
+    min-width: 180px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.info-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.info-box label {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.8;
+    margin: 0;
+}
+
+.info-box .value {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+/* ===== MÀU RIÊNG TỪNG BOX ===== */
 .info-code {
     background: #eef2ff;
     color: #1e40af;
+    border-left: 5px solid #6366f1;
 }
 
 .info-year {
     background: #ecfdf5;
     color: #15803d;
+    border-left: 5px solid #22c55e;
 }
 
 .info-date {
     background: #fef3c7;
-    /* màu vàng nhạt, tùy chọn */
-    color: #b45309;
-    /* chữ màu nâu vàng */
+    color: #92400e;
+    border-left: 5px solid #f59e0b;
 }
 
-/* --- Info box giống ô table --- */
-.disposal-info {
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .info-box {
+        min-width: 100%;
+    }
+}
+
+
+/* =========================
+   DISPOSAL FILTERS – POLISH
+   ========================= */
+.disposal-filters {
     display: flex;
-    gap: 20px;
-    /* khoảng cách giữa các ô */
-    flex-wrap: wrap;
-    /* xuống dòng nếu màn hình nhỏ */
-    margin-bottom: 30px;
+    gap: 12px;
+    align-items: flex-end;
+    padding: 10px 14px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.disposal-info .info-box {
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 12px 16px;
-    min-width: 150px;
-    /* chiều rộng tối thiểu */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+.disposal-filter {
     display: flex;
     flex-direction: column;
+    gap: 4px;
 }
 
-.disposal-info .info-box label {
-    font-weight: 600;
-    color: #1e3a8a;
-    font-size: 13px;
-    margin-bottom: 4px;
-}
-
-.disposal-info .info-box span {
-    font-weight: 500;
-    color: #0f172a;
-    font-size: 14px;
-}
-
-/* Thu nhỏ checkbox trong bảng disposal */
-.disposal-table td input[type="checkbox"] {
-    width: 16px;
-    /* chiều ngang */
-    height: 16px;
-    /* chiều cao */
-    margin: 0 auto;
-    /* canh giữa */
-    display: block;
-    cursor: pointer;
-}
-
-/* Canh checkbox trong thẻ <th> cũng vừa */
-.disposal-table th:first-child {
-    text-align: center;
-    width: 40px;
-    /* cố định độ rộng cột chọn */
-}
-
-
-/* Info boxes for disposal details */
-.disposal-info-box {
-    padding: 8px 12px;
-    border-radius: 8px;
-    display: inline-block;
-    margin-right: 8px;
-}
-
-.disposal-info-box label {
-    display: block;
+.disposal-filter label {
     font-size: 12px;
-    color: #374151;
-    margin-bottom: 4px;
-}
-
-.disposal-info-box .value {
     font-weight: 600;
-    font-size: 14px;
-}
-
-.info-code {
-    background-color: #eef2ff;
-}
-
-.info-year {
-    background-color: #ecfdf5;
-}
-
-.info-date {
-    background-color: #fff7ed;
-}
-
-/* Filter selects */
-.disposal-filter {
-    background: #eef2ff;
-    padding: 6px 10px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.disposal-filter i {
-    color: #4f46e5;
-    font-size: 14px;
-}
-
-.disposal-filter select {
-    border: none;
-    background: transparent;
-    padding: 0;
-    height: auto;
-    font-size: 14px;
-}
-
-/* --- Form modern --- */
-form {
-    background: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.12);
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.form-group {
-    margin-bottom: 18px;
-}
-
-label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: #1e3a8a;
-}
-
-input[type="text"] {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    transition: 0.25s;
-    outline: none;
-}
-
-input[type="text"]:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-}
-
-input[readonly] {
-    background: #f1f5f9;
     color: #475569;
-    cursor: not-allowed;
 }
 
-/* --- Buttons modern --- */
-.btn-group {
-    display: flex;
-    justify-content: center;
-    margin-top: 24px;
-    gap: 20px;
-}
-
-button {
-    padding: 10px 24px;
-    border: none;
-    border-radius: 8px;
+/* SELECT STYLE */
+.disposal-filter select {
+    min-width: 170px;
+    height: 38px;
+    padding: 6px 34px 6px 12px;
+    border-radius: 9999px;
+    border: 1px solid #2563eb;
+    font-size: 13px;
     font-weight: 600;
+    color: #1e293b;
     cursor: pointer;
-    transition: 0.25s ease, transform 0.2s;
+    background-color: #fff;
+
+    /* Custom arrow */
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%232563eb' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
 }
 
-.btn-save {
-    background: #1e3a8a;
-    color: #fff;
+.disposal-filter select:hover {
+    background-color: #2563eb;
+    color: #ffffff;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
 }
 
-.btn-save:hover {
-    background: #1d4ed8;
-    transform: translateY(-2px);
-}
-
-.btn-cancel {
-    background: #e11d48;
-    color: #fff;
-}
-
-.btn-cancel:hover {
-    background: #be123c;
-    transform: translateY(-2px);
-}
-
-.btn-add {
-    display: inline-block;
-    margin-top: 30px;
-    margin-left: 100px;
-    background: #1e3a8a;
-    color: #fff !important;
-    border: 2px solid #1e40af;
-    border-radius: 8px;
-    padding: 10px 22px;
-    cursor: pointer;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.25s ease, transform 0.2s;
-}
-
-.btn-add:hover {
-    background: #1d4ed8;
-    transform: translateY(-2px);
-}
-
-.btn-add:focus {
+.disposal-filter select:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.3);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
 }
 
-/* --- Modal Xóa --- */
-#deleteModal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+    .disposal-filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .disposal-filter select {
+        width: 100%;
+    }
 }
 
-#deleteModal .modal-box {
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    text-align: center;
-    max-width: 400px;
-}
-
-#deleteModal h3 {
-    color: #dc2626;
-    margin-bottom: 20px;
-}
-
-#deleteModal p {
-    margin-bottom: 30px;
-}
-
-#deleteModal button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    margin: 0 10px;
-}
-
-#deleteModal .confirm {
-    background: #dc2626;
-    color: white;
-}
-
-#deleteModal .confirm:hover {
-    background: #b91c1c;
-}
-
-#deleteModal .cancel {
-    background: #e0e7ff;
-    color: #1e3a8a;
-}
-
-#deleteModal .cancel:hover {
-    background: #c7d2fe;
-}
-
-/* Force row hover override bootstrap */
-.disposal-table.table tbody tr:hover td {
-    background-color: #e0e7ff !important;
-    transition: 0.2s ease;
-}
-
-/* Xóa hover mặc định của Bootstrap */
-.table-hover tbody tr:hover {
-    background-color: transparent !important;
-}
-
-/* Bỏ in đậm trong bảng chọn thiết bị */
-.disposal-table td {
-    font-weight: normal !important;
-}
-
-/* Đồng nhất màu chữ toàn bộ bảng trong trang chọn thiết bị */
-.disposal-table th,
-.disposal-table td {
-    color: #333 !important;
-    /* hoặc #444 nếu bảng chính của m dùng tone đậm hơn */
-    font-weight: normal !important;
-}
-
-/* In đậm lại tiêu đề bảng */
-.disposal-table thead th {
-    font-weight: 700 !important;
-    color: #0f172a !important;
-    /* màu đồng nhất với theme */
-}
-
-/* Cấp độ hỏng */
+/* ---------- Level Badge ---------- */
 .level-badge {
     display: inline-block;
     padding: 4px 10px;
     border-radius: 6px;
     font-weight: 600;
     font-size: 13px;
-    text-align: center;
 }
 
-/* Cấp độ hỏng */
 .level-low {
-    background-color: #fef3c7;
-    /* vàng nhạt */
+    background: #fef3c7;
     color: #b45309;
 }
 
 .level-severe {
-    background-color: #fee2e2;
-    /* đỏ nhạt */
+    background: #fee2e2;
     color: #b91c1c;
 }
 
-
-/* FILTERS */
+/* ---------- Filters (GIỮ STYLE) ---------- */
 .disposal-filters {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
-    margin-left: auto;
-    /* đẩy filter về cuối dòng */
-}
-
-.disposal-filter {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.75rem;
 }
 
 .disposal-filter label {
-    margin-bottom: 2px;
+    font-size: 12px;
     font-weight: 500;
     color: #374151;
+    margin-bottom: 2px;
 }
 
-/* SELECT KIỂU BUTTON NHỎ */
 .disposal-filter select {
     appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 9999px;
     border: 1px solid #3b82f6;
-    background-color: #ffffff;
-    color: #1f2937;
-    font-size: 0.8rem;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    min-width: 120px;
+    background-color: #fff;
+    color: #1f2937;
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%233b82f6' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 12px;
+    background-position: right 10px center;
 }
 
 .disposal-filter select:hover {
     background-color: #3b82f6;
-    color: #ffffff;
-    border-color: #2563eb;
+    color: #fff;
 }
 
-.disposal-filter select:focus {
-    outline: none;
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.4);
+/* ---------- Delete Modal ---------- */
+#deleteModal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.55);
+    z-index: 1000;
 }
 
-
-/* --- Main Content fix layout --- */
-.main-content {
-    position: relative;
-    width: calc(100% - 250px); /* chiều rộng trừ sidebar */
-    margin-left: 250px; /* đúng với sidebar mặc định */
-    transition: margin-left 0.3s ease, width 0.3s ease;
-    min-height: 100vh;
-    padding: 32px 40px;
-    background-color: #f8fafc;
+#deleteModal.active {
+    display: flex;
 }
 
-/* Khi sidebar collapse */
-.sidebar-collapsed ~ .main-content {
-    margin-left: 0;
-    width: 100%;
+#deleteModal .modal-box {
+    background: #fff;
+    padding: 28px 24px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    transform: scale(0.95);
+    opacity: 0;
+    transition: all 0.25s ease-in-out;
 }
 
-/* Giữ padding cho .main bên trong */
-.main {
-    padding: 0; /* padding đã nằm trong .main-content */
+#deleteModal.active .modal-box {
+    transform: scale(1);
+    opacity: 1;
 }
 
+#deleteModal h3 {
+    color: #dc2626;
+    font-size: 20px;
+    margin-bottom: 16px;
+}
 
+#deleteModal p {
+    margin-bottom: 24px;
+    color: #475569;
+    font-size: 16px;
+}
+
+#deleteModal .btn-danger {
+    background: #dc2626;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    color: #fff;
+    transition: background 0.2s;
+}
+
+#deleteModal .btn-danger:hover {
+    background: #b91c1c;
+}
+
+#deleteModal .btn-secondary {
+    background: #e5e7eb;
+    color: #1e293b;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+#deleteModal .btn-secondary:hover {
+    background: #d1d5db;
+}
+
+#deleteModal .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* ===== LOCK ICON (READ ONLY - SQUARE) ===== */
+.lock-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    border-radius: 4px;
+    /* bo rất nhẹ, gần như vuông */
+    background: #f8fafc;
+    color: #94a3b8;
+
+    border: 1px solid #e2e8f0;
+    cursor: not-allowed;
+}
+
+.lock-icon i {
+    font-size: 14px;
+}
