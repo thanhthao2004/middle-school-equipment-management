@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const profileController = require('../controllers/profile.controller');
+const { uploadAvatar } = require('../../../config/avatar-upload');
 // const { authenticate } = require('../../../core/middlewares/auth.middleware');
 // const { validate } = require('../../../core/middlewares/validation.middleware');
 // const profileValidators = require('../validators/profile.validators');
@@ -15,7 +16,13 @@ const profileController = require('../controllers/profile.controller');
 // GET /profile - Xem thông tin cá nhân
 router.get('/', profileController.getProfilePage);
 
-// POST /profile - Cập nhật thông tin cá nhân
+// GET /profile/edit - Xem form chỉnh sửa thông tin cá nhân
+router.get('/edit', profileController.getEditProfilePage);
+
+// POST /profile/edit - Cập nhật thông tin cá nhân (có upload avatar)
+router.post('/edit', uploadAvatar.single('avatar'), profileController.updateProfilePage);
+
+// POST /profile - Cập nhật thông tin cá nhân (deprecated, giữ lại để tương thích)
 router.post('/', 
     // validate(profileValidators.updateProfile), // Tạm thời bỏ qua validation
     profileController.updateProfile

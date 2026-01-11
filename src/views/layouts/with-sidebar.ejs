@@ -15,8 +15,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Custom Styles -->
-    <link href="/public/stylesheets/style.css" rel="stylesheet">
-
+    <link href="/stylesheets/style.css" rel="stylesheet">
+    
     <!-- Additional CSS for specific pages -->
     <% if (typeof additionalCSS !=='undefined' && additionalCSS) { %>
         <%- additionalCSS %>
@@ -24,25 +24,22 @@
 </head>
 
 <body class="<%= typeof bodyClass !== 'undefined' ? bodyClass : '' %>" style="background-color: var(--light-gray);">
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2">
-                <%- include('../partials/' + (typeof sidebarType !=='undefined' ? sidebarType : 'borrow-sidebar' )) %>
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <%- include('../partials/' + (typeof sidebarType !== 'undefined' ? sidebarType : 'borrow-sidebar'), { currentPage, user }) %>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <%- include('../partials/header', { currentPage, user }) %>
+            
+            <!-- Page Content -->
+            <div class="container-fluid py-4">
+                <%- body %>
             </div>
-
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 main-content">
-                <!-- Page Header -->
-                <% if (typeof pageHeader !=='undefined' && pageHeader) { %>
-                    <%- pageHeader %>
-                        <% } %>
-
-                            <!-- Main Content -->
-                            <div class="container-fluid">
-                                <%- body %>
-                            </div>
-            </div>
+            
+            <!-- Footer -->
+            <%- include('../partials/footer', { currentPage, user }) %>
         </div>
     </div>
 

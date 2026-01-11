@@ -12,17 +12,13 @@ router.use(requireRole('ql_thiet_bi'));
 router.get('/', borrowController.getManagerHomePage);
 router.get('/manager-home', borrowController.getManagerHomePage);
 
-// Danh sách phiếu mượn chờ duyệt
-router.get('/approvals', borrowController.getApprovalsPage);
-
-// Danh sách phiếu trả
-router.get('/return-slips', borrowController.getReturnSlipsListPage);
-
-// Chi tiết phiếu mượn
-router.get('/borrow/:id', borrowController.getBorrowDetailPage);
-
-// Chi tiết phiếu trả
-router.get('/return/:id', borrowController.getReturnSlipDetailPage);
+// NOTE: Borrow and return routes are now handled by manager-borrow.routes.js
+// mounted at /manager/borrow in routes/index.js
+// The routes below were causing conflicts and have been removed:
+// - /approvals -> now /manager/borrow/approvals
+// - /return-slips -> now /manager/borrow/returns  
+// - /borrow/:id -> now /manager/borrow/approvals/:id
+// - /return/:id -> now /manager/borrow/returns/:id
 
 // =============================================
 // MANAGER API

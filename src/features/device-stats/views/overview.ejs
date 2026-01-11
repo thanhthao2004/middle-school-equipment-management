@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/devices.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <%- include('../../../views/partials/header', { currentPage: 'device-stats' , user: user }) %>
+
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                <!-- Sidebar -->
+                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'device-stats' , user: user }) %>
+
+                    <!-- Main Content -->
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container-fluid py-4">
+                            <div class="page-header mb-4">
+                                <h1 class="h3 mb-0">THỐNG KÊ THIẾT BỊ</h1>
+                                <p class="text-muted">Tổng quan tình hình quản lý thiết bị</p>
+                            </div>
+
+                            <!-- Summary Cards -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-4">
+                                    <div class="card bg-primary text-white h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Tổng đầu thiết bị</h5>
+                                            <h2 class="display-4 fw-bold mb-0">
+                                                <%= stats.totalDeviceTypes %>
+                                            </h2>
+                                            <p class="card-text"><small>(Loại thiết bị)</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-success text-white h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Tổng số lượng</h5>
+                                            <h2 class="display-4 fw-bold mb-0">
+                                                <%= stats.totalDeviceUnits %>
+                                            </h2>
+                                            <p class="card-text"><small>(Đơn vị thiết bị)</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-info text-white h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Tổng giá trị (Ước tính)</h5>
+                                            <h2 class="display-6 fw-bold mb-0">
+                                                <%= stats.totalValue.toLocaleString('vi-VN') %> đ
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Charts Row -->
+                            <div class="row g-4 mb-4">
+                                <!-- Condition Chart -->
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">Tình trạng thiết bị</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <canvas id="conditionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Status Chart -->
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">Trạng thái sử dụng</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <canvas id="statusChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Category Table -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Thống kê theo Danh mục</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Danh mục</th>
+                                                    <th class="text-end">Số lượng</th>
+                                                    <th class="text-end">Giá trị (VNĐ)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (stats.categoryStats && stats.categoryStats.length> 0) { %>
+                                                    <% stats.categoryStats.forEach(cat=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= cat.categoryName %>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <%= cat.totalQuantity %>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <%= cat.totalValue.toLocaleString('vi-VN') %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }); %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="3" class="text-center">Chưa có dữ liệu
+                                                                    </td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+        <%- include('../../../views/partials/footer') %>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+            <script>
+                // Data passed from server
+                const conditionData = <% - JSON.stringify(stats.conditionStats) %>;
+                const statusData = <% - JSON.stringify(stats.statusStats) %>;
+
+                console.log('[DeviceStats] Loaded data:', { conditionData, statusData });
+
+                // Condition Chart
+                const ctxCondition = document.getElementById('conditionChart').getContext('2d');
+                new Chart(ctxCondition, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(conditionData),
+                        datasets: [{
+                            data: Object.values(conditionData),
+                            backgroundColor: [
+                                '#198754', // Tốt - Success
+                                '#0d6efd', // Khá - Primary
+                                '#ffc107', // Trung bình - Warning
+                                '#dc3545'  // Hỏng - Danger
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+
+                // Status Chart
+                const ctxStatus = document.getElementById('statusChart').getContext('2d');
+                const statusLabels = {
+                    'san_sang': 'Sẵn sàng',
+                    'dang_muon': 'Đang mượn',
+                    'bao_tri': 'Bảo trì',
+                    'thanh_ly': 'Thanh lý'
+                };
+
+                new Chart(ctxStatus, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(statusData).map(k => statusLabels[k] || k),
+                        datasets: [{
+                            data: Object.values(statusData),
+                            backgroundColor: [
+                                '#0dcaf0', // Sẵn sàng - Info
+                                '#fd7e14', // Đang mượn - Orange
+                                '#6c757d', // Bảo trì - Gray
+                                '#20c997'  // Thanh lý - Teal
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            </script>
+</body>
+
+</html>

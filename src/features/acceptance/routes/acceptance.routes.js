@@ -2,22 +2,15 @@ const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/acceptance.controller");
 
-router.get("/", controller.getListPage.bind(controller));
-router.get("/detail/:id", controller.getEditPage.bind(controller)); // Use edit page for detail view
-router.get("/edit/:id", controller.getEditPage.bind(controller));
-router.get("/delete/:id", controller.getDeletePage.bind(controller));
+router.get("/", controller.getListPage);
+router.get("/create", controller.getCreatePage);
+router.post("/create", controller.postCreate);
+router.get("/detail/:id", controller.getDetailPage);
+router.get("/edit/:id", controller.getEditPage);
 
-// POST routes for CRUD operations
-router.post("/edit/:id", (req, res) => {
-  // TODO: Implement update acceptance logic
-  // For now, just redirect back to list
-  res.redirect("/manager/acceptance");
-});
+// ✅ LƯU KẾT QUẢ NGHIỆM THU
+router.post("/edit/:id", controller.postEditPage);
 
-router.post("/delete/:id", (req, res) => {
-  // TODO: Implement delete acceptance item logic
-  // For now, just redirect back to list
-  res.redirect("/manager/acceptance");
-});
+router.get("/delete/:id", controller.getDeletePage);
 
 module.exports = router;

@@ -1,68 +1,79 @@
-const { Schema, model } = require('mongoose');
-const { getNextCode } = require('../../../core/libs/sequence');
+const mongoose = require("mongoose");
+const { Schema, Types } = mongoose;
 
-// TB_ThanhLy
-const DisposalTicketSchema = new Schema(
-	{
-		maThanhLy: { type: String, required: true, unique: true, trim: true },
-		soLuong: { type: Number, default: 0 },
-		tinhTrangDuyet: { type: String, trim: true },
-		mucDoHong: { type: String, trim: true },
-		duongDanFile: { type: String, default: '' },
-	},
-	{ timestamps: true }
+/* ======================
+   DISPOSAL ITEM
+   1 thiết bị trong biên bản
+====================== */
+const DisposalItemSchema = new Schema(
+    {
+        device: {
+            type: Types.ObjectId,
+            ref: "Device",
+            required: true
+        },
+
+        broken_date: {
+            type: Date,
+            default: Date.now
+        },
+
+        level: {
+            type: String,
+            trim: true
+        },
+
+        reason: {
+            type: String,
+            trim: true
+        },
+
+        price: {
+            type: Number,
+            default: 0
+        }
+    },
+    {
+        _id: false
+    }
 );
 
-// BaoCaoThanhLyTB
+/* ======================
+   DISPOSAL REPORT
+====================== */
 const DisposalReportSchema = new Schema(
-	{
-		maBaoCao: { type: String, required: true, unique: true, trim: true },
-		namHoc: { type: String, trim: true },
-		ngayLapBaoCao: { type: Date },
-		trangThai: { type: String, trim: true },
-		tenFile: { type: String, trim: true },
-		duongDanFile: { type: String, default: '' },
-	},
-	{ timestamps: true }
+    {
+        code: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true
+        },
+
+        year: {
+            type: String,
+            required: true
+        },
+
+        created_at: {
+            type: Date,
+            default: Date.now
+        },
+
+        items: {
+            type: [DisposalItemSchema],
+            default: []
+        },
+
+        status: {
+            type: String,
+            enum: ["Hoạt động", "Đã duyệt", "Hủy"],
+            default: "Hoạt động"
+        }
+    },
+    {
+        timestamps: true
+    }
 );
 
-// ChiTietThanhLy
-const DisposalDetailSchema = new Schema(
-	{
-		maThanhLy: { type: String, required: true, index: true },
-		maTB: { type: String, required: true },
-		lyDo: { type: String, default: '' },
-		mucDoHong: { type: String, default: '' },
-		giaBan: { type: Number, default: 0 },
-		ngayBan: { type: Date },
-	},
-	{ timestamps: true }
-);
-
-const DisposalTicket = model('DisposalTicket', DisposalTicketSchema);
-const DisposalReport = model('DisposalReport', DisposalReportSchema);
-const DisposalDetail = model('DisposalDetail', DisposalDetailSchema);
-
-
-DisposalTicketSchema.pre('validate', async function ensureMaTL(next) {
-	try {
-		if (!this.maThanhLy) {
-			this.maThanhLy = await getNextCode('TL', 3); // TL001
-		}
-		next();
-	} catch (e) {
-		next(e);
-	}
-});
-
-DisposalReportSchema.pre('validate', async function ensureMaTLBC(next) {
-	try {
-		if (!this.maBaoCao) {
-			this.maBaoCao = await getNextCode('TLBC', 3); // TLBC001
-		}
-		next();
-	} catch (e) {
-		next(e);
-	}
-});
-module.exports = { DisposalTicket, DisposalReport, DisposalDetail };
+module.exports = mongoose.model("DisposalReport", DisposalReportSchema);

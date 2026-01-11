@@ -11,8 +11,8 @@ const config = {
 		dbName: process.env.MONGODB_DB,
 	},
 	jwt: {
-		secret: process.env.JWT_SECRET,
-		expiresIn: process.env.JWT_EXPIRES_IN,
+		secret: process.env.JWT_SECRET || 'dev_secret_key_fallback',
+		expiresIn: process.env.JWT_EXPIRES_IN || '24h',
 	},
 	session: {
 		secret: process.env.SESSION_SECRET,

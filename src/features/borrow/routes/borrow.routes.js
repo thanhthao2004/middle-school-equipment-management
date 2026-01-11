@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const borrowController = require('../controllers/borrow.controller');
-const { authenticate,requireRole } = require('../../../core/middlewares/auth.middleware');
+const { authenticate, requireRole } = require('../../../core/middlewares/auth.middleware');
 const { validate } = require('../../../core/middlewares/validation.middleware');
 const borrowValidators = require('../validators/borrow.validators');
 
@@ -17,11 +17,11 @@ router.get('/', borrowController.getRegisterPage);
 router.get('/register', borrowController.getRegisterPage); // Legacy
 
 // POST /borrow - Xử lý đăng ký mượn
-router.post('/', 
+router.post('/',
     validate(borrowValidators.createBorrowRequest),
     borrowController.createBorrowRequest
 );
-router.post('/register', 
+router.post('/register',
     validate(borrowValidators.createBorrowRequest),
     borrowController.createBorrowRequest
 ); // Legacy
@@ -70,5 +70,14 @@ router.get('/api/pending-approvals', borrowController.getPendingApprovals); // L
 
 // API: POST /borrow/api/cancel/:id - Hủy phiếu mượn (API)
 router.post('/api/cancel/:id', borrowController.cancelBorrow);
+
+// =============================================
+// NEW RETURN SLIP API ROUTES
+// =============================================
+// API: POST /borrow/api/return-slips - Create a new return slip
+router.post('/api/return-slips', borrowController.createReturnSlip);
+
+// API: GET /borrow/api/borrowed-items - Get borrowed items for return
+router.get('/api/borrowed-items', borrowController.getBorrowedItems);
 
 module.exports = router;

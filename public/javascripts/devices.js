@@ -3,6 +3,11 @@
 ================================ */
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Tính thành tiền ban đầu khi trang load (nếu có giá trị sẵn)
+    if (document.getElementById('tongGia')) {
+        calculateTotalPrice();
+    }
+
     /* -----------------------------
        Delete Modal Handler
     ----------------------------- */
@@ -94,8 +99,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (ngayNhapInput && ngayNhapInput.value) {
                 const selectedDate = new Date(ngayNhapInput.value);
                 const today = new Date();
+                // Set giờ về 00:00:00 để so sánh chỉ phần ngày
+                selectedDate.setHours(0, 0, 0, 0);
                 today.setHours(0, 0, 0, 0);
 
+                // Chỉ báo lỗi nếu ngày nhập > hôm nay (không bao gồm hôm nay)
                 if (selectedDate > today) {
                     hasError = true;
                     errorMessages.push('- Ngày nhập không thể là ngày trong tương lai');
@@ -157,8 +165,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (ngayNhapInput.value) {
                     const selectedDate = new Date(ngayNhapInput.value);
                     const today = new Date();
+                    // Set giờ về 00:00:00 để so sánh chỉ phần ngày
+                    selectedDate.setHours(0, 0, 0, 0);
                     today.setHours(0, 0, 0, 0);
 
+                    // Chỉ báo lỗi nếu ngày nhập > hôm nay (không bao gồm hôm nay)
                     if (selectedDate > today) {
                         ngayNhapInput.classList.add('is-invalid');
                     } else {
@@ -351,6 +362,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* -----------------------------
+       Auto-Fill Location from Category Selection
+       When category is selected, auto-populate storage location
+    ----------------------------- */
+    const categorySelect = document.getElementById('category');
+
+    if (categorySelect && locationSelect) {
+        categorySelect.addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const categoryLocation = selectedOption.getAttribute('data-location');
+
+            if (categoryLocation && categoryLocation.trim() !== '') {
+                // Check if the location exists in the dropdown
+                let locationFound = false;
+                for (let i = 0; i < locationSelect.options.length; i++) {
+                    if (locationSelect.options[i].value === categoryLocation) {
+                        locationSelect.value = categoryLocation;
+                        locationFound = true;
+                        break;
+                    }
+                }
+
+                // If location not found in dropdown, use custom input
+                if (!locationFound && customLocationInput) {
+                    locationSelect.value = '__custom__';
+                    customLocationInput.style.display = 'block';
+                    customLocationInput.value = categoryLocation;
+                    customLocationInput.setAttribute('name', 'viTriLuuTru');
+                    locationSelect.removeAttribute('name');
+                }
+            }
+        });
+    }
+
+    /* -----------------------------
        Auto-Price Handler for Teacher-Made Equipment
        When "Giáo viên tự làm" is selected, price = 0đ
     ----------------------------- */
@@ -470,4 +515,26 @@ function showLoadingSpinner() {
 
     overlay.appendChild(spinner);
     document.body.appendChild(overlay);
+}
+
+/* -----------------------------
+   Calculate Total Price (Thành tiền)
+   Tự động tính = Giá thành × Số lượng
+----------------------------- */
+function calculateTotalPrice() {
+    const giaThanhInput = document.getElementById('giaThanh');
+    const soLuongInput = document.getElementById('soLuong');
+    const tongGiaInput = document.getElementById('tongGia');
+
+    if (!giaThanhInput || !soLuongInput || !tongGiaInput) {
+        return;
+    }
+
+    const giaThanh = parseFloat(giaThanhInput.value) || 0;
+    const soLuong = parseInt(soLuongInput.value) || 0;
+    const tongGia = giaThanh * soLuong;
+
+    // Format số với dấu phẩy ngăn cách hàng nghìn
+    const formattedPrice = tongGia.toLocaleString('vi-VN');
+    tongGiaInput.value = formattedPrice + ' VNĐ';
 }

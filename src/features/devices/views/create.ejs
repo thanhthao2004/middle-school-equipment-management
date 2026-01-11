@@ -6,30 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thêm thiết bị mới</title>
 
-    <!-- Bootstrap 5.3.0 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome 6.4.0 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/stylesheets/devices.css">
     <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        .preview-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 
 <body>
-    <!-- Header -->
     <%- include('../../../views/partials/header', { currentPage: 'devices' , user: typeof user !=='undefined' ? user : {
         role: 'ql_thiet_bi' } }) %>
 
-        <!-- Main Layout with Sidebar -->
         <div class="container-fluid p-0">
             <div class="row g-0">
-                <!-- Sidebar QLTB -->
                 <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices' , user: typeof user
                     !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
-                    <!-- Main Content -->
                     <div class="col-md-9 col-lg-10 main-content">
                         <div class="container-fluid py-4">
-                            <!-- Page Header -->
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h1 class="h3 mb-0">THÊM THIẾT BỊ MỚI</h1>
                                 <a href="/manager/devices" class="btn btn-secondary">
@@ -37,11 +39,9 @@
                                 </a>
                             </div>
 
-                            <!-- Flash Messages -->
                             <% if (typeof messages !=='undefined' && messages.error) { %>
                                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                     <i class="fas fa-exclamation-triangle me-2"></i>
-                                    <strong>Lỗi!</strong>
                                     <%= messages.error %>
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
@@ -50,320 +50,268 @@
                                     <% if (typeof messages !=='undefined' && messages.success) { %>
                                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                                             <i class="fas fa-check-circle me-2"></i>
-                                            <strong>Thành công!</strong>
                                             <%= messages.success %>
                                                 <button type="button" class="btn-close"
                                                     data-bs-dismiss="alert"></button>
                                         </div>
                                         <% } %>
 
-                                            <!-- Validation Errors Modal -->
-                                            <% if (typeof messages !=='undefined' && messages.validationErrors &&
-                                                messages.validationErrors.length> 0) { %>
-                                                <div class="modal fade" id="errorModal" tabindex="-1"
-                                                    aria-labelledby="errorModalLabel" aria-hidden="true"
-                                                    data-bs-backdrop="static">
-                                                    <div class="modal-dialog modal-dialog-centered">
-                                                        <div class="modal-content border-danger">
-                                                            <div class="modal-header bg-danger text-white">
-                                                                <h5 class="modal-title" id="errorModalLabel">
-                                                                    <i class="fas fa-exclamation-circle me-2"></i>Dữ
-                                                                    liệu không hợp lệ
-                                                                </h5>
-                                                                <button type="button" class="btn-close btn-close-white"
-                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <div class="card shadow-sm">
+                                                <div class="card-body">
+                                                    <form action="/manager/devices/create" method="POST" id="deviceForm"
+                                                        enctype="multipart/form-data">
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="tenTB" class="form-label">Tên thiết bị <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="text" class="form-control" id="tenTB"
+                                                                    name="tenTB" required
+                                                                    value="<%= typeof formData !== 'undefined' ? formData.tenTB || '' : '' %>"
+                                                                    placeholder="Nhập tên thiết bị">
                                                             </div>
-                                                            <div class="modal-body">
-                                                                <p class="mb-2">Vui lòng kiểm tra lại các lỗi sau:</p>
-                                                                <ul class="list-unstyled mb-0">
-                                                                    <% messages.validationErrors.forEach(error=> { %>
-                                                                        <li class="mb-2">
-                                                                            <i
-                                                                                class="fas fa-times-circle text-danger me-2"></i>
-                                                                            <%= error %>
-                                                                        </li>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="category" class="form-label">Danh
+                                                                    mục</label>
+                                                                <select class="form-select" id="category"
+                                                                    name="category">
+                                                                    <option value="">Chọn danh mục</option>
+                                                                    <% if (typeof categories !=='undefined' &&
+                                                                        categories.length> 0) { %>
+                                                                        <% categories.forEach(cat=> { %>
+                                                                            <option value="<%= cat._id %>"
+                                                                                data-location="<%= cat.location || '' %>"
+                                                                                <%=(typeof formData !=='undefined' &&
+                                                                                formData.category &&
+                                                                                formData.category.toString()===cat._id.toString())
+                                                                                ? 'selected' : '' %>>
+                                                                                <%= cat.tenDM || cat.name %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                                <% } %>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="lop" class="form-label">Lớp <span
+                                                                        class="text-muted">(Ctrl + Click để chọn
+                                                                        nhiều)</span></label>
+                                                                <select class="form-select" id="lop" name="lop" multiple
+                                                                    size="4">
+                                                                    <% ['6', '7' , '8' , '9' ].forEach(l=> { %>
+                                                                        <option value="<%= l %>" <%=(typeof formData
+                                                                            !=='undefined' &&
+                                                                            Array.isArray(formData.lop) &&
+                                                                            formData.lop.includes(l)) ? 'selected' : ''
+                                                                            %>>Lớp <%= l %>
+                                                                        </option>
                                                                         <% }); %>
-                                                                </ul>
+                                                                </select>
                                                             </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-danger"
-                                                                    data-bs-dismiss="modal">
-                                                                    <i class="fas fa-check me-1"></i>Đã hiểu
-                                                                </button>
+
+                                                            <div class="col-md-3 mb-3">
+                                                                <label for="soLuong" class="form-label">Số lượng</label>
+                                                                <input type="number" class="form-control" id="soLuong"
+                                                                    name="soLuong" min="0"
+                                                                    value="<%= typeof formData !== 'undefined' ? formData.soLuong || 0 : 0 %>">
+                                                            </div>
+                                                            <div class="col-md-3 mb-3">
+                                                                <label for="giaThanh" class="form-label">Giá thành (đơn
+                                                                    giá)</label>
+                                                                <input type="number" class="form-control" id="giaThanh"
+                                                                    name="giaThanh" min="0"
+                                                                    value="<%= typeof formData !== 'undefined' ? formData.giaThanh || 0 : 0 %>">
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label fw-bold text-success">Thành
+                                                                    tiền (Tự động)</label>
+                                                                <input type="text" class="form-control bg-light fw-bold"
+                                                                    id="tongGia" readonly value="0 VNĐ">
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="tinhTrangThietBi" class="form-label">Tình
+                                                                    trạng</label>
+                                                                <select class="form-select" id="tinhTrangThietBi"
+                                                                    name="tinhTrangThietBi">
+                                                                    <% const statuses=['Tốt', 'Khá' , 'Trung bình'
+                                                                        , 'Hỏng' ]; statuses.forEach(status=> {
+                                                                        %>
+                                                                        <option value="<%= status %>" <%=(typeof
+                                                                            formData !=='undefined' &&
+                                                                            formData.tinhTrangThietBi===status)
+                                                                            ? 'selected' : '' %>><%= status %>
+                                                                        </option>
+                                                                        <% }); %>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="viTriLuuTru" class="form-label">Vị trí lưu
+                                                                    trữ</label>
+                                                                <select class="form-select" id="viTriLuuTru"
+                                                                    name="viTriLuuTru">
+                                                                    <option value="">-- Chọn vị trí --</option>
+                                                                    <% if (typeof filterOptions !=='undefined' &&
+                                                                        filterOptions.locations) {
+                                                                        filterOptions.locations.forEach(loc=> { %>
+                                                                        <option value="<%= loc %>" <%=(typeof formData
+                                                                            !=='undefined' &&
+                                                                            formData.viTriLuuTru===loc) ? 'selected'
+                                                                            : '' %>><%= loc %>
+                                                                        </option>
+                                                                        <% })} %>
+                                                                            <option value="__custom__">Khác (nhập
+                                                                                mới)...</option>
+                                                                </select>
+                                                                <input type="text" class="form-control mt-2"
+                                                                    id="customViTriLuuTru" name="customViTriLuuTru"
+                                                                    placeholder="Nhập vị trí mới"
+                                                                    style="display: none;">
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="supplier" class="form-label">Nhà cung
+                                                                    cấp</label>
+                                                                <select class="form-select" id="supplier"
+                                                                    name="supplier">
+                                                                    <option value="">-- Chọn nhà cung cấp --</option>
+                                                                    <% if (typeof suppliers !=='undefined' &&
+                                                                        suppliers.length> 0) { %>
+                                                                        <% suppliers.forEach(sup=> { %>
+                                                                            <option value="<%= sup._id %>" <%=(typeof
+                                                                                formData !=='undefined' &&
+                                                                                formData.supplier &&
+                                                                                formData.supplier.toString()===sup._id.toString())
+                                                                                ? 'selected' : '' %>>
+                                                                                <%= sup.name %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                                <% } %>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="ngayNhap" class="form-label">Ngày
+                                                                    nhập</label>
+                                                                <input type="date" class="form-control" id="ngayNhap"
+                                                                    name="ngayNhap"
+                                                                    value="<%= (typeof formData !== 'undefined' && formData.ngayNhap) ? formData.ngayNhap : '' %>">
+                                                            </div>
+
+                                                            <div class="col-md-12 mb-3">
+                                                                <label class="form-label">Hình ảnh (Tối đa 5
+                                                                    ảnh)</label>
+                                                                <input type="file" class="form-control" id="hinhAnh"
+                                                                    name="hinhAnh" accept="image/*" multiple>
+                                                                <div id="imagePreviewGrid" class="row mt-3 g-2"></div>
+                                                            </div>
+
+                                                            <div class="col-md-12 mb-3">
+                                                                <label for="huongDanSuDung" class="form-label">Hướng dẫn
+                                                                    sử dụng</label>
+                                                                <textarea class="form-control" id="huongDanSuDung"
+                                                                    name="huongDanSuDung"
+                                                                    rows="3"><%= typeof formData !== 'undefined' ? formData.huongDanSuDung || '' : '' %></textarea>
                                                             </div>
                                                         </div>
-                                                    </div>
+
+                                                        <div class="d-flex justify-content-end gap-2 mt-4">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                onclick="history.back()">Hủy</button>
+                                                            <button type="submit" class="btn btn-primary"><i
+                                                                    class="fas fa-save me-1"></i> Lưu thiết bị</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
-                                                <script>
-                                                    // Auto-show error modal
-                                                    document.addEventListener('DOMContentLoaded', function () {
-                                                        var errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-                                                        errorModal.show();
-                                                    });
-                                                </script>
-                                                <% } %>
-
-                                                    <!-- Form -->
-                                                    <div class="card">
-                                                        <div class="card-body">
-                                                            <form action="/manager/devices/create" method="POST"
-                                                                id="deviceForm" enctype="multipart/form-data">
-                                                                <div class="row">
-                                                                    <!-- Mã thiết bị (hidden - auto-generated) -->
-                                                                    <input type="hidden" id="maTB" name="maTB" value="">
-                                                                    <!-- Tên thiết bị -->
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label for="tenTB" class="form-label">
-                                                                            Tên thiết bị <span
-                                                                                class="text-danger">*</span>
-                                                                        </label>
-                                                                        <input type="text" class="form-control"
-                                                                            id="tenTB" name="tenTB" required
-                                                                            value="<%= typeof formData !== 'undefined' ? formData.tenTB || '' : '' %>"
-                                                                            placeholder="Nhập tên thiết bị">
-                                                                    </div>
-
-                                                                    <!-- Danh mục -->
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label for="category" class="form-label">Danh
-                                                                            mục</label>
-                                                                        <select class="form-select" id="category"
-                                                                            name="category">
-                                                                            <option value="">Chọn danh mục</option>
-                                                                            <% if (categories && categories.length> 0) {
-                                                                                %>
-                                                                                <% categories.forEach(cat=> { %>
-                                                                                    <option value="<%= cat._id %>"
-                                                                                        <%=typeof formData
-                                                                                        !=='undefined' &&
-                                                                                        formData.category &&
-                                                                                        formData.category.toString()===cat._id.toString()
-                                                                                        ? 'selected' : '' %>>
-                                                                                        <%= cat.tenDM || cat.name || ''
-                                                                                            %>
-                                                                                    </option>
-                                                                                    <% }); %>
-                                                                                        <% } %>
-                                                                        </select>
-                                                                    </div>
-
-                                                                    <!-- Số lượng -->
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label for="soLuong" class="form-label">Số
-                                                                            lượng</label>
-                                                                        <input type="number" class="form-control"
-                                                                            id="soLuong" name="soLuong" min="0"
-                                                                            value="<%= typeof formData !== 'undefined' ? formData.soLuong || 0 : 0 %>"
-                                                                            placeholder="0">
-                                                                    </div>
-
-                                                                    <!-- Giá thành -->
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label for="giaThanh" class="form-label">
-                                                                            Giá thành (đơn giá)
-                                                                        </label>
-                                                                        <input type="number" class="form-control"
-                                                                            id="giaThanh" name="giaThanh" min="0"
-                                                                            value="<%= typeof formData !== 'undefined' ? formData.giaThanh || 0 : 0 %>"
-                                                                            placeholder="VNĐ">
-                                                                        <small class="form-text text-muted">
-                                                                            Giá mua mỗi đơn vị thiết bị
-                                                                        </small>
-                                                                    </div>
-
-                                                                    <!-- Tình trạng thiết bị (Physical Condition) -->
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label for="tinhTrangThietBi"
-                                                                            class="form-label">Tình trạng</label>
-                                                                        <select class="form-select"
-                                                                            id="tinhTrangThietBi"
-                                                                            name="tinhTrangThietBi">
-                                                                            <option value="">-- Chọn tình trạng --
-                                                                            </option>
-                                                                            <% if (filterOptions &&
-                                                                                filterOptions.statuses) { %>
-                                                                                <%
-                                                                                    filterOptions.statuses.forEach(status=>
-                                                                                    { %>
-                                                                                    <option value="<%= status %>"
-                                                                                        <%=typeof formData
-                                                                                        !=='undefined' &&
-                                                                                        formData.tinhTrangThietBi===status
-                                                                                        ? 'selected' : '' %>>
-                                                                                        <%= status %>
-                                                                                    </option>
-                                                                                    <% }); %>
-                                                                                        <% } %>
-                                                                                            <option value="Tốt"
-                                                                                                <%=typeof formData
-                                                                                                !=='undefined' &&
-                                                                                                formData.tinhTrangThietBi==='Tốt'
-                                                                                                ? 'selected' : '' %>>Tốt
-                                                                                            </option>
-                                                                                            <option value="Khá"
-                                                                                                <%=typeof formData
-                                                                                                !=='undefined' &&
-                                                                                                formData.tinhTrangThietBi==='Khá'
-                                                                                                ? 'selected' : '' %>>Khá
-                                                                                            </option>
-                                                                                            <option value="Trung bình"
-                                                                                                <%=typeof formData
-                                                                                                !=='undefined' &&
-                                                                                                formData.tinhTrangThietBi==='Trung bình'
-                                                                                                ? 'selected' : '' %>>
-                                                                                                Trung bình
-                                                                                            </option>
-                                                                                            <option value="Hỏng"
-                                                                                                <%=typeof formData
-                                                                                                !=='undefined' &&
-                                                                                                formData.tinhTrangThietBi==='Hỏng'
-                                                                                                ? 'selected' : '' %>
-                                                                                                >Hỏng
-                                                                                            </option>
-                                                                        </select>
-                                                                    </div>
-
-                                                                    <!-- Vị trí lưu trữ -->
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label for="viTriLuuTru" class="form-label">Vị
-                                                                            trí lưu trữ</label>
-
-                                                                        <select class="form-select" id="viTriLuuTru"
-                                                                            name="viTriLuuTru">
-                                                                            <option value="">-- Chọn vị trí --</option>
-                                                                            <% if (filterOptions &&
-                                                                                filterOptions.locations) { %>
-                                                                                <%
-                                                                                    filterOptions.locations.forEach(location=>
-                                                                                    { %>
-                                                                                    <option value="<%= location %>">
-                                                                                        <%= location %>
-                                                                                    </option>
-                                                                                    <% }); %>
-                                                                                        <% } %>
-                                                                                            <option value="__custom__">
-                                                                                                Khác (nhập tự do)
-                                                                                            </option>
-                                                                        </select>
-
-                                                                        <!-- Custom input field (hidden by default) -->
-                                                                        <input type="text" class="form-control mt-2"
-                                                                            id="customViTriLuuTru"
-                                                                            placeholder="Nhập vị trí lưu trữ tùy chỉnh"
-                                                                            style="display: none;">
-
-                                                                        <small class="form-text text-muted">
-                                                                            Chọn từ danh sách hoặc chọn "Khác" để nhập
-                                                                            tự do
-                                                                        </small>
-                                                                    </div>
-
-                                                                    <!-- Nguồn gốc -->
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label for="nguonGoc" class="form-label">Nguồn
-                                                                            gốc</label>
-                                                                        <select class="form-select" id="nguonGoc"
-                                                                            name="nguonGoc">
-                                                                            <option value="">-- Chọn nguồn gốc --
-                                                                            </option>
-                                                                            <% if (filterOptions &&
-                                                                                filterOptions.origins) { %>
-                                                                                <%
-                                                                                    filterOptions.origins.forEach(origin=>
-                                                                                    { %>
-                                                                                    <option value="<%= origin %>">
-                                                                                        <%= origin %>
-                                                                                    </option>
-                                                                                    <% }); %>
-                                                                                        <% } %>
-                                                                                            <option value="Mua mới">Mua
-                                                                                                mới</option>
-                                                                                            <option value="Tài trợ">Tài
-                                                                                                trợ</option>
-                                                                                            <option value="Hiến tặng">
-                                                                                                Hiến tặng</option>
-                                                                                            <option
-                                                                                                value="Giáo viên tự làm">
-                                                                                                Giáo viên tự làm
-                                                                                            </option>
-                                                                        </select>
-                                                                        <small class="form-text text-muted">
-                                                                            <i class="fas fa-info-circle"></i>
-                                                                            Chọn "Giáo viên tự làm" sẽ tự động đặt giá
-                                                                            thành = 0đ
-                                                                        </small>
-                                                                    </div>
-
-                                                                    <!-- Ngày nhập -->
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label for="ngayNhap" class="form-label">Ngày
-                                                                            nhập</label>
-                                                                        <input type="date" class="form-control"
-                                                                            id="ngayNhap" name="ngayNhap">
-                                                                    </div>
-
-                                                                    <!-- Hình ảnh (Multiple Upload) -->
-                                                                    <div class="col-md-12 mb-3">
-                                                                        <label for="hinhAnh" class="form-label">
-                                                                            <i class="fas fa-images me-1"></i>Hình ảnh
-                                                                            thiết bị (Tối đa 5 ảnh)
-                                                                        </label>
-                                                                        <input type="file" class="form-control"
-                                                                            id="hinhAnh" name="hinhAnh"
-                                                                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                                                                            multiple>
-                                                                        <small class="form-text text-muted">
-                                                                            <i class="fas fa-info-circle"></i> Chọn tối
-                                                                            đa 5 ảnh (JPG/PNG/GIF/WEBP - mỗi ảnh ≤ 5MB)
-                                                                        </small>
-
-                                                                        <!-- Multiple Images Preview Container -->
-                                                                        <div id="imagePreviewContainer" class="mt-3"
-                                                                            style="display:none;">
-                                                                            <label
-                                                                                class="form-label text-muted small">Xem
-                                                                                trước:</label>
-                                                                            <div id="imagePreviewGrid" class="row g-2">
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <!-- Hướng dẫn sử dụng -->
-                                                                    <div class="col-md-12 mb-3">
-                                                                        <label for="huongDanSuDung"
-                                                                            class="form-label">Hướng dẫn sử
-                                                                            dụng</label>
-                                                                        <textarea class="form-control"
-                                                                            id="huongDanSuDung" name="huongDanSuDung"
-                                                                            rows="4"
-                                                                            placeholder="Nhập hướng dẫn sử dụng thiết bị..."></textarea>
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Form Actions -->
-                                                                <div class="d-flex justify-content-end gap-2 mt-4">
-                                                                    <button type="button" class="btn btn-secondary"
-                                                                        onclick="window.location.href='/manager/devices'">
-                                                                        <i class="fas fa-times"></i> Hủy
-                                                                    </button>
-                                                                    <button type="submit" class="btn btn-primary">
-                                                                        <i class="fas fa-save"></i> Lưu
-                                                                    </button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                    </div>
+                                            </div>
                         </div>
                     </div>
             </div>
         </div>
 
-        <!-- Footer -->
-        <%- include('../../../views/partials/footer') %>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const soLuongInp = document.getElementById('soLuong');
+                const giaThanhInp = document.getElementById('giaThanh');
+                const tongGiaInp = document.getElementById('tongGia');
+                const viTriSelect = document.getElementById('viTriLuuTru');
+                const customViTri = document.getElementById('customViTriLuuTru');
+                const imgInput = document.getElementById('hinhAnh');
+                const imgPreview = document.getElementById('imagePreviewGrid');
 
-            <!-- Bootstrap JS -->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="/public/javascripts/devices.js"></script>
+                // 1. Tính tổng tiền
+                function updateTotalPrice() {
+                    const total = (parseFloat(soLuongInp.value) || 0) * (parseFloat(giaThanhInp.value) || 0);
+                    tongGiaInp.value = total.toLocaleString('vi-VN') + ' VNĐ';
+                }
+                soLuongInp.addEventListener('input', updateTotalPrice);
+                giaThanhInp.addEventListener('input', updateTotalPrice);
+
+                // 2. Tự động điền vị trí lưu trữ khi chọn danh mục
+                const categorySelect = document.getElementById('category');
+                categorySelect.addEventListener('change', function () {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const location = selectedOption.getAttribute('data-location');
+
+                    console.log('Category changed:', {
+                        selectedValue: this.value,
+                        location: location,
+                        viTriSelectExists: !!viTriSelect
+                    });
+
+                    if (location) {
+                        // Tìm xem location có trong dropdown không
+                        let found = false;
+                        for (let i = 0; i < viTriSelect.options.length; i++) {
+                            if (viTriSelect.options[i].value === location) {
+                                viTriSelect.value = location;
+                                customViTri.style.display = 'none';
+                                found = true;
+                                console.log('Found location in dropdown, selected:', location);
+                                break;
+                            }
+                        }
+
+                        // Nếu không tìm thấy, dùng custom input
+                        if (!found) {
+                            viTriSelect.value = '__custom__';
+                            customViTri.value = location;
+                            customViTri.style.display = 'block';
+                            console.log('Location not found in dropdown, using custom input:', location);
+                        }
+                    } else {
+                        console.log('No location data for this category');
+                    }
+                });
+
+                // 3. Xử lý vị trí tùy chỉnh
+                viTriSelect.addEventListener('change', function () {
+                    customViTri.style.display = (this.value === '__custom__') ? 'block' : 'none';
+                    if (this.value === '__custom__') customViTri.focus();
+                });
+
+                // 4. Xem trước ảnh
+                imgInput.addEventListener('change', function () {
+                    imgPreview.innerHTML = '';
+                    Array.from(this.files).forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const col = document.createElement('div');
+                            col.className = 'col-auto';
+                            col.innerHTML = `<img src="${e.target.result}" class="preview-image">`;
+                            imgPreview.appendChild(col);
+                        }
+                        reader.readAsDataURL(file);
+                    });
+                });
+
+                // Khởi tạo giá trị ban đầu
+                updateTotalPrice();
+            });
+        </script>
 </body>
 
 </html>

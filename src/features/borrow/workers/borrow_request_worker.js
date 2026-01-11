@@ -1,7 +1,9 @@
 // Worker này chạy riêng biệt với app.js
+const mongoose = require('mongoose');
 const { connectRabbitMQ } = require('../../../config/rabbitmq');
 const logger = require('../../../config/logger');
 const borrowRepo = require('../repositories/borrow.repo');
+const config = require('../../../config/env');
 
 /**
  * Helper: Generate all time slots between borrow and return dates
@@ -56,7 +58,7 @@ function generateSlots(startDate, startShift, endDate, endShift) {
 async function processBorrowRequest(msgPayload) {
     try {
         const { userId, borrowData } = msgPayload;
-        logger.info(`🔄 Processing borrow request for user ${userId}...`);
+        logger.info(`Processing borrow request for user ${userId}...`);
 
         const Device = require('../../devices/models/device.model');
 
@@ -68,17 +70,17 @@ async function processBorrowRequest(msgPayload) {
 
         const slots = generateSlots(startDate, startShift, endDate, endShift);
 
-        logger.info(`📅 Need to validate ${slots.length} time slots for ${borrowData.devices.length} device(s)`);
+        logger.info(`Need to validate ${slots.length} time slots for ${borrowData.devices.length} device(s)`);
 
         // Step 2: For each device, check inventory across ALL slots
         for (const deviceRequest of borrowData.devices) {
             const device = await Device.findOne({ maTB: deviceRequest.deviceId });
 
             if (!device) {
-                throw new Error(`❌ Thiết bị "${deviceRequest.deviceId}" không tồn tại trong hệ thống`);
+                throw new Error(` Thiết bị "${deviceRequest.deviceId}" không tồn tại trong hệ thống`);
             }
 
-            logger.info(`🔍 Checking device "${device.tenTB}" (${device.maTB}) - Total stock: ${device.soLuong}, Requested: ${deviceRequest.quantity}`);
+            logger.info(` Checking device "${device.tenTB}" (${device.maTB}) - Total stock: ${device.soLuong}, Requested: ${deviceRequest.quantity}`);
 
             // CRITICAL: Check inventory for EVERY slot
             for (const slot of slots) {
@@ -91,32 +93,32 @@ async function processBorrowRequest(msgPayload) {
                 const availableQty = device.soLuong - borrowedQty;
 
                 logger.info(
-                    `  📊 Slot [${slot.displayDate} - ${slot.displayShift}]: ` +
+                    `  Slot [${slot.displayDate} - ${slot.displayShift}]: ` +
                     `Borrowed=${borrowedQty}, Available=${availableQty}, Requested=${deviceRequest.quantity}`
                 );
 
                 if (deviceRequest.quantity > availableQty) {
                     const errorMsg =
-                        `❌ Không đủ số lượng thiết bị "${device.tenTB}" \n` +
-                        `📅 Thời điểm: ${slot.displayDate} ca ${slot.displayShift}\n` +
-                        `📦 Yêu cầu: ${deviceRequest.quantity}\n` +
-                        `✅ Khả dụng: ${availableQty}\n` +
-                        `⚠️  Đã được đặt: ${borrowedQty}/${device.soLuong}`;
+                        ` Không đủ số lượng thiết bị "${device.tenTB}" \n` +
+                        `Thời điểm: ${slot.displayDate} ca ${slot.displayShift}\n` +
+                        `Yêu cầu: ${deviceRequest.quantity}\n` +
+                        `Khả dụng: ${availableQty}\n` +
+                        `Đã được đặt: ${borrowedQty}/${device.soLuong}`;
 
                     logger.error(errorMsg);
                     throw new Error(errorMsg);
                 }
             }
 
-            logger.info(`✅ Device "${device.tenTB}" passed all ${slots.length} slot validations`);
+            logger.info(`Device "${device.tenTB}" passed all ${slots.length} slot validations`);
         }
 
         // Step 3: All validations passed - Create ticket in DB
-        logger.info('✅ All inventory checks passed! Creating ticket...');
+        logger.info('All inventory checks passed! Creating ticket...');
 
         const result = await borrowRepo.createBorrowRequest(userId, borrowData);
 
-        logger.info(`🎉 Successfully created borrow ticket: ${result.maPhieu}`);
+        logger.info(`Successfully created borrow ticket: ${result.maPhieu}`);
 
         // TODO: Send email notification
         // await sendBorrowApprovalEmail(result);
@@ -124,7 +126,7 @@ async function processBorrowRequest(msgPayload) {
         return result;
 
     } catch (err) {
-        logger.error(`❌ Error processing borrow request: ${err.message}`);
+        logger.error(` Error processing borrow request: ${err.message}`);
         logger.error('Payload:', JSON.stringify(msgPayload, null, 2));
 
         // TODO: Update draft ticket status to 'rejected' if exists
@@ -139,9 +141,14 @@ async function processBorrowRequest(msgPayload) {
 // Hàm chính để khởi động worker
 async function startWorker() {
     try {
+        // CRITICAL: Connect to MongoDB first before consuming messages
+        logger.info('Connecting to MongoDB...');
+        await mongoose.connect(config.mongodb.uri);
+        logger.info('MongoDB connected for worker');
+
         const { channel, queueName } = await connectRabbitMQ();
 
-        logger.info(`🚀 Worker is waiting for messages in queue: ${queueName}`);
+        logger.info(`Worker is waiting for messages in queue: ${queueName}`);
 
         channel.consume(queueName, async (msg) => {
             if (msg !== null) {
@@ -150,20 +157,20 @@ async function startWorker() {
 
                 try {
                     msgPayload = JSON.parse(msgContent);
-                    logger.info('📨 Received new borrow request:', msgPayload);
+                    logger.info('Received new borrow request:', msgPayload);
 
                     // Gọi hàm xử lý nghiệp vụ
                     await processBorrowRequest(msgPayload);
 
                     // Nếu xử lý thành công, xác nhận (ACK)
                     channel.ack(msg);
-                    logger.info('✅ Message ACKed successfully');
+                    logger.info('Message ACKed successfully');
 
                 } catch (err) {
                     // Nếu xử lý lỗi, từ chối (NACK)
                     // `requeue: false` nghĩa là không đưa lại vào hàng đợi (để tránh vòng lặp lỗi)
                     channel.nack(msg, false, false);
-                    logger.error('❌ Message NACKed (will not requeue):', err.message);
+                    logger.error('Message NACKed (will not requeue):', err.message);
                 }
             }
         }, {
@@ -171,7 +178,7 @@ async function startWorker() {
         });
 
     } catch (err) {
-        logger.error('💥 Worker failed to start:', err.message);
+        logger.error('Worker failed to start:', err.message);
         process.exit(1);
     }
 }

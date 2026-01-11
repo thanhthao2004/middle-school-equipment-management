@@ -12,6 +12,14 @@ class ProfileService {
         return await profileRepo.findByUserId(userId);
     }
 
+    // Lấy user kèm profile data
+    async getUserWithProfile(userId) {
+        if (!userId) {
+            return null;
+        }
+        return await profileRepo.getUserWithProfile(userId);
+    }
+
     // Cập nhật thông tin profile
     async updateProfile(userId, profileData) {
         if (!userId) {

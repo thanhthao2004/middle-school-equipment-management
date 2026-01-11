@@ -6,132 +6,205 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tạo báo cáo thanh lý</title>
 
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="/stylesheets/disposal.css">
     <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 
 <body>
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <!-- Sidebar -->
-            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'disposal' , user: typeof user
-                !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+    <!-- ===== HEADER ===== -->
+    <%- include('../../../views/partials/header', { currentPage: 'disposal' , user: typeof user !=='undefined' ? user :
+        { role: 'ql_thiet_bi' } }) %>
 
-                <!-- Main Content -->
-                <div class="col-md-9 col-lg-10 main-content">
-                    <!-- Header -->
-                    <%- include('../../../views/partials/header', { currentPage: 'disposal' , user: typeof user
-                        !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
-                        <div class="container py-4">
-                            <div class="main">
+        <!-- ===== MAIN LAYOUT ===== -->
+        <div class="container-fluid p-0">
+            <div class="row g-0">
 
-                                <!-- HEADER -->
-                                <div class="main-header">
-                                    <div style="display:flex; align-items:center;">
-                                        <button class="btn-menu" id="toggleSidebar"><i class="fas fa-bars"></i></button>
-                                        <h2>TẠO BÁO CÁO THANH LÝ THIẾT BỊ HỎNG</h2>
-                                    </div>
-                                    <div class="user"><i class="fas fa-user"></i> QLTB</div>
-                                </div>
+                <!-- ===== SIDEBAR ===== -->
+                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'disposal' , user: typeof user
+                    !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
-                                <!-- INFO SECTION -->
-                                <div class="disposal-info mb-3">
-                                    <div class="info-box info-code">
-                                        <label>Mã biên bản</label>
-                                        <span class="value">
-                                            <%= code || '' %>
-                                        </span>
-                                    </div>
-                                    <div class="info-box info-year">
-                                        <label>Năm học</label>
-                                        <span class="value">
-                                            <%= year || '' %>
-                                        </span>
-                                    </div>
-                                    <div class="info-box info-date">
-                                        <label>Ngày lập</label>
-                                        <span class="value">
-                                            <%= created_at || '' %>
-                                        </span>
-                                    </div>
-                                </div>
+                    <!-- ===== MAIN CONTENT ===== -->
+                    <div class="col-md-9 col-lg-10 main-content">
+                        <div class="container-fluid py-4">
 
-                                <!-- BUTTON ADD DEVICE -->
-                                <div style="margin-bottom:20px;">
-                                    <a href="/manager/disposal/add-devices?code=<%= code %>&year=<%= year %>&created_at=<%= created_at %>"
-                                        class="btn btn-primary">
-                                        <i class="fas fa-plus"></i> Thêm thiết bị
-                                    </a>
-                                </div>
-
-                                <!-- TABLE THIẾT BỊ -->
-                                <table class="disposal-table table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Tên thiết bị</th>
-                                            <th>Loại thiết bị</th>
-                                            <th>Bộ môn quản lý</th>
-                                            <th>Ngày phát hiện hỏng</th>
-                                            <th>Mức độ hỏng</th>
-                                            <th>Lý do hỏng</th>
-                                            <th>Giá bán dự kiến</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% if (devices && devices.length> 0) { %>
-                                            <% devices.forEach(d=> { %>
-                                                <tr>
-                                                    <td>
-                                                        <%= d.name %>
-                                                    </td>
-                                                    <td>
-                                                        <%= d.type %>
-                                                    </td>
-                                                    <td>
-                                                        <%= d.department %>
-                                                    </td>
-                                                    <td>
-                                                        <%= d.broken_date || '' %>
-                                                    </td>
-                                                    <td>
-                                                        <%= d.level || '' %>
-                                                    </td>
-                                                    <td>
-                                                        <%= d.reason || '' %>
-                                                    </td>
-                                                    <td>
-                                                        <%= d.price ? d.price.toLocaleString() : '' %> VND
-                                                    </td>
-                                                </tr>
-                                                <% }) %>
-                                                    <% } else { %>
-                                                        <tr>
-                                                            <td colspan="7" class="text-center text-muted">Chưa có thiết
-                                                                bị nào được thêm
-                                                            </td>
-                                                        </tr>
-                                                        <% } %>
-                                    </tbody>
-                                </table>
-
-                                <!-- Nút tạo báo cáo / hủy -->
-                                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-                                    <a href="/manager/disposal/create?code=<%= code %>&year=<%= year %>&created_at=<%= created_at %>"
-                                        class="btn btn-primary">Tạo báo cáo</a>
-                                    <a href="/manager/disposal" class="btn btn-secondary">Hủy</a>
-                                </div>
-
+                            <!-- Page Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h1 class="h3 mb-0">TẠO BÁO CÁO THANH LÝ THIẾT BỊ HỎNG</h1>
+                                <a href="/manager/disposal" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại
+                                </a>
                             </div>
+
+                            <!-- ===== INFO BOXES ===== -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="d-flex flex-wrap gap-3 align-items-center">
+
+                                        <div class="info-box info-code">
+                                            <label>Mã biên bản</label>
+                                            <div class="value">
+                                                <%= code || '' %>
+                                            </div>
+                                        </div>
+
+                                        <div class="info-box info-year">
+                                            <label>Năm học</label>
+                                            <div class="value">
+                                                <%= year || '' %>
+                                            </div>
+                                        </div>
+
+                                        <div class="info-box info-date">
+                                            <label>Ngày lập</label>
+                                            <div class="value">
+                                                <%= created_at || '' %>
+                                            </div>
+                                        </div>
+
+                                        <!-- Add device button -->
+                                        <div class="ms-auto">
+                                            <a href="/manager/disposal/add-devices?code=<%= code %>&year=<%= year %>&created_at=<%= created_at %>"
+                                                class="btn btn-primary">
+                                                <i class="fas fa-plus"></i> Thêm thiết bị
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ===== DEVICES TABLE ===== -->
+                            <form method="POST" action="/manager/disposal">
+                                <div class="card">
+                                    <div class="card-body p-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Mã thiết bị</th>
+                                                        <th>Tên thiết bị</th>
+                                                        <th>Danh mục</th>
+                                                        <th>Tình trạng</th>
+                                                        <th>Vị trí</th>
+                                                        <th>Mức độ hỏng</th>
+                                                        <th>Lý do</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <% if (items && items.length> 0) { %>
+                                                        <% items.forEach((item, index)=> { %>
+                                                            <tr>
+                                                                <!-- ✅ DEVICE ID HIDDEN -->
+                                                                <input type="hidden" name="deviceIds[<%= index %>]"
+                                                                    value="<%= item.device?._id %>">
+
+                                                                <!-- MÃ THIẾT BỊ -->
+                                                                <td>
+                                                                    <span class="code-box">
+                                                                        <%= item.device?.maTB || '-' %>
+                                                                    </span>
+                                                                </td>
+
+                                                                <!-- TÊN THIẾT BỊ -->
+                                                                <td>
+                                                                    <%= item.device?.tenTB || '-' %>
+                                                                </td>
+
+                                                                <!-- DANH MỤC -->
+                                                                <td>
+                                                                    <%= item.device?.category?.tenDM || '-' %>
+                                                                </td>
+
+                                                                <!-- TÌNH TRẠNG -->
+                                                                <td>
+                                                                    <span class="status-badge status-danger">
+                                                                        <%= item.device?.tinhTrangThietBi || '-' %>
+                                                                    </span>
+                                                                </td>
+
+                                                                <!-- VỊ TRÍ -->
+                                                                <td>
+                                                                    <%= item.device?.viTriLuuTru || '-' %>
+                                                                </td>
+
+                                                                <!-- ✅ MỨC ĐỘ HỎNG -->
+                                                                <td>
+                                                                    <select name="levels[<%= index %>]"
+                                                                        class="form-select form-select-sm">
+                                                                        <option value="">-- Chưa xác định --</option>
+                                                                        <option value="Hỏng nhẹ"
+                                                                            <%=item.level==='Hỏng nhẹ' ? 'selected' : ''
+                                                                            %>>
+                                                                            Hỏng nhẹ
+                                                                        </option>
+                                                                        <option value="Hỏng nặng"
+                                                                            <%=item.level==='Hỏng nặng' ? 'selected'
+                                                                            : '' %>>
+                                                                            Hỏng nặng
+                                                                        </option>
+                                                                    </select>
+                                                                </td>
+
+                                                                <!-- ✅ LÝ DO -->
+                                                                <td>
+                                                                    <input type="text" name="reasons[<%= index %>]"
+                                                                        class="form-control form-control-sm"
+                                                                        placeholder="Nhập lý do..."
+                                                                        value="<%= item.reason || '' %>">
+                                                                </td>
+                                                            </tr>
+
+                                                            <% }) %>
+                                                                <% } else { %>
+                                                                    <tr>
+                                                                        <td colspan="7"
+                                                                            class="text-center text-muted py-4">
+                                                                            Chưa có thiết bị nào được thêm
+                                                                        </td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ===== ACTION BUTTONS ===== -->
+                                <div class="d-flex justify-content-end gap-2 mt-4">
+                                    <input type="hidden" name="code" value="<%= code %>">
+                                    <input type="hidden" name="year" value="<%= year %>">
+                                    <input type="hidden" name="created_at" value="<%= created_at %>">
+
+                                    <div class="d-flex justify-content-end gap-2 mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Tạo báo cáo
+                                        </button>
+                                        <a href="/manager/disposal" class="btn btn-secondary">
+                                            <i class="fas fa-times"></i> Hủy
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </form>
+
                         </div>
-                        <!-- Footer -->
-                        <%- include('../../../views/partials/footer') %>
-                </div>
+                    </div>
+            </div>
         </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/public/javascripts/disposal.js"></script>
+
+        <!-- ===== FOOTER ===== -->
+        <%- include('../../../views/partials/footer') %>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

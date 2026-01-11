@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý thiết bị</title>
+    <title>Danh sách thiết bị</title>
 
     <!-- Bootstrap 5.3.0 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,149 +16,142 @@
 
 <body>
     <!-- Header -->
-    <%- include('../../../views/partials/header', { currentPage: 'devices' , user: typeof user !=='undefined' ? user : {
-        role: 'ql_thiet_bi' } }) %>
+    <%- include('../../../views/partials/header', { currentPage: 'devices' , user: typeof user !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
-        <!-- Main Layout with Sidebar -->
-        <div class="container-fluid p-0">
-            <div class="row g-0">
-                <!-- Sidebar QLTB -->
-                <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices' , user: typeof user
-                    !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
+    <!-- Main Layout with Sidebar -->
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar QLTB -->
+            <%- include('../../../views/partials/qltb-sidebar', { currentPage: 'devices' , user: typeof user !=='undefined' ? user : { role: 'ql_thiet_bi' } }) %>
 
-                    <!-- Main Content -->
-                    <div class="col-md-9 col-lg-10 main-content">
-                        <div class="container-fluid py-4">
-                            <!-- Page Header -->
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h1 class="h3 mb-0">QUẢN LÝ THIẾT BỊ</h1>
-                                <div class="d-flex align-items-center gap-3">
-                                    <span class="text-muted small">Quản lý thiết bị</span>
-                                    <a href="/manager/devices/create" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i> Thêm thiết bị mới
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="container-fluid py-4">
+                    <!-- Page Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 mb-0">DANH SÁCH THIẾT BỊ</h1>
+                        <div class="d-flex gap-2">
+                            <a href="/manager/devices/create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Thêm mới
+                            </a>
+                             <!-- Additional buttons can be added here -->
+                        </div>
+                    </div>
+
+                    <!-- Flash Messages -->
+                    <% if (typeof messages !=='undefined' && messages.success) { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <%= messages.success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+                    <% if (typeof messages !=='undefined' && messages.error) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <%= messages.error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+
+                    <!-- Filters -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form action="/manager/devices" method="GET" class="row g-3" id="filterForm">
+                                
+                                <!-- Search -->
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <label for="search" class="form-label">Tìm kiếm</label>
+                                    <input type="text" class="form-control" id="search" name="search"
+                                        placeholder="Tên hoặc mã thiết bị..."
+                                        value="<%= typeof filters !== 'undefined' ? filters.search : '' %>">
+                                </div>
+
+                                <!-- Category -->
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <label for="categoryId" class="form-label">Danh mục</label>
+                                    <select class="form-select" id="categoryId" name="categoryId">
+                                        <option value="">Tất cả</option>
+                                        <% if (typeof categories !=='undefined' && categories.length > 0) { %>
+                                            <% categories.forEach(cat => { %>
+                                                <option value="<%= cat._id %>" 
+                                                    <%= (typeof filters !== 'undefined' && filters.categoryId === cat._id.toString()) ? 'selected' : '' %>>
+                                                    <%= cat.name || cat.tenDM %>
+                                                </option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                </div>
+
+                                <!-- Status -->
+                                <div class="col-12 col-md-6 col-lg-2">
+                                    <label for="status" class="form-label">Tình trạng</label>
+                                    <select class="form-select" id="status" name="status">
+                                        <option value="">Tất cả</option>
+                                        <% 
+                                            const uniqueStatuses = new Set(['Tốt', 'Khá', 'Trung bình', 'Hỏng']); 
+                                            if (typeof filterOptions !== 'undefined' && filterOptions && filterOptions.statuses) {
+                                                filterOptions.statuses.forEach(s => uniqueStatuses.add(s));
+                                            }
+                                        %>
+                                        <% Array.from(uniqueStatuses).forEach(status => { %>
+                                            <option value="<%= status %>"
+                                                <%= (typeof filters !== 'undefined' && filters.tinhTrangThietBi === status) ? 'selected' : '' %>>
+                                                <%= status %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+
+                                <!-- Location -->
+                                <div class="col-12 col-md-6 col-lg-2">
+                                    <label for="location" class="form-label">Vị trí</label>
+                                    <select class="form-select" id="location" name="location">
+                                        <option value="">Tất cả</option>
+                                        <% if (typeof filterOptions !== 'undefined' && filterOptions && filterOptions.locations) { %>
+                                            <% filterOptions.locations.forEach(loc => { %>
+                                                <option value="<%= loc %>"
+                                                    <%= (typeof filters !== 'undefined' && filters.viTriLuuTru === loc) ? 'selected' : '' %>>
+                                                    <%= loc %>
+                                                </option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                </div>
+
+                                <!-- Origin -->
+                                <div class="col-12 col-md-6 col-lg-2">
+                                    <label for="origin" class="form-label">Nguồn gốc</label>
+                                    <select class="form-select" id="origin" name="origin">
+                                        <option value="">Tất cả</option>
+                                        <% 
+                                            const allOrigins = new Set();
+                                            if (typeof filterOptions !== 'undefined' && filterOptions && filterOptions.origins) {
+                                                filterOptions.origins.forEach(o => allOrigins.add(o));
+                                            }
+                                            ['Mua mới', 'Tài trợ', 'Hiến tặng', 'Giáo viên tự làm'].forEach(o => allOrigins.add(o));
+                                        %>
+                                        <% Array.from(allOrigins).sort().forEach(orig => { %>
+                                            <option value="<%= orig %>"
+                                                <%= (typeof filters !== 'undefined' && filters.nguonGoc === orig) ? 'selected' : '' %>>
+                                                <%= orig %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="col-12 d-flex gap-2 justify-content-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Lọc
+                                    </button>
+                                    <a href="/manager/devices" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Xóa bộ lọc
                                     </a>
                                 </div>
-                            </div>
+                            </form>
+                        </div>
+                    </div>
 
-                            <!-- Flash Messages -->
-                            <% if (typeof messages !=='undefined' && messages.success) { %>
-                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    <%= messages.success %>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                                <% } %>
-                                    <% if (typeof messages !=='undefined' && messages.error) { %>
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            <%= messages.error %>
-                                                <button type="button" class="btn-close"
-                                                    data-bs-dismiss="alert"></button>
-                                        </div>
-                                        <% } %>
-
-                                            <!-- Filter Section -->
-                                            <div class="card mb-4">
-                                                <div class="card-header bg-light">
-                                                    <h5 class="mb-0">
-                                                        <i class="fas fa-filter me-2"></i>Bộ lọc tìm kiếm
-                                                    </h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <form method="GET" action="/manager/devices" id="filterForm"
-                                                        class="row g-3">
-                                                        <!-- Tìm kiếm -->
-                                                        <div class="col-12 col-md-6 col-lg-4">
-                                                            <label for="search" class="form-label">Tìm kiếm</label>
-                                                            <input type="text" class="form-control" id="search"
-                                                                name="search" placeholder="Mã hoặc tên thiết bị..."
-                                                                value="<%= filters.search || '' %>">
-                                                        </div>
-
-                                                        <!-- Danh mục -->
-                                                        <div class="col-12 col-md-6 col-lg-2">
-                                                            <label for="category" class="form-label">Danh mục</label>
-                                                            <select class="form-select" id="category" name="category">
-                                                                <option value="">Tất cả</option>
-                                                                <% if (categories && categories.length> 0) { %>
-                                                                    <% categories.forEach(cat=> { %>
-                                                                        <option value="<%= cat._id %>"
-                                                                            <%=filters.categoryId===cat._id.toString()
-                                                                            ? 'selected' : '' %>>
-                                                                            <%= cat.tenDM || cat.name || '' %>
-                                                                        </option>
-                                                                        <% }); %>
-                                                                            <% } %>
-                                                            </select>
-                                                        </div>
-
-                                                        <!-- Tình trạng thiết bị (Physical Condition) -->
-                                                        <div class="col-12 col-md-6 col-lg-2">
-                                                            <label for="status" class="form-label">Tình trạng</label>
-                                                            <select class="form-select" id="status" name="status">
-                                                                <option value="">Tất cả</option>
-                                                                <% if (filterOptions && filterOptions.statuses &&
-                                                                    filterOptions.statuses.length> 0) { %>
-                                                                    <% filterOptions.statuses.forEach(status=> { %>
-                                                                        <option value="<%= status %>"
-                                                                            <%=filters.tinhTrangThietBi===status
-                                                                            ? 'selected' : '' %>>
-                                                                            <%= status %>
-                                                                        </option>
-                                                                        <% }); %>
-                                                                            <% } %>
-                                                            </select>
-                                                        </div>
-
-                                                        <!-- Vị trí lưu trữ -->
-                                                        <div class="col-12 col-md-6 col-lg-2">
-                                                            <label for="location" class="form-label">Vị trí</label>
-                                                            <select class="form-select" id="location" name="location">
-                                                                <option value="">Tất cả</option>
-                                                                <% if (filterOptions && filterOptions.locations &&
-                                                                    filterOptions.locations.length> 0) { %>
-                                                                    <% filterOptions.locations.forEach(loc=> { %>
-                                                                        <option value="<%= loc %>"
-                                                                            <%=filters.viTriLuuTru===loc ? 'selected'
-                                                                            : '' %>>
-                                                                            <%= loc %>
-                                                                        </option>
-                                                                        <% }); %>
-                                                                            <% } %>
-                                                            </select>
-                                                        </div>
-
-                                                        <!-- Nguồn gốc -->
-                                                        <div class="col-12 col-md-6 col-lg-2">
-                                                            <label for="origin" class="form-label">Nguồn gốc</label>
-                                                            <select class="form-select" id="origin" name="origin">
-                                                                <option value="">Tất cả</option>
-                                                                <% if (filterOptions && filterOptions.origins &&
-                                                                    filterOptions.origins.length> 0) { %>
-                                                                    <% filterOptions.origins.forEach(orig=> { %>
-                                                                        <option value="<%= orig %>"
-                                                                            <%=filters.nguonGoc===orig ? 'selected' : ''
-                                                                            %>>
-                                                                            <%= orig %>
-                                                                        </option>
-                                                                        <% }); %>
-                                                                            <% } %>
-                                                            </select>
-                                                        </div>
-
-                                                        <!-- Buttons -->
-                                                        <div class="col-12 d-flex gap-2 justify-content-end">
-                                                            <button type="submit" class="btn btn-primary">
-                                                                <i class="fas fa-search"></i> Lọc
-                                                            </button>
-                                                            <button type="button" class="btn btn-outline-secondary"
-                                                                id="clearFiltersBtn">
-                                                                <i class="fas fa-times"></i> Xóa bộ lọc
-                                                            </button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-
-                                            <!-- Devices Table -->
+                    <!-- Devices Table -->
                                             <div class="card">
                                                 <div class="card-body p-0">
                                                     <div class="table-responsive">
@@ -166,13 +159,14 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th>Mã TB</th>
+                                                                    <th>Hình ảnh</th>
                                                                     <th>Tên thiết bị</th>
                                                                     <th>Danh mục</th>
                                                                     <th>Số lượng</th>
                                                                     <th>Giá thành</th>
                                                                     <th>Tình trạng</th>
                                                                     <th>Vị trí</th>
-                                                                    <th>Nguồn gốc</th>
+                                                                    <th>Nhà cung cấp</th>
                                                                     <th>Ngày nhập</th>
                                                                     <th>Thao tác</th>
                                                                 </tr>
@@ -187,12 +181,46 @@
                                                                                 </span>
                                                                             </td>
                                                                             <td>
+                                                                                <% let hasImage=false; let imageUrl='' ;
+                                                                                    if (device.hinhAnh) { if
+                                                                                    (Array.isArray(device.hinhAnh) &&
+                                                                                    device.hinhAnh.length> 0) {
+                                                                                    imageUrl = device.hinhAnh[0];
+                                                                                    hasImage = true;
+                                                                                    } else if (typeof device.hinhAnh ===
+                                                                                    'string' && device.hinhAnh) {
+                                                                                    imageUrl = device.hinhAnh;
+                                                                                    hasImage = true;
+                                                                                    }
+                                                                                    }
+
+                                                                                    if (hasImage) { %>
+                                                                                    <img src="<%= imageUrl %>"
+                                                                                        alt="<%= device.tenTB %>"
+                                                                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                                                                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                                                    <div
+                                                                                        style="display: none; width: 50px; height: 50px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; align-items: center; justify-content: center;">
+                                                                                        <i
+                                                                                            class="fas fa-image text-muted"></i>
+                                                                                    </div>
+                                                                                    <% } else { %>
+                                                                                        <div
+                                                                                            style="display: flex; width: 50px; height: 50px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; align-items: center; justify-content: center;">
+                                                                                            <i
+                                                                                                class="fas fa-image text-muted"></i>
+                                                                                        </div>
+                                                                                        <% } %>
+                                                                            </td>
+                                                                            <td>
                                                                                 <%= device.tenTB || '' %>
                                                                             </td>
                                                                             <td>
                                                                                 <% if (device.category &&
-                                                                                    device.category.tenDM) { %>
-                                                                                    <%= device.category.tenDM %>
+                                                                                    (device.category.name ||
+                                                                                    device.category.tenDM)) { %>
+                                                                                    <%= device.category.name ||
+                                                                                        device.category.tenDM %>
                                                                                         <% } else if (device.maDM) { %>
                                                                                             <%= device.maDM %>
                                                                                                 <% } else { %>
@@ -213,21 +241,45 @@
                                                                                             <% } %>
                                                                             </td>
                                                                             <td>
-                                                                                <% if (device.tinhTrangThietBi) { %>
+                                                                                <% if (device.conditionStats) { const
+                                                                                    colorMap={ 'Tốt' : 'success' , 'Khá'
+                                                                                    : 'primary' , 'Trung bình'
+                                                                                    : 'warning' , 'Hỏng' : 'danger' };
+                                                                                    let hasStats=false;
+                                                                                    Object.entries(device.conditionStats).forEach(([status,
+                                                                                    count])=> {
+                                                                                    if (count > 0) {
+                                                                                    hasStats = true;
+                                                                                    %>
                                                                                     <span
-                                                                                        class="status-badge status-available">
-                                                                                        <%= device.tinhTrangThietBi %>
+                                                                                        class="badge bg-<%= colorMap[status] || 'secondary' %> mb-1 d-inline-block">
+                                                                                        <%= status %>: <%= count %>
                                                                                     </span>
-                                                                                    <% } else { %>
+                                                                                    <% } }); if (!hasStats) { %>
                                                                                         <span
-                                                                                            class="text-muted">-</span>
-                                                                                        <% } %>
+                                                                                            class="status-badge status-available">
+                                                                                            <%= device.tinhTrangThietBi
+                                                                                                || 'Tốt' %>
+                                                                                        </span>
+                                                                                        <% } } else { %>
+                                                                                            <span
+                                                                                                class="status-badge status-available">
+                                                                                                <%= device.tinhTrangThietBi
+                                                                                                    || 'Tốt' %>
+                                                                                            </span>
+                                                                                            <% } %>
                                                                             </td>
                                                                             <td>
                                                                                 <%= device.viTriLuuTru || '-' %>
                                                                             </td>
                                                                             <td>
-                                                                                <%= device.nguonGoc || '-' %>
+                                                                                <% if (device.supplier &&
+                                                                                    device.supplier.name) { %>
+                                                                                    <%= device.supplier.name %>
+                                                                                        <% } else { %>
+                                                                                            <span
+                                                                                                class="text-muted">-</span>
+                                                                                            <% } %>
                                                                             </td>
                                                                             <td>
                                                                                 <% if (device.ngayNhap) { %>
@@ -309,7 +361,17 @@
 
             <!-- Bootstrap JS -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="/public/javascripts/devices.js"></script>
+            <script src="/javascripts/devices.js"></script>
 </body>
 
+</html>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

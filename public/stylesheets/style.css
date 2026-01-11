@@ -33,6 +33,59 @@ body {
   min-height: 100vh;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   background: var(--light-gray);
+  display: flex;
+  flex-direction: column;
+}
+
+.container-fluid,
+.app-shell,
+main {
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
+  margin-top: auto;
+  width: 100%;
+  clear: both;
+}
+
+/* Footer inside main-content (with-sidebar layout) */
+.main-content footer {
+  margin-left: 0 !important;
+  width: 100% !important;
+  position: relative;
+  margin-top: auto;
+}
+
+/* Footer outside main-content (main layout without sidebar) */
+body:not(.login-page):not(.forgot-password-page) > footer {
+  margin-left: 0;
+  width: 100%;
+}
+
+@media (max-width: 576px) {
+  .main-content {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+  
+  footer {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .main-content footer {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .main-content > nav,
+  .main-content > .navbar,
+  .main-content header {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
 }
 
 a {
@@ -48,8 +101,7 @@ a {
 }
 
 /* --- Sidebar (Global Rule) --- */
-/* COMMENTED OUT - Sidebar styling moved to qltb-sidebar.ejs with position:sticky */
-/*
+/* Base sidebar styling - can be overridden by inline styles in each sidebar partial */
 .sidebar {
   width: 260px;
   background-color: var(--sidebar-bg);
@@ -68,7 +120,6 @@ a {
   font-size: 14px;
   line-height: 1.45;
 }
-*/
 
 .sidebar .menu-title {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -147,11 +198,11 @@ a {
 /* mobile narrow sidebar look (as in mock) */
 @media (max-width: 576px) {
   .sidebar {
-    position: relative;
+    position: relative !important;
     /* make sidebar flow on small screens */
-    width: 100%;
+    width: 100% !important;
     padding: 18px;
-    height: auto;
+    height: auto !important;
   }
 
   .app-shell {
@@ -160,17 +211,105 @@ a {
 
   /* main content takes full width when sidebar is stacked */
   .main-content {
+    margin-left: 0 !important;
+    /* Remove margin on mobile */
     padding: 18px;
+  }
+}
+
+/* --- Navbar fixes --- */
+.navbar-brand {
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  font-size: 1rem;
+}
+
+@media (max-width: 991px) {
+  .navbar-brand {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 0.85rem;
+  }
+}
+
+.navbar-nav .nav-link span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  display: inline-block;
+}
+
+@media (max-width: 991px) {
+  .navbar-nav .nav-link span {
+    max-width: 120px;
   }
 }
 
 /* --- Main content area (Global Rule) --- */
 .main-content {
   flex: 1 1 auto;
+  margin-left: 260px;
+  /* Prevent overlap with fixed sidebar */
   padding: 0;
   /* Header/Footer sẽ tự chiếm đủ 100% */
   box-sizing: border-box;
-  /* margin-left removed - Bootstrap grid (col-md-9 col-lg-10) handles positioning */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: calc(100% - 260px);
+  position: relative;
+}
+
+/* Page content container trong main-content */
+.main-content .container-fluid {
+  flex: 1;
+  width: 100%;
+  margin-left: 0;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  box-sizing: border-box;
+}
+
+/* Header và Footer trong main-content phải có width 100% */
+.main-content > nav,
+.main-content > .navbar,
+.main-content header,
+.main-content .navbar {
+  width: 100%;
+  margin-left: 0;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Navbar container trong main-content */
+.main-content .navbar .container-fluid {
+  width: 100%;
+  margin-left: 0;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  box-sizing: border-box;
+}
+
+.main-content footer {
+  width: 100%;
+  margin-left: 0;
+  position: relative;
+  margin-top: auto;
+  box-sizing: border-box;
+}
+
+/* Footer container */
+.main-content footer .container {
+  width: 100%;
+  margin-left: 0;
+  box-sizing: border-box;
 }
 
 .page-header {
